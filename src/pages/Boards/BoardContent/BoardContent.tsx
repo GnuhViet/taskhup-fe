@@ -22,14 +22,18 @@ import { arrayMove } from '@dnd-kit/sortable'
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { cloneDeep, isEmpty } from 'lodash'
 import { generatePlaceholderCard } from '~/utils/formatters'
+import { createContext } from 'react'
 
 import Column from './ListColumns/Column/Column'
 import Card from './ListColumns/Column/ListCards/Card/Card'
+import React from 'react'
 
 const ACTIVE_DRAG_ITEM_TYPE = {
   COLUMN: 'ACTIVE_DRAG_ITEM_TYPE_COLUMN',
   CARD: 'ACTIVE_DRAG_ITEM_TYPE_CARD'
 }
+
+export const AppContext = createContext('')
 
 function BoardContent({
   board,
@@ -40,6 +44,9 @@ function BoardContent({
   moveCardToDifferentColumn,
   deleteColumnDetails
 }) {
+
+  const [isPopUpOpen, setIsPopUpOpen] = useState(false)
+
   // https://docs.dndkit.com/api-documentation/sensors
   // Nếu dùng PointerSensor mặc định thì phải kết hợp thuộc tính CSS touch-action: none ở những phần tử kéo thả - nhưng mà còn bug
   // const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 10 } })
@@ -160,6 +167,7 @@ function BoardContent({
 
   // Trigger khi bắt đầu kéo (drag) một phần tử
   const handleDragStart = (event) => {
+    if (isPopUpOpen) return
     // console.log('handleDragStart: ', event)
     setActiveDragItemId(event?.active?.id)
     setActiveDragItemType(event?.active?.data?.current?.columnId ? ACTIVE_DRAG_ITEM_TYPE.CARD : ACTIVE_DRAG_ITEM_TYPE.COLUMN)
@@ -256,7 +264,7 @@ function BoardContent({
 
         // Dùng arrayMove vì kéo card trong một cái column thì tương tự với logic kéo column trong một cái board content
         const dndOrderedCards = arrayMove(oldColumnWhenDraggingCard?.cards, oldCardIndex, newCardIndex)
-        const dndOrderedCardIds = dndOrderedCards.map(card => card._id)
+        const dndOrderedCardIds = dndOrderedCards.map((card: any) => card._id)
 
         // Vẫn gọi update State ở đây để tránh delay hoặc Flickering giao diện lúc kéo thả cần phải chờ gọi API (small trick)
         setOrderedColumns(prevColumns => {
@@ -372,40 +380,42 @@ function BoardContent({
   }, [activeDragItemType, orderedColumns])
 
   return (
-    <DndContext
+    <AppContext.Provider value={{ isPopUpOpen, setIsPopUpOpen }}>
+      <DndContext
       // Cảm biến (đã giải thích kỹ ở video số 30)
-      sensors={sensors}
-      // Thuật toán phát hiện va chạm (nếu không có nó thì card với cover lớn sẽ không kéo qua Column được vì lúc này nó đang bị conflict giữa card và column), chúng ta sẽ dùng closestCorners thay vì closestCenter
-      // https://docs.dndkit.com/api-documentation/context-provider/collision-detection-algorithms
-      // Update video 37: nếu chỉ dùng closestCorners sẽ có bug flickering + sai lệch dữ liệu (vui lòng xem video 37 sẽ rõ)
-      // collisionDetection={closestCorners}
+        sensors={sensors}
+        // Thuật toán phát hiện va chạm (nếu không có nó thì card với cover lớn sẽ không kéo qua Column được vì lúc này nó đang bị conflict giữa card và column), chúng ta sẽ dùng closestCorners thay vì closestCenter
+        // https://docs.dndkit.com/api-documentation/context-provider/collision-detection-algorithms
+        // Update video 37: nếu chỉ dùng closestCorners sẽ có bug flickering + sai lệch dữ liệu (vui lòng xem video 37 sẽ rõ)
+        // collisionDetection={closestCorners}
 
-      // Tự custom nâng cao thuật toán phát hiện va chạm (video fix bug số 37)
-      collisionDetection={collisionDetectionStrategy}
+        // Tự custom nâng cao thuật toán phát hiện va chạm (video fix bug số 37)
+        collisionDetection={collisionDetectionStrategy}
 
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-    >
-      <Box sx={{
-        bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#34495e' : '#1976d2'),
-        width: '100%',
-        height: (theme) => theme.trello.boardContentHeight,
-        p: '10px 0'
-      }}>
-        <ListColumns
-          columns={orderedColumns}
-          createNewColumn={createNewColumn}
-          createNewCard={createNewCard}
-          deleteColumnDetails={deleteColumnDetails}
-        />
-        <DragOverlay dropAnimation={customDropAnimation}>
-          {!activeDragItemType && null}
-          {(activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) && <Column column={activeDragItemData} />}
-          {(activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.CARD) && <Card card={activeDragItemData} />}
-        </DragOverlay>
-      </Box>
-    </DndContext>
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+      >
+        <Box sx={{
+          bgcolor: (theme: any) => (theme.palette.mode === 'dark' ? '#34495e' : '#1976d2'),
+          width: '100%',
+          height: (theme: any) => theme.trello.boardContentHeight,
+          p: '10px 0'
+        }}>
+          <ListColumns
+            columns={orderedColumns}
+            createNewColumn={createNewColumn}
+            createNewCard={createNewCard}
+            deleteColumnDetails={deleteColumnDetails}
+          />
+          <DragOverlay dropAnimation={customDropAnimation}>
+            {!activeDragItemType && null}
+            {(activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) && <Column column={activeDragItemData} />}
+            {(activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.CARD) && <Card card={activeDragItemData} />}
+          </DragOverlay>
+        </Box>
+      </DndContext>
+    </AppContext.Provider>
   )
 }
 

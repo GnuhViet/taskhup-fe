@@ -23,6 +23,7 @@ import { CSS } from '@dnd-kit/utilities'
 import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
 import { useConfirm } from 'material-ui-confirm'
+import React from 'react'
 
 function Column({ column, createNewCard, deleteColumnDetails }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -117,12 +118,12 @@ function Column({ column, createNewCard, deleteColumnDetails }) {
           ml: 2,
           borderRadius: '6px',
           height: 'fit-content',
-          maxHeight: (theme) => `calc(${theme.trello.boardContentHeight} - ${theme.spacing(5)})`
+          maxHeight: (theme: any) => `calc(${theme.trello.boardContentHeight} - ${theme.spacing(5)})`
         }}
       >
         {/* Box Column Header */}
         <Box sx={{
-          height: (theme) => theme.trello.columnHeaderHeight,
+          height: (theme: any) => theme.trello.columnHeaderHeight,
           p: 2,
           display: 'flex',
           alignItems: 'center',
@@ -206,7 +207,7 @@ function Column({ column, createNewCard, deleteColumnDetails }) {
 
         {/* Box Column Footer */}
         <Box sx={{
-          height: (theme) => theme.trello.columnFooterHeight,
+          height: (theme: any) => theme.trello.columnFooterHeight,
           p: 2
         }}>
           {!openNewCardForm
