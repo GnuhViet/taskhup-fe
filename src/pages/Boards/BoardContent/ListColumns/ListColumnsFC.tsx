@@ -2,15 +2,23 @@
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import Box from '@mui/material/Box'
-import Column from './Column/Column'
+import ColumnFC from './Column/ColumnFC'
 import Button from '@mui/material/Button'
 import NoteAddIcon from '@mui/icons-material/NoteAdd'
 import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
 import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable'
 import React from 'react'
+import { Column } from '~/core/model/column.model'
 
-function ListColumns({ columns, createNewColumn, createNewCard, deleteColumnDetails }) {
+interface ListColumnsFCProps {
+    columns: Column[]
+    createNewColumn: (newColumnData: any) => void
+    createNewCard: (newCardData: any) => void
+    deleteColumnDetails: (columnId: string) => void
+}
+
+const ListColumnsFC:React.FC<ListColumnsFCProps> = ({ columns, createNewColumn, createNewCard, deleteColumnDetails }) => {
   const [openNewColumnForm, setOpenNewColumnForm] = useState(false)
   const toggleOpenNewColumnForm = () => setOpenNewColumnForm(!openNewColumnForm)
 
@@ -18,11 +26,11 @@ function ListColumns({ columns, createNewColumn, createNewCard, deleteColumnDeta
 
   const addNewColumn = () => {
     if (!newColumnTitle) {
-      toast.error('Please enter Column Title!')
+      toast.error('Please enter ColumnFC Title!')
       return
     }
 
-    // Tạo dữ liệu Column để gọi API
+    // Tạo dữ liệu ColumnFC để gọi API
     const newColumnData = {
       title: newColumnTitle
     }
@@ -35,7 +43,7 @@ function ListColumns({ columns, createNewColumn, createNewCard, deleteColumnDeta
      */
     createNewColumn(newColumnData)
 
-    // Đóng trạng thái thêm Column mới & Clear Input
+    // Đóng trạng thái thêm ColumnFC mới & Clear Input
     toggleOpenNewColumnForm()
     setNewColumnTitle('')
   }
@@ -56,7 +64,7 @@ function ListColumns({ columns, createNewColumn, createNewCard, deleteColumnDeta
         overflowY: 'hidden',
         '&::-webkit-scrollbar-track': { m: 2 }
       }}>
-        {columns?.map(column => <Column
+        {columns?.map(column => <ColumnFC
           key={column._id}
           column={column}
           createNewCard={createNewCard}
@@ -145,4 +153,4 @@ function ListColumns({ columns, createNewColumn, createNewCard, deleteColumnDeta
   )
 }
 
-export default ListColumns
+export default ListColumnsFC

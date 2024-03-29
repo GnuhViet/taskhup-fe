@@ -1,10 +1,15 @@
-import Box from '@mui/material/Box'
-import Card from './Card/Card'
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import SimpleModal from './Card/CardDetailModal/SimpleModal'
 import React from 'react'
+import Box from '@mui/material/Box'
+import CardFC from './Card/CardFC'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import CardDialog from './Card/CardDetailModal/CardDialogFC'
+import { Card } from '~/core/model/card.model'
 
-function ListCards({ cards }) {
+interface ListCardsFCProps {
+    cards: Card[]
+}
+
+const ListCardsFC: React.FC<ListCardsFCProps> = ({ cards }) => {
   return (
     <SortableContext items={cards?.map(c => c._id)} strategy={verticalListSortingStrategy}>
       <Box sx={{
@@ -24,10 +29,10 @@ function ListCards({ cards }) {
         '&::-webkit-scrollbar-thumb': { backgroundColor: '#ced0da' },
         '&::-webkit-scrollbar-thumb:hover': { backgroundColor: '#bfc2cf' }
       }}>
-        {cards?.map(card => <Card key={card._id} card={card} modalRender={( props ) => {return <SimpleModal {...props}/> }}/>)}
+        {cards?.map(card => <CardFC key={card._id} card={card} modalRender={(props: any) => {return <CardDialog {...props}/> }}/>)}
       </Box>
     </SortableContext>
   )
 }
 
-export default ListCards
+export default ListCardsFC

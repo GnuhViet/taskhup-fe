@@ -1,3 +1,5 @@
+import React from 'react'
+
 import { useColorScheme } from '@mui/material/styles'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
@@ -8,10 +10,10 @@ import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined'
 import SettingsBrightnessIcon from '@mui/icons-material/SettingsBrightness'
 
-function ModeSelect() {
+const ModeSelect: React.FC = () => {
   const { mode, setMode } = useColorScheme()
 
-  const handleChange = (event) => {
+  const handleChange = (event: any) => {
     const selectedMode = event.target.value
     setMode(selectedMode)
   }

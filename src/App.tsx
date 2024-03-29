@@ -1,11 +1,12 @@
-import Board from '~/pages/Boards/_id'
+import BoardComponent from '~/pages/Boards/_id'
+import React from 'react'
 
-function App() {
+const App: React.FC = () => {
   return (
     <>
       {/* React Router Dom /boards /boards/{board_id} */}
       {/* Board Details */}
-      <Board />
+      <BoardComponent />
     </>
   )
 }

@@ -3,14 +3,17 @@
 module.exports = {
   env: { browser: true, es2020: true, node: true },
   extends: [
+    'plugin:@typescript-eslint/recommended',
     'eslint:recommended',
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended'
   ],
+  parser: '@typescript-eslint/parser',
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
   settings: { react: { version: '18.2' } },
   plugins: [
+    '@typescript-eslint',
     'react',
     'react-hooks',
     'react-refresh'
@@ -30,7 +33,7 @@ module.exports = {
         'patterns': ['@mui/*/*/*']
       }
     ],
-
+    '@typescript-eslint/no-explicit-any': 'off',
     // Common
     'no-console': 1,
     'no-extra-boolean-cast': 0,

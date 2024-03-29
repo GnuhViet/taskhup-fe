@@ -1,5 +1,6 @@
+import React from 'react'
 import Box from '@mui/material/Box'
-import ListColumns from './ListColumns/ListColumns'
+import ListColumnsFC from './ListColumns/ListColumnsFC'
 
 import {
   DndContext,
@@ -24,26 +25,32 @@ import { cloneDeep, isEmpty } from 'lodash'
 import { generatePlaceholderCard } from '~/utils/formatters'
 import { createContext } from 'react'
 
-import Column from './ListColumns/Column/Column'
-import Card from './ListColumns/Column/ListCards/Card/Card'
-import React from 'react'
+import ColumnFC from './ListColumns/Column/ColumnFC'
+import CardFC from './ListColumns/Column/ListCards/Card/CardFC'
+
+import { Board } from '~/core/model/board.model'
+import { Card } from '~/core/model/card.model'
+import { Column } from '~/core/model/Column.model'
+
 
 const ACTIVE_DRAG_ITEM_TYPE = {
   COLUMN: 'ACTIVE_DRAG_ITEM_TYPE_COLUMN',
   CARD: 'ACTIVE_DRAG_ITEM_TYPE_CARD'
 }
 
-export const AppContext = createContext('')
+export const AppContext = createContext(null)
 
-function BoardContent({
-  board,
-  createNewColumn,
-  createNewCard,
-  moveColumns,
-  moveCardInTheSameColumn,
-  moveCardToDifferentColumn,
-  deleteColumnDetails
-}) {
+interface BoadContentFCProps {
+  board: Board,
+  createNewColumn: (newColumnData: Column) => void,
+  createNewCard: (newCardData: Card) => void,
+  moveColumns: () => void,
+  moveCardInTheSameColumn: () => void,
+  moveCardToDifferentColumn: () => void,
+  deleteColumnDetails: () => void
+}
+
+const BoardContentFC: React.FC<BoadContentFCProps> = ({ board, createNewColumn, createNewCard, moveColumns, moveCardInTheSameColumn, moveCardToDifferentColumn, deleteColumnDetails }) => {
 
   const [isPopUpOpen, setIsPopUpOpen] = useState(false)
 
@@ -77,13 +84,13 @@ function BoardContent({
     setOrderedColumns(board.columns)
   }, [board])
 
-  // Tìm một cái Column theo CardId
-  const findColumnByCardId = (cardId) => {
+  // Tìm một cái ColumnFC theo CardId
+  const findColumnByCardId = (cardId: string) => {
     // Đoạn này cần lưu ý, nên dùng c.cards thay vì c.cardOrderIds bởi vì ở bước handleDragOver chúng ta sẽ làm dữ liệu cho cards hoàn chỉnh trước rồi mới tạo ra cardOrderIds mới.
     return orderedColumns.find(column => column?.cards?.map(card => card._id)?.includes(cardId))
   }
 
-  // Khởi tạo Function chung xử lý việc cập nhật lại state trong trường hợp di chuyển Card giữa các Column khác nhau.
+  // Khởi tạo Function chung xử lý việc cập nhật lại state trong trường hợp di chuyển Card giữa các ColumnFC khác nhau.
   const moveCardBetweenDifferentColumns = (
     overColumn,
     overCardId,
@@ -99,23 +106,22 @@ function BoardContent({
       const overCardIndex = overColumn?.cards?.findIndex(card => card._id === overCardId)
 
       // Logic tính toán "cardIndex mới" (trên hoặc dưới của overCard) lấy chuẩn ra từ code của thư viện - nhiều khi muốn từ chối hiểu =))
-      let newCardIndex
       const isBelowOverItem = active.rect.current.translated &&
         active.rect.current.translated.top > over.rect.top + over.rect.height
       const modifier = isBelowOverItem ? 1 : 0
-      newCardIndex = overCardIndex >= 0 ? overCardIndex + modifier : overColumn?.cards?.length + 1
+      const newCardIndex = overCardIndex >= 0 ? overCardIndex + modifier : overColumn?.cards?.length + 1
 
       // Clone mảng OrderedColumnsState cũ ra một cái mới để xử lý data rồi return - cập nhật lại OrderedColumnsState mới
       const nextColumns = cloneDeep(prevColumns)
       const nextActiveColumn = nextColumns.find(column => column._id === activeColumn._id)
       const nextOverColumn = nextColumns.find(column => column._id === overColumn._id)
 
-      // nextActiveColumn: Column cũ
+      // nextActiveColumn: ColumnFC cũ
       if (nextActiveColumn) {
         // Xóa card ở cái column active (cũng có thể hiểu là column cũ, cái lúc mà kéo card ra khỏi nó để sang column khác)
         nextActiveColumn.cards = nextActiveColumn.cards.filter(card => card._id !== activeDraggingCardId)
 
-        // Thêm Placeholder Card nếu Column rỗng: Bị kéo hết Card đi, không còn cái nào nữa. (Video 37.2)
+        // Thêm Placeholder Card nếu ColumnFC rỗng: Bị kéo hết Card đi, không còn cái nào nữa. (Video 37.2)
         if (isEmpty(nextActiveColumn.cards)) {
           nextActiveColumn.cards = [generatePlaceholderCard(nextActiveColumn)]
         }
@@ -124,7 +130,7 @@ function BoardContent({
         nextActiveColumn.cardOrderIds = nextActiveColumn.cards.map(card => card._id)
       }
 
-      // nextOverColumn: Column mới
+      // nextOverColumn: ColumnFC mới
       if (nextOverColumn) {
         // Kiểm tra xem card đang kéo nó có tồn tại ở overColumn chưa, nếu có thì cần xóa nó trước
         nextOverColumn.cards = nextOverColumn.cards.filter(card => card._id !== activeDraggingCardId)
@@ -167,7 +173,6 @@ function BoardContent({
 
   // Trigger khi bắt đầu kéo (drag) một phần tử
   const handleDragStart = (event) => {
-    if (isPopUpOpen) return
     // console.log('handleDragStart: ', event)
     setActiveDragItemId(event?.active?.id)
     setActiveDragItemType(event?.active?.data?.current?.columnId ? ACTIVE_DRAG_ITEM_TYPE.CARD : ACTIVE_DRAG_ITEM_TYPE.COLUMN)
@@ -181,7 +186,7 @@ function BoardContent({
 
   // Trigger trong quá trình kéo (drag) một phần tử
   const handleDragOver = (event) => {
-    // Không làm gì thêm nếu đang kéo Column
+    // Không làm gì thêm nếu đang kéo ColumnFC
     if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) return
 
     // Còn nếu kéo card thì xử lý thêm để có thể kéo card qua lại giữa các columns
@@ -271,7 +276,7 @@ function BoardContent({
           // Clone mảng OrderedColumnsState cũ ra một cái mới để xử lý data rồi return - cập nhật lại OrderedColumnsState mới
           const nextColumns = cloneDeep(prevColumns)
 
-          // Tìm tới cái Column mà chúng ta đang thả
+          // Tìm tới cái ColumnFC mà chúng ta đang thả
           const targetColumn = nextColumns.find(column => column._id === overColumn._id)
 
           // cập nhật lại 2 giá trị mới là card và cardOrderIds trong cái targetColumn
@@ -384,7 +389,7 @@ function BoardContent({
       <DndContext
       // Cảm biến (đã giải thích kỹ ở video số 30)
         sensors={sensors}
-        // Thuật toán phát hiện va chạm (nếu không có nó thì card với cover lớn sẽ không kéo qua Column được vì lúc này nó đang bị conflict giữa card và column), chúng ta sẽ dùng closestCorners thay vì closestCenter
+        // Thuật toán phát hiện va chạm (nếu không có nó thì card với cover lớn sẽ không kéo qua ColumnFC được vì lúc này nó đang bị conflict giữa card và column), chúng ta sẽ dùng closestCorners thay vì closestCenter
         // https://docs.dndkit.com/api-documentation/context-provider/collision-detection-algorithms
         // Update video 37: nếu chỉ dùng closestCorners sẽ có bug flickering + sai lệch dữ liệu (vui lòng xem video 37 sẽ rõ)
         // collisionDetection={closestCorners}
@@ -402,7 +407,7 @@ function BoardContent({
           height: (theme: any) => theme.trello.boardContentHeight,
           p: '10px 0'
         }}>
-          <ListColumns
+          <ListColumnsFC
             columns={orderedColumns}
             createNewColumn={createNewColumn}
             createNewCard={createNewCard}
@@ -410,8 +415,8 @@ function BoardContent({
           />
           <DragOverlay dropAnimation={customDropAnimation}>
             {!activeDragItemType && null}
-            {(activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) && <Column column={activeDragItemData} />}
-            {(activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.CARD) && <Card card={activeDragItemData} />}
+            {(activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) && <ColumnFC column={activeDragItemData} createNewCard={undefined} deleteColumnDetails = {undefined}  />}
+            {(activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.CARD) && <CardFC card={activeDragItemData} modalRender={undefined} />}
           </DragOverlay>
         </Box>
       </DndContext>
@@ -419,4 +424,4 @@ function BoardContent({
   )
 }
 
-export default BoardContent
+export default BoardContentFC

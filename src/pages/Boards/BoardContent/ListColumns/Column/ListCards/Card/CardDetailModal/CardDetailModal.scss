@@ -1,0 +1,154 @@
+// styles.scss
+.closeIcon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 100;
+    font-size: 1.7rem;
+    padding: 10px;
+    margin-left: 40px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+
+    svg {
+        padding-right: 4px;
+    }
+}
+
+.closeIcon:hover {
+    background-color: #CFD3DB;
+    cursor: pointer;
+}
+
+.button {
+    color: #3E4E6B !important;
+    background-color: #E2E4EA !important;
+    box-shadow: none !important;
+    height: 32px !important;
+}
+
+.button:hover {
+    background-color: #CFD3DB !important;
+}
+
+.left-icon {
+    font-size: 24px !important; 
+    margin-right: 16px !important;
+}
+
+.dialogTitle {
+    display: flex;
+
+    .subtitlesIcon {
+        margin-top: 3px;
+    }
+
+    .textarea-title {
+        padding: 0;
+        width: 780px;
+        font-size: 20px;
+        font-weight: 600;
+        font-style: normal;
+        background: transparent;
+    }
+
+    .sub-title {
+        margin-top: 4px;
+    }
+}
+
+
+.dialog-content {
+    display: flex;
+
+
+    .body {
+        width: 80%;
+
+        .card-detail-title {
+            margin-left: 40px;
+        }
+
+        .card-details {
+            display: flex;
+        
+            .field {
+                margin-right: 16px;
+                .field-title {
+                    font-size: 14px;
+                    margin-bottom: 4px;
+                }
+                .field-content {
+                    display: flex;
+                }
+            }
+        
+            .member-field {
+                .circle-avatar {
+                    width: 32px;
+                    height: 32px;
+                    background-color: #3E4E6B;
+                    border-radius: 50%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    margin-right: 4px;
+                }
+                
+                .circle-avatar span {
+                    color: white;
+                    font-size: 14px;
+                    font-weight: 400;
+                }
+            
+                .add-icon {
+                    background-color: #E2E4EA;
+                    border-radius: 50%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 32px;
+                    height: 32px;
+                    font-size: 24px;
+                    font-weight: 100;
+                }
+            
+                .add-icon:hover {
+                    background-color: #CFD3DB;
+                    cursor: pointer;
+                }
+            }
+        }
+
+        .section-details {
+            display: flex;
+            margin-top: 16px;
+
+            .section-title {
+                font-size: 18px;
+                margin-bottom: 4px;
+            }
+        }
+    }
+    
+    .list-right-buttons {
+        width: 20%;
+        .button-title {
+            font-size: 14px;
+        }
+
+        .button {
+            width: 100%;
+            justify-content: flex-start;
+        }
+
+        .right-button {
+            margin-top: 8px;
+        }
+    }
+    
+}
+

@@ -18,7 +18,6 @@ const handler = ({ nativeEvent: event }) => {
 export class MouseSensor extends DndKitMouseSensor {
   static activators = [{ eventName: 'onMouseDown', handler }]
 }
-
 export class TouchSensor extends DndKitTouchSensor {
   static activators = [{ eventName: 'onTouchStart', handler }]
 }

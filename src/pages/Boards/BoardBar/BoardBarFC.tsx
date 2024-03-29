@@ -26,7 +26,7 @@ const MENU_STYLES = {
   }
 }
 
-function BoardBar({ board }) {
+function BoardBarFC({ board }) {
   return (
     <Box sx={{
       width: '100%',
@@ -169,4 +169,4 @@ function BoardBar({ board }) {
   )
 }
 
-export default BoardBar
+export default BoardBarFC

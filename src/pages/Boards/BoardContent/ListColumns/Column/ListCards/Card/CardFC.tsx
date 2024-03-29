@@ -1,6 +1,6 @@
 import React from 'react'
 import { useContext } from 'react'
-import { AppContext } from '~/pages/Boards/BoardContent/BoardContent'
+import { AppContext } from '~/pages/Boards/BoardContent/BoardContentFC'
 import { Card as MuiCard } from '@mui/material'
 import CardActions from '@mui/material/CardActions'
 import CardContent from '@mui/material/CardContent'
@@ -10,15 +10,20 @@ import CommentIcon from '@mui/icons-material/Comment'
 import AttachmentIcon from '@mui/icons-material/Attachment'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import SimpleModal from './CardDetailModal/SimpleModal'
+import SimpleModal from './CardDetailModal/CardDialogFC'
 
-import { useModal } from 'mui-modal-provider'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { Card } from '~/core/model/card.model'
 
-function Card({ card, modalRender }) {
+interface CardFCProps {
+    card: Card
+    modalRender: any
+}
+
+const CardFC: React.FC<CardFCProps> = ({ card, modalRender }) => {
   const [open, setOpen] = React.useState(false)
-  const { setIsPopUpOpen } = useContext(AppContext)
+  const setIsPopUpOpen = useContext(AppContext)
 
   const handleClose = () => {
     setOpen(false)
@@ -89,4 +94,4 @@ function Card({ card, modalRender }) {
   )
 }
 
-export default Card
+export default CardFC

@@ -17,18 +17,29 @@ import Tooltip from '@mui/material/Tooltip'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import AddCardIcon from '@mui/icons-material/AddCard'
 import DragHandleIcon from '@mui/icons-material/DragHandle'
-import ListCards from './ListCards/ListCards'
+import ListCardsFC from './ListCards/ListCardsFC'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
 import { useConfirm } from 'material-ui-confirm'
 import React from 'react'
+import { useContext } from 'react'
+import { AppContext } from '~/pages/Boards/BoardContent/BoardContentFC'
+import { Column } from '~/core/model/column.model'
 
-function Column({ column, createNewCard, deleteColumnDetails }) {
+interface ColumnFCProps {
+    column: Column
+    createNewCard: (newCardData: any) => void
+    deleteColumnDetails: (columnId: string) => void
+}
+
+const ColumnFC: React.FC<ColumnFCProps> = ({ column, createNewCard, deleteColumnDetails }) => {
+  const isPopUpOpen = useContext(AppContext)
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: column._id,
-    data: { ...column }
+    data: { ...column },
+    disabled: isPopUpOpen
   })
   const dndKitColumnStyles = {
     // touchAction: 'none', // Dành cho sensor default dạng PointerSensor
@@ -43,7 +54,7 @@ function Column({ column, createNewCard, deleteColumnDetails }) {
 
   const [anchorEl, setAnchorEl] = useState(null)
   const open = Boolean(anchorEl)
-  const handleClick = (event) => setAnchorEl(event.currentTarget)
+  const handleClick = (event: any) => setAnchorEl(event.currentTarget)
   const handleClose = () => setAnchorEl(null)
 
   // Cards đã được sắp xếp ở component cha cao nhất (boards/_id.jsx) (Video 71 đã giải thích lý do)
@@ -79,12 +90,12 @@ function Column({ column, createNewCard, deleteColumnDetails }) {
     setNewCardTitle('')
   }
 
-  // Xử lý xóa một Column và Cards bên trong nó
+  // Xử lý xóa một ColumnFC và Cards bên trong nó
   const confirmDeleteColumn = useConfirm()
   const handleDeleteColumn = () => {
     confirmDeleteColumn({
-      title: 'Delete Column?',
-      description: 'This action will permanently delete your Column and its Cards! Are you sure?',
+      title: 'Delete ColumnFC?',
+      description: 'This action will permanently delete your ColumnFC and its Cards! Are you sure?',
       confirmationText: 'Confirm',
       cancellationText: 'Cancel'
       // buttonOrder: ['confirm', 'cancel']
@@ -121,7 +132,7 @@ function Column({ column, createNewCard, deleteColumnDetails }) {
           maxHeight: (theme: any) => `calc(${theme.trello.boardContentHeight} - ${theme.spacing(5)})`
         }}
       >
-        {/* Box Column Header */}
+        {/* Box ColumnFC Header */}
         <Box sx={{
           height: (theme: any) => theme.trello.columnHeaderHeight,
           p: 2,
@@ -203,9 +214,9 @@ function Column({ column, createNewCard, deleteColumnDetails }) {
         </Box>
 
         {/* List Cards */}
-        <ListCards cards={orderedCards} />
+        <ListCardsFC cards={orderedCards} />
 
-        {/* Box Column Footer */}
+        {/* Box ColumnFC Footer */}
         <Box sx={{
           height: (theme: any) => theme.trello.columnFooterHeight,
           p: 2
@@ -282,4 +293,4 @@ function Column({ column, createNewCard, deleteColumnDetails }) {
   )
 }
 
-export default Column
+export default ColumnFC

@@ -8,14 +8,14 @@ export const mockData = {
     title: 'TrungQuanDev MERN Stack Board',
     description: 'Pro MERN stack Course',
     type: 'public', // 'private'
-    ownerIds: [], // Những users là Admin của board
-    memberIds: [], // Những users là member bình thường của board
+    ownerIds: [] as string[], // Những users là Admin của board
+    memberIds: [] as string[], // Những users là member bình thường của board
     columnOrderIds: ['column-id-01', 'column-id-02', 'column-id-03', 'column-id-04'], // Thứ tự sắp xếp / vị trí của các Columns trong 1 boards
     columns: [
       {
         _id: 'column-id-01',
         boardId: 'board-id-01',
-        title: 'To Do Column 01',
+        title: 'To Do ColumnFC 01',
         cardOrderIds: ['card-id-01', 'card-id-02', 'card-id-03', 'card-id-04', 'card-id-05', 'card-id-06', 'card-id-07'],
         cards: [
           {
@@ -40,7 +40,7 @@ export const mockData = {
       {
         _id: 'column-id-02',
         boardId: 'board-id-01',
-        title: 'Inprogress Column 02',
+        title: 'Inprogress ColumnFC 02',
         cardOrderIds: ['card-id-08', 'card-id-09', 'card-id-10'],
         cards: [
           { _id: 'card-id-08', boardId: 'board-id-01', columnId: 'column-id-02', title: 'Title of card 08', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
@@ -51,7 +51,7 @@ export const mockData = {
       {
         _id: 'column-id-03',
         boardId: 'board-id-01',
-        title: 'Done Column 03',
+        title: 'Done ColumnFC 03',
         cardOrderIds: ['card-id-11', 'card-id-12', 'card-id-13'],
         cards: [
           { _id: 'card-id-11', boardId: 'board-id-01', columnId: 'column-id-03', title: 'Title of card 11', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
@@ -62,9 +62,9 @@ export const mockData = {
       {
         _id: 'column-id-04',
         boardId: 'board-id-01',
-        title: 'Empty Column 04',
+        title: 'Empty ColumnFC 04',
         /**
-         * Video 37.2: Cách xử lý bug logic thư viện Dnd-kit khi Column là rỗng:
+         * Video 37.2: Cách xử lý bug logic thư viện Dnd-kit khi ColumnFC là rỗng:
          * Phía FE sẽ tự tạo ra một cái card đặc biệt: Placeholder Card, không liên quan tới Back-end
          * Card đặc biệt này sẽ được ẩn ở giao diện UI người dùng.
          * Cấu trúc Id của cái card này để Unique rất đơn giản, không cần phải làm random phức tạp:

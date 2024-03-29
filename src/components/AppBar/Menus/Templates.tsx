@@ -9,10 +9,10 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import Check from '@mui/icons-material/Check'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
-function Starred() {
+const Templates: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState(null)
   const open = Boolean(anchorEl)
-  const handleClick = (event) => {
+  const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget)
   }
   const handleClose = () => {
@@ -23,22 +23,22 @@ function Starred() {
     <Box>
       <Button
         sx={{ color: 'white' }}
-        id="basic-button-starred"
-        aria-controls={open ? 'basic-menu-starred' : undefined}
+        id="basic-button-templates"
+        aria-controls={open ? 'basic-menu-templates' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
         endIcon={<ExpandMoreIcon />}
       >
-        Starred
+        Templates
       </Button>
       <Menu
-        id="basic-menu-starred"
+        id="basic-menu-templates"
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
         MenuListProps={{
-          'aria-labelledby': 'basic-button-starred'
+          'aria-labelledby': 'basic-button-templates'
         }}
       >
         <MenuItem>
@@ -72,4 +72,4 @@ function Starred() {
   )
 }
 
-export default Starred
+export default Templates

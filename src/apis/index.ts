@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { API_ROOT } from '~/utils/constants'
+import { API_ROOT } from '../utils/constants'
 
 /**
  * Lưu ý: Đối với việc sử dụng axios ở khóa MERN Stack Pro trên kênh YouTube: TrungQuanDev - Một Lập Trình Viên
@@ -11,40 +11,40 @@ import { API_ROOT } from '~/utils/constants'
  */
 
 /** Boards */
-export const fetchBoardDetailsAPI = async (boardId) => {
+export const fetchBoardDetailsAPI = async (boardId: string) => {
   const response = await axios.get(`${API_ROOT}/v1/boards/${boardId}`)
   // Lưu ý: axios sẽ trả kết quả về qua property của nó là data
   return response.data
 }
 
-export const updateBoardDetailsAPI = async (boardId, updateData) => {
+export const updateBoardDetailsAPI = async (boardId: string, updateData: any) => {
   const response = await axios.put(`${API_ROOT}/v1/boards/${boardId}`, updateData)
   return response.data
 }
 
-export const moveCardToDifferentColumnAPI = async (updateData) => {
+export const moveCardToDifferentColumnAPI = async (updateData: any) => {
   const response = await axios.put(`${API_ROOT}/v1/boards/supports/moving_card`, updateData)
   return response.data
 }
 
 /** Columns */
-export const createNewColumnAPI = async (newColumnData) => {
+export const createNewColumnAPI = async (newColumnData: any) => {
   const response = await axios.post(`${API_ROOT}/v1/columns`, newColumnData)
   return response.data
 }
 
-export const updateColumnDetailsAPI = async (columnId, updateData) => {
+export const updateColumnDetailsAPI = async (columnId: any, updateData: any) => {
   const response = await axios.put(`${API_ROOT}/v1/columns/${columnId}`, updateData)
   return response.data
 }
 
-export const deleteColumnDetailsAPI = async (columnId) => {
+export const deleteColumnDetailsAPI = async (columnId: any) => {
   const response = await axios.delete(`${API_ROOT}/v1/columns/${columnId}`)
   return response.data
 }
 
 /** Cards */
-export const createNewCardAPI = async (newCardData) => {
+export const createNewCardAPI = async (newCardData: any) => {
   const response = await axios.post(`${API_ROOT}/v1/cards`, newCardData)
   return response.data
 }
