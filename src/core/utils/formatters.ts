@@ -2,12 +2,15 @@
  * YouTube: TrungQuanDev - Một Lập Trình Viên
  * Created by trungquandev.com's author on Jun 28, 2023
  */
+import { Column } from '~/core/model/column.model'
+import { Card } from '~/core/model/card.model'
+
 /**
  * Capitalize the first letter of a string
  */
 export const capitalizeFirstLetter = (val: any) => {
-  if (!val) return ''
-  return `${val.charAt(0).toUpperCase()}${val.slice(1)}`
+    if (!val) return ''
+    return `${val.charAt(0).toUpperCase()}${val.slice(1)}`
 }
 
 /**
@@ -18,11 +21,10 @@ export const capitalizeFirstLetter = (val: any) => {
  * "columnId-placeholder-card" (mỗi column chỉ có thể có tối đa một cái Placeholder Card)
  * Quan trọng khi tạo: phải đầy đủ: (_id, boardId, columnId, FE_PlaceholderCard)
 */
-export const generatePlaceholderCard = (column: any) => {
-  return {
-    _id: `${column._id}-placeholder-card`,
-    boardId: column.boardId,
-    columnId: column._id,
-    FE_PlaceholderCard: true
-  }
+export const generatePlaceholderCard = (column: Column):Card => {
+    const card= {} as Card
+    card.id = 'placeholder-card'
+    card.columnId = column.id
+    card.FE_PlaceholderCard = true
+    return card
 }
