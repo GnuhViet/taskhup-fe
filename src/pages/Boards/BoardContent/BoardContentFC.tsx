@@ -32,7 +32,7 @@ import { Board } from '~/core/model/board.model'
 import { Card } from '~/core/model/card.model'
 import { Column } from '~/core/model/Column.model'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateColumnOrder } from '~/core/redux/slices/boardSlice'
+import { updateColum, updateColumnOrder } from '~/core/redux/slices/boardSlice'
 import { useStompClient } from 'react-stomp-hooks'
 import { BoardColumnMoveReq } from '~/core/services/board-services.model'
 
@@ -56,32 +56,33 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
     moveCardToDifferentColumn,
     deleteColumnDetails
 }) => {
-    const [isPopUpOpen, setIsPopUpOpen] = useState(false)
-
-    const board: Board = useSelector((state: any) => state.boardReducer.board)
-    const boardId = useSelector((state: any) => state.boardReducer.boardId)
+    //<editor-fold desc="Sensor custom">
     // https://docs.dndkit.com/api-documentation/sensors
     // Nếu dùng PointerSensor mặc định thì phải kết hợp thuộc tính CSS touch-action: none ở những phần tử kéo thả - nhưng mà còn bug
     // const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 10 } })
-
     // Yêu cầu chuột di chuyển 10px thì mới kích hoạt event, fix trường hợp click bị gọi event
     const mouseSensor = useSensor(MouseSensor, { activationConstraint: { distance: 10 } })
-
     // Nhấn giữ 250ms và dung sai của cảm ứng 500px thì mới kích hoạt event
     const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 500 } })
-
     // Ưu tiên sử dụng kết hợp 2 loại sensors là mouse và touch để có trải nghiệm trên mobile tốt nhất, không bị bug.
     // const sensors = useSensors(pointerSensor)
     const sensors = useSensors(mouseSensor, touchSensor)
 
     const columns: Column[] = useSelector((state: any) => state.boardReducer.board.columns)
     const [orderedColumns, setOrderedColumns] = useState(columns)
+    //</editor-fold>
+
+    //<editor-fold desc="Hook & init state">
+    const [isPopUpOpen, setIsPopUpOpen] = useState(false)
+
+    const board: Board = useSelector((state: any) => state.boardReducer.board)
+    const boardId = useSelector((state: any) => state.boardReducer.boardId)
 
     // Cùng một thời điểm chỉ có một phần tử đang được kéo (column hoặc card)
-    const [activeDragItemId, setActiveDragItemId] = useState(null)
-    const [activeDragItemType, setActiveDragItemType] = useState(null)
-    const [activeDragItemData, setActiveDragItemData] = useState(null)
-    const [oldColumnWhenDraggingCard, setOldColumnWhenDraggingCard] = useState(null)
+    const [activeDragItemIdState, setActiveDragItemIdState] = useState(null)
+    const [activeDragItemTypeState, setActiveDragItemTypeState] = useState(null)
+    const [activeDragItemDataSate, setActiveDragItemDataSate] = useState(null)
+    const [oldColumnWhenDraggingCardState, setOldColumnWhenDraggingCardState] = useState(null)
 
     // Điểm va chạm cuối cùng trước đó (xử lý thuật toán phát hiện va chạm, video 37)
     const lastOverId = useRef(null)
@@ -95,6 +96,7 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
         }
         // Columns đã được sắp xếp ở component cha cao nhất (boards/_id.jsx) (Video 71 đã giải thích lý do)
     }, [board])
+    //</editor-fold>
 
     // Tìm một cái ColumnFC theo CardId
     const findColumnById = (id: string) => {
@@ -104,18 +106,20 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
 
     // Khởi tạo Function chung xử lý việc cập nhật lại state trong trường hợp di chuyển Card giữa các ColumnFC khác nhau.
     const moveCardBetweenDifferentColumns = (
-        overColumn,
-        overCardId,
-        active,
-        over,
-        activeColumn,
-        activeDraggingCardId,
-        activeDraggingCardData,
-        triggerFrom
+        overColumn: any,
+        overCardId: any,
+        active: any,
+        over: any,
+        activeColumn: any,
+        activeDraggingCardId: any,
+        activeDraggingCardData: any,
+        triggerFrom: string
     ) => {
         setOrderedColumns(prevColumns => {
             // Tìm vị trí (index) của cái overCard trong column đích (nơi mà activeCard sắp được thả)
-            const overCardIndex = overColumn?.cards?.findIndex(card => card.id === overCardId)
+            const overCardIndex = overColumn?.cards?.findIndex((card: Card) => card.id === overCardId)
+
+            console.log('overCardIndex: ', overCardIndex)
 
             // Logic tính toán "cardIndex mới" (trên hoặc dưới của overCard) lấy chuẩn ra từ code của thư viện - nhiều khi muốn từ chối hiểu =))
             const isBelowOverItem = active.rect.current.translated &&
@@ -150,7 +154,7 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
                 // Phải cập nhật lại chuẩn dữ liệu columnId trong card sau khi kéo card giữa 2 column khác nhau.
                 const rebuild_activeDraggingCardData = {
                     ...activeDraggingCardData,
-                    columnId: nextOverColumn._id
+                    columnId: nextOverColumn.id
                 }
                 // Tiếp theo là thêm cái card đang kéo vào overColumn theo vị trí index mới
                 nextOverColumn.cards = nextOverColumn.cards.toSpliced(newCardIndex, 0, rebuild_activeDraggingCardData)
@@ -178,7 +182,7 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
                 //     nextColumns
                 // )
             }
-
+            dispatch(updateColum(nextColumns))
             return nextColumns
         })
     }
@@ -186,20 +190,20 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
     // Trigger khi bắt đầu kéo (drag) một phần tử
     const handleDragStart = (event: any) => {
         // console.log('handleDragStart: ', event)
-        setActiveDragItemId(event?.active?.id)
-        setActiveDragItemType(event?.active?.data?.current?.columnId ? ACTIVE_DRAG_ITEM_TYPE.CARD : ACTIVE_DRAG_ITEM_TYPE.COLUMN)
-        setActiveDragItemData(event?.active?.data?.current)
+        setActiveDragItemIdState(event?.active?.id)
+        setActiveDragItemTypeState(event?.active?.data?.current?.columnId ? ACTIVE_DRAG_ITEM_TYPE.CARD : ACTIVE_DRAG_ITEM_TYPE.COLUMN)
+        setActiveDragItemDataSate(event?.active?.data?.current)
 
         // Nếu là kéo card thì mới thực hiện hành động set giá trị oldColumn
         if (event?.active?.data?.current?.columnId) {
-            setOldColumnWhenDraggingCard(findColumnById(event?.active?.data?.current?.columnId))
+            setOldColumnWhenDraggingCardState(findColumnById(event?.active?.data?.current?.columnId))
         }
     }
 
     // Trigger trong quá trình kéo (drag) một phần tử
     const handleDragOver = (event: any) => {
         // Không làm gì thêm nếu đang kéo ColumnFC
-        if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) return
+        if (activeDragItemTypeState === ACTIVE_DRAG_ITEM_TYPE.COLUMN) return
 
         // Còn nếu kéo card thì xử lý thêm để có thể kéo card qua lại giữa các columns
         // console.log('handleDragOver: ', event)
@@ -245,7 +249,7 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
         if (!active || !over) return
 
         // Xử lý kéo thả Cards
-        if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.CARD) {
+        if (activeDragItemTypeState === ACTIVE_DRAG_ITEM_TYPE.CARD) {
             // activeDraggingCard: Là cái card đang được kéo
             const { id: activeDraggingCardId, data: { current: activeDraggingCardData } } = active
             // overCard: là cái card đang tương tác trên hoặc dưới so với cái card được kéo ở trên.
@@ -261,7 +265,7 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
 
             // Hành động kéo thả card giữa 2 column khác nhau
             // Phải dùng tới activeDragItemData.columnId hoặc oldColumnWhenDraggingCard._id (set vào state từ bước handleDragStart) chứ không phải activeData trong scope handleDragEnd này vì sau khi đi qua onDragOver tới đây là state của card đã bị cập nhật một lần rồi.
-            if (oldColumnWhenDraggingCard.id !== overColumn.id) {
+            if (oldColumnWhenDraggingCardState.id !== overColumn.id) {
                 moveCardBetweenDifferentColumns(
                     overColumn,
                     overCardId,
@@ -272,16 +276,17 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
                     activeDraggingCardData,
                     'handleDragEnd'
                 )
-            } else {
+            }
+            else {
                 // Hành động kéo thả card trong cùng một cái column
 
                 // Lấy vị trí cũ (từ thằng oldColumnWhenDraggingCard)
-                const oldCardIndex = oldColumnWhenDraggingCard?.cards?.findIndex(c => c.id === activeDragItemId)
+                const oldCardIndex = oldColumnWhenDraggingCardState?.cards?.findIndex(c => c.id === activeDragItemIdState)
                 // Lấy vị trí mới (từ thằng overColumn)
                 const newCardIndex = overColumn?.cards?.findIndex(c => c.id === overCardId)
 
                 // Dùng arrayMove vì kéo card trong một cái column thì tương tự với logic kéo column trong một cái board content
-                const dndOrderedCards = arrayMove(oldColumnWhenDraggingCard?.cards, oldCardIndex, newCardIndex)
+                const dndOrderedCards = arrayMove(oldColumnWhenDraggingCardState?.cards, oldCardIndex, newCardIndex)
                 const dndOrderedCardIds = dndOrderedCards.map((card: any) => card.id)
 
                 // Vẫn gọi update State ở đây để tránh delay hoặc Flickering giao diện lúc kéo thả cần phải chờ gọi API (small trick)
@@ -296,22 +301,20 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
                     targetColumn.cards = dndOrderedCards
                     targetColumn.cardOrderIds = dndOrderedCardIds
 
+                    dispatch(updateColum(nextColumns))
                     // Trả về giá trị state mới (chuẩn vị trí)
                     return nextColumns
                 })
 
                 /**
                  * Gọi lên props function moveCardInTheSameColumn nằm ở component cha cao nhất (boards/_id.jsx)
-                 * Lưu ý: Về sau ở học phần MERN Stack Advance nâng cao học trực tiếp mình sẽ với mình thì chúng ta sẽ đưa dữ liệu Board ra ngoài Redux Global Store,
-                 * và lúc này chúng ta có thể gọi luôn API ở đây là xong thay vì phải lần lượt gọi ngược lên những component cha phía bên trên. (Đối với component con nằm càng sâu thì càng khổ :D)
-                 * - Với việc sử dụng Redux như vậy thì code sẽ Clean chuẩn chỉnh hơn rất nhiều.
                  */
                 // moveCardInTheSameColumn(dndOrderedCards, dndOrderedCardIds, oldColumnWhenDraggingCard._id)
             }
         }
 
         // Xử lý kéo thả Columns trong một cái boardContent
-        if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) {
+        if (activeDragItemTypeState === ACTIVE_DRAG_ITEM_TYPE.COLUMN) {
             // Nếu vị trí sau khi kéo thả khác với vị trí ban đầu
             if (active.id !== over.id) {
                 // Lấy vị trí cũ (từ thằng active)
@@ -339,10 +342,10 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
         }
 
         // Những dữ liệu sau khi kéo thả này luôn phải đưa về giá trị null mặc định ban đầu
-        setActiveDragItemId(null)
-        setActiveDragItemType(null)
-        setActiveDragItemData(null)
-        setOldColumnWhenDraggingCard(null)
+        setActiveDragItemIdState(null)
+        setActiveDragItemTypeState(null)
+        setActiveDragItemDataSate(null)
+        setOldColumnWhenDraggingCardState(null)
     }
 
     //<editor-fold desc="Custom lib">
@@ -356,7 +359,7 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
     // Chúng ta sẽ custom lại chiến lược / thuật toán phát hiện va chạm tối ưu cho việc kéo thả card giữa nhiều columns (video 37 fix bug quan trọng)
     const collisionDetectionStrategy = useCallback((args: any) => {
         // Trường hợp kéo column thì dùng thuật toán closestCorners là chuẩn nhất
-        if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) {
+        if (activeDragItemTypeState === ACTIVE_DRAG_ITEM_TYPE.COLUMN) {
             return closestCorners({ ...args })
         }
 
@@ -392,7 +395,7 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
 
         // Nếu overId là null thì trả về mảng rỗng - tránh bug crash trang
         return lastOverId.current ? [{ id: lastOverId.current }] : []
-    }, [activeDragItemType, columns])
+    }, [activeDragItemTypeState, columns])
     //</editor-fold>
 
     return (
@@ -425,11 +428,11 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
                         deleteColumnDetails={deleteColumnDetails}
                     />
                     <DragOverlay dropAnimation={customDropAnimation}>
-                        {!activeDragItemType && null}
-                        {(activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) &&
-                          <ColumnFC column={activeDragItemData} /*createNewCard={undefined}*/ deleteColumnDetails={undefined}/>}
-                        {(activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.CARD) &&
-                          <CardFC card={activeDragItemData} modalRender={undefined}/>}
+                        {!activeDragItemTypeState && null}
+                        {(activeDragItemTypeState === ACTIVE_DRAG_ITEM_TYPE.COLUMN) &&
+                          <ColumnFC column={activeDragItemDataSate} /*createNewCard={undefined}*/ deleteColumnDetails={undefined}/>}
+                        {(activeDragItemTypeState === ACTIVE_DRAG_ITEM_TYPE.CARD) &&
+                          <CardFC card={activeDragItemDataSate} modalRender={undefined}/>}
                     </DragOverlay>
                 </Box>
             </DndContext>

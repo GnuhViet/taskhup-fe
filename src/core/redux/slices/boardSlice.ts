@@ -33,6 +33,9 @@ export const boardSlice = createSlice({
             column.cardOrderIds = [generatePlaceholderCard(column).id]
             state.board.columns.push(column)
         },
+        updateColum: (state, action: PayloadAction<Column[]>) => {
+            state.board.columns = action.payload
+        },
         addCard: (state, action: PayloadAction<BoardCardCreateResp>) => {
             state.board.columns.forEach(column => {
                 if (column.id === action.payload.boardColumnId) {
@@ -89,6 +92,7 @@ export const boardSlice = createSlice({
 export const {
     save,
     addColumn,
+    updateColum,
     addCard,
     updateColumnOrder,
     updateColumnOrderResponse,

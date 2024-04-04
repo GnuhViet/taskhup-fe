@@ -8,68 +8,68 @@ const COLUMN_FOOTER_HEIGHT = '56px'
 
 // Create a theme instance.
 const theme = extendTheme({
-  trello: {
-    appBarHeight: APP_BAR_HEIGHT,
-    boardBarHeight: BOARD_BAR_HEIGHT,
-    boardContentHeight: BOARD_CONTENT_HEIGHT,
-    columnHeaderHeight: COLUMN_HEADER_HEIGHT,
-    columnFooterHeight: COLUMN_FOOTER_HEIGHT
-  },
-  colorSchemes: {
-    light: {},
-    dark: {}
-  },
-  components: {
-    MuiCssBaseline: {
-      styleOverrides: {
-        body: {
-          '*::-webkit-scrollbar': {
-            width: '8px',
-            height: '8px'
-          },
-          '*::-webkit-scrollbar-thumb': {
-            backgroundColor: '#dcdde1',
-            borderRadius: '8px'
-          },
-          '*::-webkit-scrollbar-thumb:hover': {
-            backgroundColor: 'white'
-          }
-        }
-      }
+    trello: {
+        appBarHeight: APP_BAR_HEIGHT,
+        boardBarHeight: BOARD_BAR_HEIGHT,
+        boardContentHeight: BOARD_CONTENT_HEIGHT,
+        columnHeaderHeight: COLUMN_HEADER_HEIGHT,
+        columnFooterHeight: COLUMN_FOOTER_HEIGHT
     },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-          borderWidth: '0.5px',
-          '&:hover': { borderWidth: '0.5px' }
-        }
-      }
+    colorSchemes: {
+        light: {},
+        dark: {}
     },
-    MuiInputLabel: {
-      styleOverrides: {
-        root: { fontSize: '0.875rem' }
-      }
-    },
-    MuiTypography: {
-      styleOverrides: {
-        root: {
-          '&.MuiTypography-body1': { fontSize: '0.875rem' }
+    components: {
+        MuiCssBaseline: {
+            styleOverrides: {
+                body: {
+                    '*::-webkit-scrollbar': {
+                        width: '8px',
+                        height: '8px'
+                    },
+                    '*::-webkit-scrollbar-thumb': {
+                        backgroundColor: '#dcdde1',
+                        borderRadius: '8px'
+                    },
+                    '*::-webkit-scrollbar-thumb:hover': {
+                        backgroundColor: 'white'
+                    }
+                }
+            }
+        },
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    textTransform: 'none',
+                    borderWidth: '0.5px',
+                    '&:hover': { borderWidth: '0.5px' }
+                }
+            }
+        },
+        MuiInputLabel: {
+            styleOverrides: {
+                root: { fontSize: '0.875rem' }
+            }
+        },
+        MuiTypography: {
+            styleOverrides: {
+                root: {
+                    '&.MuiTypography-body1': { fontSize: '0.875rem' }
+                }
+            }
+        },
+        MuiOutlinedInput: {
+            styleOverrides: {
+                root: {
+                    fontSize: '0.875rem',
+                    '& fieldset': { borderWidth: '0.5px !important' },
+                    '&:hover fieldset': { borderWidth: '1px !important' },
+                    '&.Mui-focused fieldset': { borderWidth: '1px !important' }
+                }
+            }
         }
-      }
-    },
-    MuiOutlinedInput: {
-      styleOverrides: {
-        root: {
-          fontSize: '0.875rem',
-          '& fieldset': { borderWidth: '0.5px !important' },
-          '&:hover fieldset': { borderWidth: '1px !important' },
-          '&.Mui-focused fieldset': { borderWidth: '1px !important' }
-        }
-      }
     }
-  }
-  // ...other properties
+    // ...other properties
 })
 
 export default theme

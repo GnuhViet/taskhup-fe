@@ -221,10 +221,7 @@ const ColumnFC: React.FC<ColumnFCProps> = ({ column, deleteColumnDetails }) => {
                 <ListCardsFC cards={orderedCards} />
 
                 {/* Box ColumnFC Footer */}
-                <Box sx={{
-                    height: (theme: any) => theme.trello.columnFooterHeight,
-                    p: 2
-                }}>
+                <Box sx={{ height: (theme: any) => theme.trello.columnFooterHeight, p: 2 }}>
                     {!openNewCardForm
                         ? <Box sx={{
                             height: '100%',
