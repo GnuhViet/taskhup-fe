@@ -7,7 +7,12 @@ import { boardApi } from '~/core/redux/api/board.api'
 import { mapOrder } from '~/core/utils/sorts'
 import { isEmpty } from 'lodash'
 import { generatePlaceholderCard } from '~/core/utils/formatters'
-import { BoardCardCreateResp, BoardColumnCreateResp, BoardColumnMoveReq } from '~/core/services/board-services.model'
+import {
+    BoardCardCreateResp,
+    BoardCardMoveReq,
+    BoardColumnCreateResp,
+    BoardColumnMoveReq
+} from '~/core/services/board-services.model'
 import { mapObject } from '~/core/utils/mapper'
 
 export interface BoardState {
@@ -56,6 +61,27 @@ export const boardSlice = createSlice({
 
             state.board.columnOrderIds = columnOrderIds
             state.board.columns = sortedColumns
+        },
+        updateCardOrderResponse: (state, action: PayloadAction<BoardCardMoveReq>) => {
+            const response = action.payload
+            if (response.fromColumnId == response.toColumnId) {
+                const column = state.board.columns.find(column => column.id === response.fromColumnId)
+                column.cardOrderIds = response.cardOrderIds
+                column.cards = mapOrder(column.cards, response.cardOrderIds, 'id')
+            }
+            else if (response.fromColumnId !== response.toColumnId) {
+                const fromColumn = state.board.columns.find(column => column.id === response.fromColumnId)
+                const toColumn = state.board.columns.find(column => column.id === response.toColumnId)
+
+                fromColumn.cardOrderIds = [...fromColumn.cardOrderIds].filter(cardId => cardId !== response.cardId)
+                toColumn.cardOrderIds = [...response.cardOrderIds]
+
+                fromColumn.cards = fromColumn.cards.filter(card => card.id !== response.cardId)
+                toColumn.cards = [...toColumn.cards, response.card]
+
+                fromColumn.cards = mapOrder(fromColumn.cards, fromColumn.cardOrderIds, 'id')
+                toColumn.cards = mapOrder(toColumn.cards, toColumn.cardOrderIds, 'id')
+            }
         },
         updateColumnOrder: (state, action: PayloadAction<Column[]>) => {
             state.board.columnOrderIds = action.payload.map(column => column.id)

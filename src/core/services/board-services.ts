@@ -27,7 +27,6 @@ export const handleSocketEvent = (event: IMessage, dispatch: Dispatch) => {
         break
     case ACTION.CREATE_CARD:
         dispatch(addCard(resp.data))
-        console.log('CREATE_CARD', resp)
         break
     case ACTION.MOVE_CARD:
         console.log('MOVE_CARD', resp)

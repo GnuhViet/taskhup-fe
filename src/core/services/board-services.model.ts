@@ -1,3 +1,5 @@
+import { Card } from '~/core/model/card.model'
+
 export class BoardColumnCreateReq {
     title: string
 }
@@ -25,7 +27,8 @@ export class BoardCardCreateResp {
 
 export class BoardCardMoveReq {
     cardId: string
-    oldColumnId: string
-    newColumnId: string
+    fromColumnId: string
+    toColumnId: string
     cardOrderIds: string[]
+    card: Card
 }
