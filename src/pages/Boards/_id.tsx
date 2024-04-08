@@ -243,11 +243,10 @@ const BoardComponent: React.FC = () => {
                     // createNewColumn={createNewColumn}
                     // createNewCard={createNewCard}
                     // moveColumns={moveColumns}
-                    moveCardInTheSameColumn={moveCardInTheSameColumn}
-                    moveCardToDifferentColumn={moveCardToDifferentColumn}
-                    deleteColumnDetails={deleteColumnDetails}
+                    // moveCardInTheSameColumn={moveCardInTheSameColumn}
+                    // moveCardToDifferentColumn={moveCardToDifferentColumn}
+                    // deleteColumnDetails={deleteColumnDetails}
                 />
-                {console.log('render!!')}
             </>
         </Container>
     )

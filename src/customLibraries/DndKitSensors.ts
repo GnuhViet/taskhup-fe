@@ -2,10 +2,11 @@ import {
     MouseSensor as DndKitMouseSensor,
     TouchSensor as DndKitTouchSensor
 } from '@dnd-kit/core'
+import React from 'react'
 
 // Block DnD event propagation if element have "data-no-dnd" attribute
-const handler = ({ nativeEvent: event }) => {
-    let cur = event.target
+const handler = ({ nativeEvent: event }: React.MouseEvent | React.TouchEvent) => {
+    let cur = (event.target as HTMLElement)
     while (cur) {
         if (cur.dataset && cur.dataset.noDnd) {
             return false
@@ -15,11 +16,10 @@ const handler = ({ nativeEvent: event }) => {
     return true
 }
 
-// @ts-ignore
 export class MouseSensor extends DndKitMouseSensor {
-    static activators = [{ eventName: 'onMouseDown', handler }]
+    static activators = DndKitMouseSensor.activators.concat([{ eventName: 'onMouseDown', handler }])
 }
-// @ts-ignore
+
 export class TouchSensor extends DndKitTouchSensor {
-    static activators = [{ eventName: 'onTouchStart', handler }]
+    static activators = DndKitTouchSensor.activators.concat([{ eventName: 'onTouchStart', handler }])
 }
