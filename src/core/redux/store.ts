@@ -1,15 +1,17 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { boardApi } from './api/board.api'
 import boardSlice from './slices/boardSlice'
+import homeSlice from './slices/homeSlice'
 
 export const store = configureStore({
-  reducer: {
-    boardReducer: boardSlice,
-    [boardApi.reducerPath]: boardApi.reducer,
-  },
+    reducer: {
+        boardReducer: boardSlice,
+        [boardApi.reducerPath]: boardApi.reducer,
+        homeReducer: homeSlice
+    },
 
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware()
-    .concat(boardApi.middleware)
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware()
+        .concat(boardApi.middleware)
 })
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
