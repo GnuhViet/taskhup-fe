@@ -29,7 +29,7 @@ import { useGetBoardByCodeQuery } from '~/core/redux/api/board.api'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAllBoard, getBoard, handleSocketEvent } from '~/core/services/board-services'
 import { addColumn, save } from '~/core/redux/slices/boardSlice'
-import { useSubscription } from 'react-stomp-hooks'
+import { StompSessionProvider, useSubscription } from 'react-stomp-hooks'
 
 const BoardComponent: React.FC = () => {
 
@@ -47,13 +47,14 @@ const BoardComponent: React.FC = () => {
 
     const { data: board, error, isLoading } = useGetBoardByCodeQuery(boardId)
 
-    useEffect(() => {
-        if (board) {
-            console.log('boardResp: ', board)
-            // board = boardResp;
-            // dispatch(save(boardResp))
-        }
-    }, [board])
+
+    // useEffect(() => {
+    //     if (board) {
+    //         console.log('boardResp: ', board)
+    //         // board = boardResp;
+    //         // dispatch(save(boardResp))
+    //     }
+    // }, [board])
 
     useSubscription(`/topic/board/${boardId}`, (message) => {
         handleSocketEvent(message, dispatch)
@@ -155,62 +156,62 @@ const BoardComponent: React.FC = () => {
      * Khi di chuyển card trong cùng ColumnFC:
      * Chỉ cần gọi API để cập nhật mảng cardOrderIds của ColumnFC chứa nó (thay đổi vị trí trong mảng)
      */
-    const moveCardInTheSameColumn = (dndOrderedCards: any, dndOrderedCardIds: any, columnId: any) => {
-        // Update cho chuẩn dữ liệu state Board
-        const newBoard = { ...board }
-        const columnToUpdate = newBoard.columns.find((column: any) => column._id === columnId)
-        if (columnToUpdate) {
-            columnToUpdate.cards = dndOrderedCards
-            columnToUpdate.cardOrderIds = dndOrderedCardIds
-        }
-        // setBoard(newBoard)
+    // const moveCardInTheSameColumn = (dndOrderedCards: any, dndOrderedCardIds: any, columnId: any) => {
+    //     // Update cho chuẩn dữ liệu state Board
+    //     const newBoard = { ...board }
+    //     const columnToUpdate = newBoard.columns.find((column: any) => column._id === columnId)
+    //     if (columnToUpdate) {
+    //         columnToUpdate.cards = dndOrderedCards
+    //         columnToUpdate.cardOrderIds = dndOrderedCardIds
+    //     }
+    //     // setBoard(newBoard)
 
-        // Gọi API update ColumnFC
-        updateColumnDetailsAPI(columnId, { cardOrderIds: dndOrderedCardIds })
-    }
+    //     // Gọi API update ColumnFC
+    //     updateColumnDetailsAPI(columnId, { cardOrderIds: dndOrderedCardIds })
+    // }
 
-    /**
-     * Khi di chuyển card sang ColumnFC khác:
-     * B1: Cập nhật mảng cardOrderIds của ColumnFC ban đầu chứa nó (Hiểu bản chất là xóa cái _id của Card ra khỏi mảng)
-     * B2: Cập nhật mảng cardOrderIds của ColumnFC tiếp theo (Hiểu bản chất là thêm _id của Card vào mảng)
-     * B3: Cập nhật lại trường columnId mới của cái Card đã kéo
-     * => Làm một API support riêng.
-     */
-    const moveCardToDifferentColumn = (currentCardId: any, prevColumnId: any, nextColumnId: any, dndOrderedColumns: any[]) => {
-        // Update cho chuẩn dữ liệu state Board
-        const dndOrderedColumnsIds = dndOrderedColumns.map(c => c._id)
-        const newBoard = { ...board }
-        newBoard.columns = dndOrderedColumns
-        newBoard.columnOrderIds = dndOrderedColumnsIds
-        // setBoard(newBoard)
+    // /**
+    //  * Khi di chuyển card sang ColumnFC khác:
+    //  * B1: Cập nhật mảng cardOrderIds của ColumnFC ban đầu chứa nó (Hiểu bản chất là xóa cái _id của Card ra khỏi mảng)
+    //  * B2: Cập nhật mảng cardOrderIds của ColumnFC tiếp theo (Hiểu bản chất là thêm _id của Card vào mảng)
+    //  * B3: Cập nhật lại trường columnId mới của cái Card đã kéo
+    //  * => Làm một API support riêng.
+    //  */
+    // const moveCardToDifferentColumn = (currentCardId: any, prevColumnId: any, nextColumnId: any, dndOrderedColumns: any[]) => {
+    //     // Update cho chuẩn dữ liệu state Board
+    //     const dndOrderedColumnsIds = dndOrderedColumns.map(c => c._id)
+    //     const newBoard = { ...board }
+    //     newBoard.columns = dndOrderedColumns
+    //     newBoard.columnOrderIds = dndOrderedColumnsIds
+    //     // setBoard(newBoard)
 
-        // Gọi API xử lý phía BE
-        let prevCardOrderIds = dndOrderedColumns.find(c => c._id === prevColumnId)?.cardOrderIds
-        // Xử lý vấn đề khi kéo Card cuối cùng ra khỏi ColumnFC, ColumnFC rỗng sẽ có placeholder card, cần xóa nó đi trước khi gửi dữ liệu lên cho phía BE. (Nhớ lại video 37.2)
-        if (prevCardOrderIds[0].includes('placeholder-card')) prevCardOrderIds = []
+    //     // Gọi API xử lý phía BE
+    //     let prevCardOrderIds = dndOrderedColumns.find(c => c._id === prevColumnId)?.cardOrderIds
+    //     // Xử lý vấn đề khi kéo Card cuối cùng ra khỏi ColumnFC, ColumnFC rỗng sẽ có placeholder card, cần xóa nó đi trước khi gửi dữ liệu lên cho phía BE. (Nhớ lại video 37.2)
+    //     if (prevCardOrderIds[0].includes('placeholder-card')) prevCardOrderIds = []
 
-        moveCardToDifferentColumnAPI({
-            currentCardId,
-            prevColumnId,
-            prevCardOrderIds,
-            nextColumnId,
-            nextCardOrderIds: dndOrderedColumns.find(c => c._id === nextColumnId)?.cardOrderIds
-        })
-    }
+    //     moveCardToDifferentColumnAPI({
+    //         currentCardId,
+    //         prevColumnId,
+    //         prevCardOrderIds,
+    //         nextColumnId,
+    //         nextCardOrderIds: dndOrderedColumns.find(c => c._id === nextColumnId)?.cardOrderIds
+    //     })
+    // }
 
     // Xử lý xóa một ColumnFC và Cards bên trong nó
-    const deleteColumnDetails = (columnId: any) => {
-        // Update cho chuẩn dữ liệu state Board
-        const newBoard = { ...board }
-        newBoard.columns = newBoard.columns.filter((c: { id: any }) => c.id !== columnId)
-        newBoard.columnOrderIds = newBoard.columnOrderIds.filter((_id: any) => _id !== columnId)
-        // setBoard(newBoard)
+    // const deleteColumnDetails = (columnId: any) => {
+    //     // Update cho chuẩn dữ liệu state Board
+    //     const newBoard = { ...board }
+    //     newBoard.columns = newBoard.columns.filter((c: { id: any }) => c.id !== columnId)
+    //     newBoard.columnOrderIds = newBoard.columnOrderIds.filter((_id: any) => _id !== columnId)
+    //     // setBoard(newBoard)
 
-        // Gọi API xử lý phía BE
-        deleteColumnDetailsAPI(columnId).then(res => {
-            toast.success(res?.deleteResult)
-        })
-    }
+    //     // Gọi API xử lý phía BE
+    //     deleteColumnDetailsAPI(columnId).then(res => {
+    //         toast.success(res?.deleteResult)
+    //     })
+    // }
 
     if (error) {
         toast.error(error.message)
@@ -218,34 +219,37 @@ const BoardComponent: React.FC = () => {
 
     if (isLoading) {
         return (
-            <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 2,
-                width: '100vw',
-                height: '100vh'
-            }}>
-                <CircularProgress/>
-                <Typography>Loading Board...</Typography>
-            </Box>
+            <>
+                {console.log('loading!!!!!!!!!: ', isLoading)}
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 2,
+                    width: '100vw',
+                    height: '100vh'
+                }}>
+                    <CircularProgress />
+                    <Typography>Loading Board...</Typography>
+                </Box>
+            </>
         )
     }
 
     return (
         <Container disableGutters maxWidth={false} sx={{ height: '100vh' }}>
             <>
-
-                <BoardBarFC board={board}/>
+                {console.log('board: ', board)}
+                <BoardBarFC board={board} />
                 <BoardContentFC
-                    // board={board}
+                // board={board}
 
-                    // createNewColumn={createNewColumn}
-                    // createNewCard={createNewCard}
-                    // moveColumns={moveColumns}
-                    // moveCardInTheSameColumn={moveCardInTheSameColumn}
-                    // moveCardToDifferentColumn={moveCardToDifferentColumn}
-                    // deleteColumnDetails={deleteColumnDetails}
+                // createNewColumn={createNewColumn}
+                // createNewCard={createNewCard}
+                // moveColumns={moveColumns}
+                // moveCardInTheSameColumn={moveCardInTheSameColumn}
+                // moveCardToDifferentColumn={moveCardToDifferentColumn}
+                // deleteColumnDetails={deleteColumnDetails}
                 />
             </>
         </Container>

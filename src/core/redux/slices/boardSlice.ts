@@ -29,6 +29,11 @@ export const boardSlice = createSlice({
     name: 'counter',
     initialState,
     reducers: {
+        setBoard: (state, action: PayloadAction<string>) => {
+            state.boardId = action.payload
+            // state.board = {} as Board
+            // console.log('finish set board!!')
+        },
         save: (state, action: PayloadAction<Board>) => {
             state.board = action.payload
         },
@@ -96,6 +101,8 @@ export const boardSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addMatcher(boardApi.endpoints.getBoardByCode.matchFulfilled, (state, action) => {
+            console.log('getBoardByCode.matchFulfilled')
+
             const board = action.payload
             board.columns = mapOrder(board.columns, board.columnOrderIds, 'id')
             board.columns.forEach((column: Column) => {
@@ -116,6 +123,7 @@ export const boardSlice = createSlice({
 
 // Action creators are generated for each case reducer function
 export const {
+    setBoard,
     save,
     addColumn,
     updateColum,

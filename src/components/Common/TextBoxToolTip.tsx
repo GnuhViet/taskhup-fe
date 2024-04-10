@@ -7,34 +7,42 @@ export interface TextBoxToolTipProps {
     sx?: any
     id: string
     text: string
+    breakOnLine?: number
 }
 
 const overflowDotSx = {
     overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis'
+    // whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+    display: '-webkit-box',
+    WebkitBoxOrient: 'vertical'
 }
 
-const TextBoxToolTip: React.FC<TextBoxToolTipProps> = ({ sx, text, id }) => {
+const slotProps = { popper: { modifiers: [{ name: 'offset', options: { offset: [-30, -30] } }] } }
+
+const TextBoxToolTip: React.FC<TextBoxToolTipProps> = ({ sx, text, id, breakOnLine }) => {
     const [isEllipsis, setIsEllipsis] = React.useState(false)
 
     React.useEffect(() => {
         const element = document.getElementById(`tooltip-text-item-${id}`)
         if (element) {
-            setIsEllipsis(element.scrollWidth > element.clientWidth)
+            setIsEllipsis(element.scrollHeight > element.clientHeight)
         }
     }, [id])
 
     return (
-        <Box sx={{ ...sx, ...overflowDotSx }} id={`tooltip-text-item-${id}`}>
-            {isEllipsis ? (
-                <Tooltip title={text}>
+        <>
+            <Box sx={{ ...sx, ...overflowDotSx, WebkitLineClamp: breakOnLine ? breakOnLine : 1 }} id={`tooltip-text-item-${id}`}>
+                {isEllipsis ? (
+                    <Tooltip title={text} enterDelay={1500} slotProps={slotProps}>
+                        <span>{text}</span>
+                    </Tooltip>
+                ) : (
                     <span>{text}</span>
-                </Tooltip>
-            ) : (
-                <span>{text}</span>
-            )}
-        </Box>
+                )}
+            </Box>
+        </>
+
     )
 }
 
