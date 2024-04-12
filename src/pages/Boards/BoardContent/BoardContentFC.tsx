@@ -17,7 +17,7 @@ import {
     // rectIntersection,
     getFirstCollision
 } from '@dnd-kit/core'
-import { MouseSensor, TouchSensor } from '~/customLibraries/DndKitSensors'
+import { MouseSensor, TouchSensor } from '~/core/utils/customLibraries/DndKitSensors'
 
 import { arrayMove } from '@dnd-kit/sortable'
 import { useEffect, useState, useCallback, useRef } from 'react'
