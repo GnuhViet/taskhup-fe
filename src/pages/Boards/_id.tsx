@@ -36,6 +36,7 @@ const BoardComponent: React.FC = () => {
     const dispatch = useDispatch()
     // const board = useSelector((state: any) => state.boardReducer.board)
     const boardId = useSelector((state: any) => state.boardReducer.boardId)
+    const token = useSelector((state: any) => state.authReducer.token.accessToken)
     const boardState = useSelector((state: any) => state.boardReducer)
 
     // useEffect(() => {

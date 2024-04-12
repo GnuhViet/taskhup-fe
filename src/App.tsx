@@ -6,15 +6,29 @@ import HomeFC from '~/pages/Home/HomeFC'
 
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import ErrorPage from './pages/Error/ErrorPage'
+import Layout from '~/pages/Auth/Layout'
+import Public from '~/pages/Auth/Public'
+import Login from '~/pages/Auth/login'
+import RequireAuth from '~/pages/Auth/RequireAuth'
+import BoardComponentWrap from './pages/Boards/BoardComponentWrap'
+import LoginFC from './pages/Auth/Login/LoginFC'
 
 const router = createBrowserRouter([
     {
         path: '/',
         errorElement: <ErrorPage />,
+        // element: <Layout />,
         children: [
-            { path: '', element: <HomeFC /> },
-            { path: '/board', element: <BoardComponent /> },
-            { path: '/error', element: <ErrorPage /> }
+            // { path: '', element: <Public/> },
+            { path: '', element: <LoginFC /> },
+            {
+                element: <RequireAuth />,
+                children: [
+                    { path: '/home', element: <HomeFC /> },
+                    { path: '/board', element: <BoardComponentWrap /> },
+                    { path: '/error', element: <ErrorPage /> }
+                ]
+            }
         ]
     }
 ])
@@ -24,10 +38,10 @@ const App: React.FC = () => {
         <>
             {/* React Router Dom /boards /boards/{board_id} */}
             {/* Board Details */}
-            <AppBar />
-            <StompSessionProvider url={'http://localhost:8080/ws-endpoint'}>
-                <RouterProvider router={router} />
-            </StompSessionProvider>
+
+            <RouterProvider router={router} />
+
+            {/* <RouterProvider router={router} /> */}
             {/* <Box sx={{ display: 'none' }}>
                 <BoardComponent />
             </Box> */}

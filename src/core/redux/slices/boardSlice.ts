@@ -103,7 +103,8 @@ export const boardSlice = createSlice({
         builder.addMatcher(boardApi.endpoints.getBoardByCode.matchFulfilled, (state, action) => {
             console.log('getBoardByCode.matchFulfilled')
 
-            const board = action.payload
+            const board = JSON.parse(JSON.stringify({ ...action.payload as Board })) // make object not readonly
+
             board.columns = mapOrder(board.columns, board.columnOrderIds, 'id')
             board.columns.forEach((column: Column) => {
                 // Khi f5 trang web thì cần xử lý vấn đề kéo thả vào một column rỗng (Nhớ lại video 37.2, code hiện tại là video 69)

@@ -21,6 +21,13 @@ import 'react-toastify/dist/ReactToastify.css'
 import { ConfirmProvider } from 'material-ui-confirm'
 import { Provider } from 'react-redux'
 import { store } from '~/core/redux/store'
+import { setCredentials } from './core/redux/slices/authSlice'
+
+const storedToken = localStorage.getItem('auth-token')
+if (storedToken) {
+    const token = JSON.parse(storedToken)
+    store.dispatch(setCredentials(token))
+}
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     // <React.StrictMode>
