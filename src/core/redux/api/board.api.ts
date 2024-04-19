@@ -4,6 +4,8 @@ const API_URL = 'api/v1/board'
 import { apiSlice } from '~/core/redux/api/base.api'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Board } from '../../model/board.model'
+import { create } from 'lodash'
+import { BoardCreateReq } from '~/core/services/board-services.model'
 
 export type Channel = 'redux' | 'general'
 
@@ -30,19 +32,15 @@ export type Channel = 'redux' | 'general'
 
 export const boardApi = apiSlice.injectEndpoints({
     endpoints: (builder: any) => ({
-        login: builder.mutation({
-            query: (credentials: any) => ({ //TODO request type
-                url: '/api/v1/auth/login',
-                method: 'POST',
-                body: {
-                    username: credentials.user,
-                    password: credentials.pwd
-                }
-            })
-        }),
         getBoardByCode: builder.query({
             query: (code: string) => ({
                 url: `${API_URL}/${code}`,
+                method: 'GET'
+            })
+        }),
+        getUserWorkspaceBoard: builder.query({
+            query: (workspaceId: string) => ({
+                url: `${API_URL}/workspace-boards/${workspaceId}`,
                 method: 'GET'
             })
         }),
@@ -50,6 +48,13 @@ export const boardApi = apiSlice.injectEndpoints({
             query: () => ({
                 url: `${API_URL}`,
                 method: 'GET'
+            })
+        }),
+        createBoard: builder.mutation({
+            query: (data: BoardCreateReq) => ({
+                url: `${API_URL}`,
+                method: 'POST',
+                body: data
             })
         })
     })
@@ -61,5 +66,6 @@ export const boardApi = apiSlice.injectEndpoints({
 
 export const {
     useGetBoardByCodeQuery,
-    useGetAllBoardQuery
+    useGetAllBoardQuery,
+    useCreateBoardMutation
 } = boardApi

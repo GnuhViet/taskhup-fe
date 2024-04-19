@@ -23,17 +23,17 @@ const theme = extendTheme({
         MuiCssBaseline: {
             styleOverrides: {
                 body: {
-                    '*::-webkit-scrollbar': {
-                        width: '8px',
-                        height: '8px'
-                    },
-                    '*::-webkit-scrollbar-thumb': {
-                        backgroundColor: '#dcdde1',
-                        borderRadius: '8px'
-                    },
-                    '*::-webkit-scrollbar-thumb:hover': {
-                        backgroundColor: 'white'
-                    }
+                    // '*::-webkit-scrollbar': {
+                    //     width: '10px',
+                    //     height: '10px'
+                    // },
+                    // '*::-webkit-scrollbar-thumb': {
+                    //     backgroundColor: '#dcdde1',
+                    //     borderRadius: '8px'
+                    // },
+                    // '*::-webkit-scrollbar-thumb:hover': {
+                    //     backgroundColor: '#A8A8A8'
+                    // }
                 }
             }
         },

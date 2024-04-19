@@ -15,24 +15,41 @@ const baseQuery = fetchBaseQuery({
     }
 })
 
+// Re-fresh token if 403 error
 const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
-    const result = await baseQuery(args, api, extraOptions)
+    let result = await baseQuery(args, api, extraOptions)
 
-    // if (result?.error?.originalStatus === 403) {
-    //     console.log('sending refresh token')
-    //     // send refresh token to get new access token
-    //     const refreshResult = await baseQuery('/refresh', api, extraOptions)
-    //     console.log(refreshResult)
-    //     if (refreshResult?.data) {
-    //         const user = api.getState().auth.user
-    //         // store the new token
-    //         api.dispatch(setCredentials({ ...refreshResult.data, user }))
-    //         // retry the original query with new access token
-    //         result = await baseQuery(args, api, extraOptions)
-    //     } else {
-    //         api.dispatch(logOut())
-    //     }
-    // }
+    if (result?.error?.status === 403) {
+        // get the refresh token from the store
+        const refreshToken = api.getState().authReducer.token.refreshToken
+        // if no refresh token, log out
+        if (!refreshToken) {
+            api.dispatch(logOut())
+            return result
+        }
+        // send refresh token to post api/v1/auth/refresh
+        const refreshResult = await baseQuery({
+            url: '/api/v1/auth/refresh',
+            method: 'POST',
+            body: { refreshToken }
+        }, api, extraOptions)
+
+        // if refresh token is expired, log out
+        if (refreshResult?.error?.status === 401) {
+            api.dispatch(logOut())
+            return result
+        }
+
+        // set new token
+        if (refreshResult?.data) {
+            // store the new token
+            api.dispatch(setCredentials(refreshResult.data))
+            // retry the original query with new access token
+            result = await baseQuery(args, api, extraOptions)
+        } else {
+            api.dispatch(logOut())
+        }
+    }
 
     return result
 }

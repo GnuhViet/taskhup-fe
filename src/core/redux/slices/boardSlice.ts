@@ -11,7 +11,8 @@ import {
     BoardCardCreateResp,
     BoardCardMoveReq,
     BoardColumnCreateResp,
-    BoardColumnMoveReq
+    BoardColumnMoveReq,
+    BoardDtoResp
 } from '~/core/services/board-services.model'
 import { mapObject } from '~/core/utils/mapper'
 
@@ -48,13 +49,13 @@ export const boardSlice = createSlice({
         },
         addCard: (state, action: PayloadAction<BoardCardCreateResp>) => {
             state.board.columns.forEach(column => {
-                if (column.id === action.payload.boardColumnId) {
+                if (column.id === action.payload.columnId) {
                     if (column.cards.length === 1 && column.cards[0].id === 'placeholder-card') {
                         column.cards = []
                         column.cardOrderIds = []
                     }
                     const card = mapObject<Card>(action.payload, new Card())
-                    column.cards = [...column.cards, card]
+                    column.cards = [...column.cards, { ...card } as Card]
                     column.cardOrderIds = [...column.cardOrderIds, card.id]
                 }
             })
@@ -62,7 +63,7 @@ export const boardSlice = createSlice({
         updateColumnOrderResponse: (state, action: PayloadAction<BoardColumnMoveReq>) => {
             const columnOrderIds = action.payload.columnOrderIds
             const board = state.board
-            const sortedColumns = mapOrder([...board.columns], [...columnOrderIds].join(','), 'id')
+            const sortedColumns = mapOrder([...board.columns], [...columnOrderIds], 'id')
 
             state.board.columnOrderIds = columnOrderIds
             state.board.columns = sortedColumns
@@ -82,7 +83,7 @@ export const boardSlice = createSlice({
                 toColumn.cardOrderIds = [...response.cardOrderIds]
 
                 fromColumn.cards = fromColumn.cards.filter(card => card.id !== response.cardId)
-                toColumn.cards = [...toColumn.cards, response.card]
+                toColumn.cards = [...toColumn.cards.filter(card => card.id !== response.cardId), response.card]
 
                 fromColumn.cards = mapOrder(fromColumn.cards, fromColumn.cardOrderIds, 'id')
                 toColumn.cards = mapOrder(toColumn.cards, toColumn.cardOrderIds, 'id')
@@ -105,6 +106,7 @@ export const boardSlice = createSlice({
 
             const board = JSON.parse(JSON.stringify({ ...action.payload as Board })) // make object not readonly
 
+            board.columnOrderIds = String(board.columnOrderIds).split(',')
             board.columns = mapOrder(board.columns, board.columnOrderIds, 'id')
             board.columns.forEach((column: Column) => {
                 // Khi f5 trang web thì cần xử lý vấn đề kéo thả vào một column rỗng (Nhớ lại video 37.2, code hiện tại là video 69)
@@ -112,6 +114,7 @@ export const boardSlice = createSlice({
                     column.cards = [generatePlaceholderCard(column)]
                     column.cardOrderIds = [generatePlaceholderCard(column).id]
                 } else {
+                    column.cardOrderIds = String(column.cardOrderIds).split(',')
                     // Sắp xếp thứ tự các cards luôn ở đây trước khi đưa dữ liệu xuống bên dưới các component con (video 71 đã giải thích lý do ở phần Fix bug quan trọng)
                     column.cards = mapOrder(column.cards, column.cardOrderIds, 'id')
                 }
@@ -131,6 +134,7 @@ export const {
     addCard,
     updateColumnOrder,
     updateColumnOrderResponse,
+    updateCardOrderResponse,
     messageReceived,
     websocketReady
 } = boardSlice.actions

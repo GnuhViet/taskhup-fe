@@ -34,7 +34,7 @@ const TextBoxToolTip: React.FC<TextBoxToolTipProps> = ({ sx, text, id, breakOnLi
         <>
             <Box sx={{ ...sx, ...overflowDotSx, WebkitLineClamp: breakOnLine ? breakOnLine : 1 }} id={`tooltip-text-item-${id}`}>
                 {isEllipsis ? (
-                    <Tooltip title={text} enterDelay={1500} slotProps={slotProps}>
+                    <Tooltip title={text} enterDelay={800} slotProps={slotProps}>
                         <span>{text}</span>
                     </Tooltip>
                 ) : (

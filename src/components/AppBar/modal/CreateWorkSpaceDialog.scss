@@ -1,0 +1,25 @@
+// styles.scss
+.closeIcon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 100;
+    font-size: 1.7rem;
+    padding: 10px;
+    margin-left: 40px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+
+    svg {
+        padding-right: 4px;
+    }
+}
+
+.closeIcon:hover {
+    background-color: #CFD3DB;
+    cursor: pointer;
+}
+

@@ -302,7 +302,10 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
 
         // Xử lý logic ở đây chỉ khi kéo card qua 2 column khác nhau, còn nếu kéo card trong chính column ban đầu của nó thì không làm gì
         // Vì đây đang là đoạn xử lý lúc kéo (handleDragOver), còn xử lý lúc kéo xong xuôi thì nó lại là vấn đề khác ở (handleDragEnd)
-        if (activeColumn.id === overColumn.id) return
+        if (activeColumn.id === overColumn.id) {
+            setIsMoveCardBetweenDifferentColumns(false)
+            return
+        }
 
         moveCardBetweenDifferentColumns(
             // overColumn,

@@ -1,4 +1,5 @@
 import { Card } from '~/core/model/card.model'
+import { Column } from '../model/column.model'
 
 export class BoardColumnCreateReq {
     title: string
@@ -22,7 +23,8 @@ export class BoardCardCreateReq {
 export class BoardCardCreateResp {
     id: string
     title: string
-    boardColumnId: string
+    boardId: string
+    columnId: string
 }
 
 export class BoardCardMoveReq {
@@ -31,4 +33,43 @@ export class BoardCardMoveReq {
     toColumnId: string
     cardOrderIds: string[]
     card: Card
+}
+
+export class BoardDtoResp {
+    id: string
+    name: string
+    title: string
+    description: string
+    type: string
+    ownerIds: string[]
+    memberIds: string[]
+    columnOrderIds: string
+    columns: BoardColumnDtoResp[]
+}
+
+export class BoardColumnDtoResp {
+    id: string
+    boardId: string
+    title: string
+    cardOrderIds: string
+    cards: BoardColumnDtoResp[]
+}
+
+export class BoardCardDtoResp {
+    id: string
+    boardId: string
+    columnId: string
+    title: string
+    description: string
+    cover: string
+    memberIds: string[]
+    comments: string[]
+    attachments: string[]
+    FE_PlaceholderCard: any
+}
+
+export class BoardCreateReq {
+    title: string
+    background: string
+    workspaceId: string
 }

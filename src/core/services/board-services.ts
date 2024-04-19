@@ -1,6 +1,11 @@
 import { IMessage } from 'react-stomp-hooks'
 import { Dispatch } from '@reduxjs/toolkit'
-import { addCard, addColumn, updateColumnOrderResponse } from '~/core/redux/slices/boardSlice'
+import {
+    addCard,
+    addColumn,
+    updateColumnOrderResponse,
+    updateCardOrderResponse
+} from '~/core/redux/slices/boardSlice'
 
 export enum ACTION {
     CREATE_COLUMN = 'CREATE_COLUMN',
@@ -29,6 +34,7 @@ export const handleSocketEvent = (event: IMessage, dispatch: Dispatch) => {
         dispatch(addCard(resp.data))
         break
     case ACTION.MOVE_CARD:
+        dispatch(updateCardOrderResponse(resp.data))
         console.log('MOVE_CARD', resp)
         break
     case ACTION.DELETE_CARD:

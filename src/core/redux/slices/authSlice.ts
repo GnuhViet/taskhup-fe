@@ -21,9 +21,10 @@ const authSlice = createSlice({
 
             localStorage.setItem('auth-token', JSON.stringify(token))
         },
-        logOut: (state, action) => {
+        logOut: (state) => {
             state.token.accessToken = null
             state.token.refreshToken = null
+            localStorage.removeItem('auth-token')
         }
     }
 })

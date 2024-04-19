@@ -1,5 +1,6 @@
 export class Card {
     id: string
+    boardId: string
     columnId: string
     title: string
     description: string

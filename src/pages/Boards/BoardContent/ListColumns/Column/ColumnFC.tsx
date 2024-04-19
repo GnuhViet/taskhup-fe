@@ -133,6 +133,17 @@ const ColumnFC: React.FC<ColumnFCProps> = ({ column, deleteColumnDetails }) => {
                     ml: 2,
                     borderRadius: '6px',
                     height: 'fit-content',
+                    '*::-webkit-scrollbar': {
+                        width: '8px',
+                        height: '8px'
+                    },
+                    '*::-webkit-scrollbar-thumb': {
+                        backgroundColor: '#e9eaec',
+                        borderRadius: '8px'
+                    },
+                    '*::-webkit-scrollbar-thumb:hover': {
+                        backgroundColor: '#acafb9'
+                    },
                     maxHeight: (theme: any) => `calc(${theme.trello.boardContentHeight} - ${theme.spacing(5)})`
                 }}
             >
