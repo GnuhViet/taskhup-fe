@@ -14,14 +14,17 @@ import Select, { selectClasses } from '@mui/joy/Select'
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown'
 import Option from '@mui/joy/Option'
 import Button from '@mui/material/Button'
-import { BoardCreateReq } from '~/core/services/board-services.model'
-import { useSelector } from 'react-redux'
+import { BoardCreateReq, BoardCreateResp } from '~/core/services/board-services.model'
+import { useDispatch, useSelector } from 'react-redux'
 import { WorkSpace } from '~/core/model/workspace.model'
 import { useCreateBoardMutation } from '~/core/redux/api/board.api'
+import { addCreatedBoard } from '~/core/redux/slices/homeSlice'
+import { ApiResponse } from '~/core/services/api.model'
+import { toast } from 'react-toastify'
 
 export interface CreateBoardPopoverProps {
     id: string
-    workspaceId: string
+    workspaceId?: string
     open: boolean
     anchorEl: HTMLElement
     onClose?: () => void
@@ -80,7 +83,8 @@ const backGroundUrlList = {
 
 
 const CreateBoardPopover: React.FC<CreateBoardPopoverProps> = ({ id, workspaceId, open, anchorEl, onClose }) => {
-    const workspaces = useSelector((state: any) => state.homeReducer.workspace)
+    const dispatch = useDispatch()
+    const workspaces = (useSelector((state: any) => state.homeReducer.workspace) as WorkSpace[]).filter((item: WorkSpace) => item.canCreateBoard)
 
     enum BackgroundType {
         URL = 'URL',
@@ -151,21 +155,23 @@ const CreateBoardPopover: React.FC<CreateBoardPopoverProps> = ({ id, workspaceId
         defaultValues: {
             title: '',
             background: '',
-            workspaceId: workspaceId
+            workspaceId: workspaceId === undefined ? '' : workspaceId
         }
     })
 
     const { register, handleSubmit, formState } = form
     const { errors } = formState
 
-    const [create, {isLoadingCreate}] = useCreateBoardMutation()
+    const [create, { isLoading }] = useCreateBoardMutation()
 
     const onSubmit: SubmitHandler<BoardCreateReq> = async (data) => {
         try {
             data.background = backGroundData
 
-            const board = await create(data).unwrap()
-
+            const resp = await create(data).unwrap() as ApiResponse<BoardCreateResp>
+            dispatch(addCreatedBoard(resp.data))
+            onClose()
+            toast.success('Board created!')
             // dispatch later
         } catch (error) {
             //TODO
@@ -184,10 +190,16 @@ const CreateBoardPopover: React.FC<CreateBoardPopoverProps> = ({ id, workspaceId
             open={open}
             anchorEl={anchorEl}
             onClose={onClose}
-            anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right'
-            }}
+            anchorOrigin={
+                id === 'header-create-board-popover'
+                    ? {
+                        vertical: 'bottom',
+                        horizontal: 'left'
+                    } : {
+                        vertical: 'top',
+                        horizontal: 'right'
+                    }
+            }
             transformOrigin={{
                 vertical: 'top',
                 horizontal: 'left'
@@ -198,7 +210,8 @@ const CreateBoardPopover: React.FC<CreateBoardPopoverProps> = ({ id, workspaceId
                         minWidth: '300px',
                         borderRadius: '8px',
                         // border: '1px solid #B2B9C4',
-                        boxShadow: '0'
+                        boxShadow: '0',
+                        marginTop: id === 'header-create-board-popover' ? '8px' : '0'
                     }
                 }
             }}
@@ -260,7 +273,7 @@ const CreateBoardPopover: React.FC<CreateBoardPopoverProps> = ({ id, workspaceId
                             <Box className="formSection" sx={{ pb: '4px' }}>
                                 <Box sx={titleSx}>Workspace</Box>
                                 <Select
-                                    placeholder="Choose…"
+                                    placeholder="Choose workspace…"
                                     indicator={<KeyboardArrowDown />}
                                     sx={{
                                         [`& .${selectClasses.indicator}`]: {

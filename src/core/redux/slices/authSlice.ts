@@ -1,13 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { Token } from '~/core/model/token.model'
+import { AuthorToken, Token } from '~/core/model/token.model'
 import { AuthenticationResponse } from '~/core/services/auth-services.model'
 
 export interface AuthState {
     token: Token
+    authorTokenStore: AuthorToken[]
 }
 
 const initialState: AuthState = {
-    token: {} as Token
+    token: {} as Token,
+    authorTokenStore: []
 }
 
 const authSlice = createSlice({
@@ -18,18 +20,31 @@ const authSlice = createSlice({
             const token = action.payload as AuthenticationResponse
             state.token.accessToken = token.accessToken
             state.token.refreshToken = token.refreshToken
-
+            state.token.authorToken = null
             localStorage.setItem('auth-token', JSON.stringify(token))
         },
         logOut: (state) => {
             state.token.accessToken = null
             state.token.refreshToken = null
+            state.token.authorToken = null
             localStorage.removeItem('auth-token')
+        },
+        setAuthorToken: (state, action) => {
+            state.token.authorToken = action.payload as AuthorToken
+        },
+        addAuthorToken: (state, action) => {
+            const token = action.payload as AuthorToken
+            state.authorTokenStore = [...state.authorTokenStore, token]
         }
     }
 })
 
-export const { setCredentials, logOut } = authSlice.actions
+export const {
+    setCredentials,
+    setAuthorToken,
+    addAuthorToken,
+    logOut
+} = authSlice.actions
 
 export default authSlice.reducer
 

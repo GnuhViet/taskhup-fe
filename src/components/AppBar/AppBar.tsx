@@ -21,9 +21,11 @@ import InputAdornment from '@mui/material/InputAdornment'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
 import CreateMenu from './Menus/Create'
+import { useNavigate } from 'react-router-dom'
 
 const AppBar: React.FC = () => {
     const [searchValue, setSearchValue] = useState('')
+    const navigate = useNavigate()
 
     return (
         <>
@@ -43,12 +45,32 @@ const AppBar: React.FC = () => {
             }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <AppsIcon />
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <SvgIcon component={TrelloIcon} fontSize="small" inheritViewBox />
-                        <Typography variant="span" sx={{
-                            fontSize: '1.2rem',
-                            fontWeight: 'bold',
-                        }}>Trello</Typography>
+                    <Box
+                        sx={{
+                            cursor: 'pointer',
+                            minWidth: '100px',
+                            minHeight: '32px',
+                            borderRadius: '3px',
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'center center',
+                            backgroundSize: '85px',
+                            backgroundImage: 'url(https://trello.com/assets/d947df93bc055849898e.gif)',
+                            filter: 'brightness(0) saturate(100%) invert(30%) sepia(53%) saturate(323%) hue-rotate(179deg) brightness(91%) contrast(88%)',
+                            '&:hover': {
+                                maxHeight: '100%',
+                                boxShadow: 'inset 0 0 0 1000px rgba(0, 0, 0, 0.2)',
+                                backgroundImage: 'url(https://trello.com/assets/87e1af770a49ce8e84e3.gif)'
+                            }
+                        }}
+                        onClick={() => navigate('/home')}
+                    >
+                        <Box sx={{}}>
+                            {/*<SvgIcon component={TrelloIcon} fontSize="small" inheritViewBox />*/}
+                            {/*<Typography variant="span" sx={{*/}
+                            {/*    fontSize: '1.2rem',*/}
+                            {/*    fontWeight: 'bold'*/}
+                            {/*}}>Trello</Typography>*/}
+                        </Box>
                     </Box>
 
                     <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>

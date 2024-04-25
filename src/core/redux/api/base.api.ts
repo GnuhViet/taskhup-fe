@@ -8,8 +8,12 @@ const baseQuery = fetchBaseQuery({
     credentials: 'include',
     prepareHeaders: (headers, { getState }) => {
         const token = (getState() as RootState).authReducer.token.accessToken
+        const authorToken = (getState() as RootState).authReducer.token.authorToken
         if (token) {
             headers.set('authorization', `Bearer ${token}`)
+        }
+        if (authorToken) {
+            headers.set('X-author', `${authorToken.authorToken}`)
         }
         return headers
     }

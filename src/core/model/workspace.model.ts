@@ -5,5 +5,6 @@ export class WorkSpace {
     title: string
     description: string
     type: string
+    canCreateBoard: boolean
     boards: Board[]
 }

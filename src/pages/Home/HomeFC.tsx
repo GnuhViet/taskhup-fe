@@ -2,7 +2,7 @@ import Box from '@mui/material/Box'
 import { ReactComponent as TrelloIcon } from '~/assets/trello.svg'
 import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined'
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
-import { skipToken } from "@reduxjs/toolkit/query"
+import { skipToken } from '@reduxjs/toolkit/query'
 import './HomeFC.scss'
 import SideBarButton from '~/components/Home/sidebar/SideBarButton'
 import List from '@mui/material/List'
@@ -34,7 +34,7 @@ const workspaceItemSx = {
 }
 
 const HomeFC = () => {
-    const workspace = useSelector((state: any) => state.homeReducer.workspace)
+    const workspace = useSelector((state: any) => state.homeReducer.workspace) as WorkSpace[]
 
     const { error, isLoading } = useGetUserWorkSpaceQuery({})
     // const response = data as ApiResponse<GetWorkSpaceResp>
@@ -46,12 +46,12 @@ const HomeFC = () => {
     if (isLoading) return <div>Loading...</div>
 
     return (
-        <> {console.log('home re-render!!', workspace)}
+        <>
             <Box className="home-container">
                 <Box className="home-sticky-container">
                     <Box className="home-left-sidebar-container">
                         <List className="top-button">
-                            <SideBarButton id={'board-button'} text={'Boards'} icon={<TrelloIcon style={iconSx} />} />
+                            <SideBarButton id={'board-button'} text={'Boards'} icon={<TrelloIcon style={iconSx} />} defaultSelected/>
                             <SideBarButton id={'template-button'} text={'Template'} icon={<InsightsOutlinedIcon sx={iconSx} />} />
                             <SideBarButton id={'home-button'} text={'Home'} icon={<HomeOutlinedIcon sx={iconSx} />} />
                         </List>
@@ -84,12 +84,31 @@ const HomeFC = () => {
 
                     <Box className="home-content">
                         <Box>
-                            <Box sx={sectionTitleSx}>YOUR WORKSPACES</Box>
+                            {workspace.filter((workspace: WorkSpace) => workspace.type === 'JOINED').length > 0
+                                && <Box sx={sectionTitleSx}>YOUR WORKSPACES</Box>
+                            }
                             {
                                 workspace
                                 && workspace
                                     .map((workspace: WorkSpace) => (
                                         workspace.type === 'JOINED'
+                                            ?
+                                            <Box sx={workspaceItemSx} key={workspace.id}>
+                                                <WorkSpaceItem workspace={workspace} />
+                                            </Box>
+                                            : null
+                                    ))
+                            }
+                        </Box>
+                        <Box>
+                            {workspace.filter((workspace: WorkSpace) => workspace.type === 'GUEST').length > 0
+                                && <Box sx={sectionTitleSx}>GUEST WORKSPACES</Box>
+                            }
+                            {
+                                workspace
+                                && workspace
+                                    .map((workspace: WorkSpace) => (
+                                        workspace.type === 'GUEST'
                                             ?
                                             <Box sx={workspaceItemSx} key={workspace.id}>
                                                 <WorkSpaceItem workspace={workspace} />

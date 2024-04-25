@@ -31,29 +31,31 @@ const itemSx = {
     alignItems: 'center'
 }
 
-const textSx = {
-    // pt: '4px'
-}
-
 export interface SideBarButtonProps {
     id: string
     sx?: any
+    textSx?: any
     text: string
-    icon: React.ReactNode
+    icon?: React.ReactNode
+    defaultSelected?: any
 }
 
-const SideBarButton: React.FC<SideBarButtonProps> = ({ id, sx, text, icon }) => {
+const SideBarButton: React.FC<SideBarButtonProps> = ({ id, sx, textSx, text, icon, defaultSelected }) => {
     const dispatch = useDispatch()
     const selectedButtonId = useSelector((state: any) => state.homeReducer.selectedButtonId)
 
     const handleClick = () => {
         dispatch(setSelectedButtonId(id))
     }
-
+    React.useEffect(() => {
+        if (defaultSelected !== undefined) {
+            dispatch(setSelectedButtonId(id))
+        }
+    }, [])
     return (
         <ListItemButton sx={buttonSx} selected={selectedButtonId === id} onClick={handleClick}>
             <Box sx={{ display: 'flex', ...sx }}>
-                <ListItemIcon sx={itemSx}>{icon}</ListItemIcon>
+                {icon && <ListItemIcon sx={itemSx}>{icon}</ListItemIcon>}
                 <ListItemText sx={textSx}
                     primaryTypographyProps={{ fontWeight: selectedButtonId === id ? 'bold' : '400' }}
                     primary={text} />

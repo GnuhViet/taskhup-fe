@@ -12,7 +12,7 @@ export const ErrorPage = () => {
                         <h1 style={{ fontSize: '10rem', margin: '0', height: 'fit-content' }}>404</h1>
                         <h2>Page not found!</h2>
                         <p>Sorry, the page you are looking for does not exist.</p>
-                        <p>Click <Link to={'/'}>here</Link> to go back to the home page.</p>
+                        <p>Click <Link to={'/home'}>here</Link> to go back to the home page.</p>
                     </div>
                 </div>
             </Box>

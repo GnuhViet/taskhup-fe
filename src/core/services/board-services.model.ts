@@ -73,3 +73,10 @@ export class BoardCreateReq {
     background: string
     workspaceId: string
 }
+
+export class BoardCreateResp {
+    id: string
+    title: string
+    background: string
+    workspaceId: string
+}

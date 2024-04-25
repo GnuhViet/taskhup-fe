@@ -13,6 +13,8 @@ import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined'
 import SideBarButton from './SideBarButton'
 import { useSelector } from 'react-redux'
 
+import Box from '@mui/material/Box'
+
 const buttonSx = {
     borderRadius: '8px',
     height: '36px',
@@ -102,7 +104,7 @@ const SideBarExpandButton: React.FC<SideBarExpandButtonProps> = ({ workSpaceId, 
             <Collapse in={open} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                     <SideBarButton id={`${workSpaceId}-boards-button`}
-                        sx={collapseButtonSx} text={'Boards'} icon={<TrelloIcon sx={iconSx} />} />
+                        sx={collapseButtonSx} text={'Boards'} icon={<Box sx={iconSx}><TrelloIcon /></Box>} />
                     <SideBarButton id={`${workSpaceId}-highlight-button`}
                         sx={collapseButtonSx} text={'Highlights'} icon={<InsightsOutlinedIcon sx={iconSx} />} />
                     <SideBarButton id={`${workSpaceId}-view-button`}
@@ -114,7 +116,6 @@ const SideBarExpandButton: React.FC<SideBarExpandButtonProps> = ({ workSpaceId, 
                 </List>
             </Collapse>
         </>
-
 
 
     )

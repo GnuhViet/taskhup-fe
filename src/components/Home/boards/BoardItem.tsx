@@ -53,7 +53,7 @@ const BoardItem: React.FC<BoardItemProps> = ({ id, title, desc, starred, backgro
         await dispatch(setBoard(id))
 
         console.log('do navigate !!')
-        navigate('/board')
+        navigate('/workspace/board')
     }
 
     return (

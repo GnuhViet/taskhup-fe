@@ -1,21 +1,19 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
 import Avatar from '@mui/material/Avatar'
 import Button from '@mui/material/Button'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Checkbox from '@mui/material/Checkbox'
 import Link from '@mui/material/Link'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import Typography from '@mui/material/Typography'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { AuthenticationRequest, AuthenticationResponse } from '~/core/services/auth-services.model'
+import { AuthenticationResponse, RegisterRequest } from '~/core/services/auth-services.model'
 import { CircularProgress, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput } from '@mui/material'
 import { VisibilityOff, Visibility } from '@mui/icons-material'
-import { useLoginMutation } from '~/core/redux/api/auth.api'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { setCredentials } from '~/core/redux/slices/authSlice'
+import { useRegisterMutation } from '~/core/redux/api/auth.api'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
@@ -32,28 +30,23 @@ function Copyright(props: any) {
     )
 }
 
-const LoginFC = () => {
+const RegisterFC = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    const token = useSelector((state: any) => state.authReducer.token.accessToken)
-
-    useEffect(() => {
-        if (token) {
-            navigate('/home')
-        }
-    }, [token, navigate])
 
     const [showPassword, setShowPassword] = React.useState(false)
     const handleClickShowPassword = () => setShowPassword((show) => !show)
     const handleMouseDownPassword = (event: any) => { event.preventDefault() }
 
 
-    const [login, { isLoading }] = useLoginMutation()
+    const [login, { isLoading }] = useRegisterMutation()
 
-    const form = useForm<AuthenticationRequest>({
+    const form = useForm<RegisterRequest>({
         defaultValues: {
             username: '',
-            password: ''
+            password: '',
+            email: '',
+            fullName: ''
         }
     })
 
@@ -61,11 +54,13 @@ const LoginFC = () => {
     const { errors } = formState
 
 
-    const onSubmit: SubmitHandler<AuthenticationRequest> = async (data) => {
+    const onSubmit: SubmitHandler<RegisterRequest> = async (data) => {
         try {
-            const authReq = {} as AuthenticationRequest
+            const authReq = {} as RegisterRequest
             authReq.username = data.username
             authReq.password = data.password
+            authReq.email = data.email
+            authReq.fullName = data.fullName
 
             const authResp = await login(authReq).unwrap() as AuthenticationResponse
             await dispatch(setCredentials(authResp))
@@ -108,18 +103,27 @@ const LoginFC = () => {
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    Sign in
+                    Register new account
                 </Typography>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Box sx={{ maxWidth: 'sm' }} margin='normal' >
-                        <FormControl sx={{ m: '10px 0 10px 0' }} fullWidth variant="outlined">
+                        <FormControl sx={{ mt: '10px' }} fullWidth variant="outlined">
                             <InputLabel htmlFor="outlined-adornment-username">Username</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-username"
                                 type="text"
                                 label="Username"
+                                placeholder='JohnDoe99'
                                 {...register('username', {
-                                    required: 'Field is required'
+                                    required: 'Field is required',
+                                    maxLength: {
+                                        value: 50,
+                                        message: 'Field is too long'
+                                    },
+                                    pattern: {
+                                        value: /^[a-zA-Z0-9._]{6,}$/,
+                                        message: 'Field must be min 5 character and not containing special character'
+                                    }
                                 })}
                                 error={!!errors.username}
                             />
@@ -129,12 +133,56 @@ const LoginFC = () => {
                                 </Typography>
                             )}
                         </FormControl>
-
-                        <FormControl fullWidth variant="outlined">
+                        <FormControl sx={{ mt: '10px' }} fullWidth variant="outlined">
+                            <InputLabel htmlFor="outlined-adornment-username">Email</InputLabel>
+                            <OutlinedInput
+                                id="outlined-adornment-email"
+                                type="text"
+                                label="Email"
+                                placeholder='JohnDoe99@gmail.com'
+                                {...register('email', {
+                                    required: 'Field is required',
+                                    maxLength: {
+                                        value: 50,
+                                        message: 'Field is too long'
+                                    },
+                                    pattern: {
+                                        value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
+                                        message: 'Invalid email'
+                                    }
+                                })}
+                                error={!!errors.email}
+                            />
+                            {errors.email && (
+                                <Typography variant="caption" color="error">
+                                    {errors.email.message}
+                                </Typography>
+                            )}
+                        </FormControl>
+                        <FormControl sx={{ mt: '10px' }} fullWidth variant="outlined">
+                            <InputLabel htmlFor="outlined-adornment-username">Full name</InputLabel>
+                            <OutlinedInput
+                                id="outlined-adornment-username"
+                                type="text"
+                                label="Full name"
+                                placeholder='John Doe'
+                                {...register('fullName', {
+                                    required: 'Field is required'
+                                })}
+                                error={!!errors.fullName}
+                            />
+                            {errors.fullName && (
+                                <Typography variant="caption" color="error">
+                                    {errors.fullName.message}
+                                </Typography>
+                            )}
+                        </FormControl>
+                        <FormControl sx={{ mt: '10px' }} fullWidth variant="outlined">
                             <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-password"
                                 type={showPassword ? 'text' : 'password'}
+                                placeholder='johnDoe99@'
                                 endAdornment={
                                     <InputAdornment position="end">
                                         <IconButton
@@ -149,7 +197,11 @@ const LoginFC = () => {
                                 }
                                 label="Password"
                                 {...register('password', {
-                                    required: 'Field is required'
+                                    required: 'Field is required',
+                                    pattern: {
+                                        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{4,50}$/,
+                                        message: 'Field must be min 4 and max 50 character containing at least 1 uppercase, 1 lowercase, 1 special character and 1 digit'
+                                    }
                                 })}
                                 error={!!errors.password}
                             />
@@ -159,27 +211,23 @@ const LoginFC = () => {
                                 </Typography>
                             )}
                         </FormControl>
-                        <FormControlLabel
-                            control={<Checkbox value="remember" color="primary" />}
-                            label="Remember me"
-                        />
                         <Button
                             type="submit"
                             fullWidth
                             variant="contained"
                             sx={{ mt: 3, mb: 2 }}
                         >
-                            Sign In
+                            Register
                         </Button>
                         <Grid container>
                             <Grid item xs>
-                                <Link href="#" variant="body2">
+                                <Link href="#" variant="body2" onClick={() => navigate('/forgor-passowrd')}>
                                     Forgot password?
                                 </Link>
                             </Grid>
                             <Grid item>
-                                <Link href="#" variant="body2">
-                                    {'Don\'t have an account? Sign Up'}
+                                <Link href="#" variant="body2" onClick={() => navigate('/login')}>
+                                    {'Already have an account? Login'}
                                 </Link>
                             </Grid>
                         </Grid>
@@ -191,4 +239,4 @@ const LoginFC = () => {
     )
 }
 
-export default LoginFC
+export default RegisterFC

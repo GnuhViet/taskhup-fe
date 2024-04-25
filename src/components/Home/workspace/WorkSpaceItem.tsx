@@ -17,6 +17,7 @@ import { WorkSpace } from '~/core/model/workspace.model'
 import { Board } from '~/core/model/board.model'
 import { Create } from '@mui/icons-material'
 import CreateBoardPopover from '../boards/createboard/CreateBoardPopover'
+import { useNavigate } from 'react-router-dom'
 
 const avatarSx = {
     minWidth: '32px',
@@ -66,6 +67,7 @@ export interface WorkSpaceItemProps {
 }
 
 const WorkSpaceItem: React.FC<WorkSpaceItemProps> = ({ workspace }) => {
+    const navigate = useNavigate()
     const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget)
@@ -74,11 +76,11 @@ const WorkSpaceItem: React.FC<WorkSpaceItemProps> = ({ workspace }) => {
         setAnchorEl(null)
     }
     const open = Boolean(anchorEl)
-    const id = open ? 'simple-popover' : undefined
+    const id = open ? 'workspace-create-board-popover' : undefined
 
     return (
         <Box>
-            <Box className='section-header' sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Box className='section-header' sx={{ display: 'flex', justifyContent: 'space-between', pr: '10px' }}>
                 <Box className='section-header-title' sx={{ display: 'flex', alignItems: 'center' }}>
                     <SquareAvatar sx={avatarSx} src={null} alt='T' />
                     <TextBoxToolTip sx={titleSx} text={workspace?.title.toUpperCase()} id={workspace?.id} breakOnLine={1} />
@@ -86,14 +88,14 @@ const WorkSpaceItem: React.FC<WorkSpaceItemProps> = ({ workspace }) => {
                 <Box>
                     <Button sx={{ ...buttonSx }} variant='contained' startIcon={<TrelloIcon />}>Boards</Button>
                     <Button sx={{ ...buttonSx }} variant='contained' startIcon={<GridViewOutlinedIcon />}>Views</Button>
-                    <Button sx={{ ...buttonSx }} variant='contained' startIcon={<PermIdentityOutlinedIcon />}>Members (2)</Button>
-                    <Button sx={{ ...buttonSx }} variant='contained' startIcon={<SettingsOutlinedIcon />}>Settings</Button>
+                    <Button sx={{ ...buttonSx }} variant='contained' startIcon={<PermIdentityOutlinedIcon />} onClick={() => navigate(`/w/${workspace.id}/member`)}>Members (2)</Button>
+                    <Button sx={{ ...buttonSx }} variant='contained' startIcon={<SettingsOutlinedIcon />} onClick={() => navigate(`/w/${workspace.id}/settings`)}>Settings</Button>
                     <Button sx={{ ...buttonSx, ...upgradeButtonSx }} variant='contained' startIcon={<MovingOutlinedIcon />}>Upgrade</Button>
                     {/* <Button sx={{ ...buttonSx, ...verifiedButtonSx }} variant='contained' startIcon={<VerifiedOutlinedIcon />}>Ultimate</Button> */}
                 </Box>
             </Box>
 
-            <Box className='section-content' sx={{ display: 'flex', mt: '16px' }}>
+            <Box className='section-content' sx={{ display: 'flex', mt: '16px', flexWrap: 'wrap' }}>
                 {workspace?.boards?.map((board: Board) =>
                     <Box key={board.id} sx={{ m: '0 16px 16px 0' }}>
                         <BoardItem
@@ -105,9 +107,11 @@ const WorkSpaceItem: React.FC<WorkSpaceItemProps> = ({ workspace }) => {
                         />
                     </Box>
                 )}
-                <Button sx={{ ...buttonSx, width: '194px', height: '96px', fontWeight: '300', m: '0 16px 16px 0' }} aria-describedby={id} onClick={handleClick}>
-                    Create new board
-                </Button>
+                {workspace.canCreateBoard &&
+                    <Button sx={{ ...buttonSx, width: '194px', height: '96px', fontWeight: '300', m: '0 16px 16px 0' }} aria-describedby={id} onClick={handleClick}>
+                        Create new board
+                    </Button>
+                }
                 <CreateBoardPopover id={id} workspaceId={workspace.id} open={open} anchorEl={anchorEl} onClose={handleClose} />
             </Box>
         </Box>

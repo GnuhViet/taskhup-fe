@@ -40,9 +40,13 @@ const theme = extendTheme({
         MuiButton: {
             styleOverrides: {
                 root: {
+                    // lineHeight: 0,
                     textTransform: 'none',
                     borderWidth: '0.5px',
-                    '&:hover': { borderWidth: '0.5px' }
+                    '&:hover': { borderWidth: '0.5px' },
+                    '&:disabled': {
+                        backgroundColor: '#F7F8F9'
+                    }
                 }
             }
         },

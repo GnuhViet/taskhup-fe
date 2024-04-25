@@ -10,13 +10,21 @@ import LibraryAddIcon from '@mui/icons-material/LibraryAdd'
 import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined'
 import HomeWorkOutlinedIcon from '@mui/icons-material/HomeWorkOutlined'
 import CreateWorkSpaceDialog from '../modal/CreateWorkSpaceDialog'
+import CreateBoardPopover from '~/components/Home/boards/createboard/CreateBoardPopover'
 
 const CreateMenu: React.FC = () => {
     const [anchorEl, setAnchorEl] = React.useState(null)
+    const [anchorElClone, setAnchorElClone] = React.useState(null)
     const open = Boolean(anchorEl)
+
+    const [openPopover, setOpenPopover] = React.useState(false)
+    const popOverId = 'header-create-board-popover'
+
     const handleClick = (event: any) => {
         setAnchorEl(event.currentTarget)
+        setAnchorElClone(event.currentTarget)
     }
+
     const handleClose = () => {
         setAnchorEl(null)
     }
@@ -63,7 +71,7 @@ const CreateMenu: React.FC = () => {
                         }
                     }}
                 >
-                    <MenuItem style={{ display: 'block', fontSize: '12px', marginBottom: '4px' }} >
+                    <MenuItem style={{ display: 'block', fontSize: '12px', marginBottom: '4px' }} onClick={() => { setOpenPopover(true); handleClose() }} >
                         <Box sx={{ display: 'flex', mb: '4px' }}>
                             <ListItemIcon>
                                 <SpaceDashboardOutlinedIcon fontSize='small' />
@@ -89,6 +97,8 @@ const CreateMenu: React.FC = () => {
                     </MenuItem>
                 </Menu>
             </Box>
+            {console.log('popoverid', popOverId)}
+            <CreateBoardPopover id={popOverId} open={openPopover} anchorEl={anchorElClone} onClose={() => setOpenPopover(false)} />
             <CreateWorkSpaceDialog open={openCreateWorkspaceDialog} handleClose={() => setOpenCreateWorkspaceDialog(false)} />
         </>
     )

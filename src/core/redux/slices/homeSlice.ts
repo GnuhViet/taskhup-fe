@@ -6,19 +6,22 @@ import { WorkSpace } from '~/core/model/workspace.model'
 import { workspaceApi } from '../api/workspace.api'
 import { GetWorkSpaceResp } from '~/core/services/workspace-services.model'
 import { ApiResponse } from '~/core/services/api.model'
+import { BoardCreateResp } from '~/core/services/board-services.model'
+import { mapObject } from '~/core/utils/mapper'
+import { set } from 'lodash'
 
 export interface BoardState {
     selectedButtonId: string
     workspace: WorkSpace[]
-    board: Board[]
-    newWorkspaceCreated: boolean
+    currentActiveWorkspaceId: string
+    // board: Board[]
 }
 
 const initialState: BoardState = {
     selectedButtonId: '-1',
     workspace: [],
-    board: [],
-    newWorkspaceCreated: false
+    currentActiveWorkspaceId: ''
+    // board: [],
 }
 
 export const homeSlice = createSlice({
@@ -28,16 +31,27 @@ export const homeSlice = createSlice({
         setSelectedButtonId: (state, action: PayloadAction<string>) => {
             state.selectedButtonId = action.payload
         },
+        setCurrentActiveWorkspaceId: (state, action: PayloadAction<string>) => {
+            state.currentActiveWorkspaceId = action.payload
+        },
         addCreatedWorkSpace: (state, action: PayloadAction<WorkSpace>) => {
             const workspace = { ...action.payload } as WorkSpace
             workspace.type = 'JOINED'
             state.workspace = [...state.workspace, workspace]
+        },
+        addCreatedBoard: (state, action: PayloadAction<BoardCreateResp>) => {
+            const board = { ...action.payload } as BoardCreateResp
+            state.workspace.forEach((workspace) => {
+                if (workspace.id === board.workspaceId) {
+                    workspace.boards = [...workspace.boards, mapObject<Board>(board, new Board())]
+                }
+            })
         }
     },
     extraReducers: (builder) => {
         builder.addMatcher(boardApi.endpoints.getAllBoard.matchFulfilled, (state, action) => {
-            const board = action.payload?.data
-            state.board = board
+            // const board = action.payload?.data
+            // state.board = board
         })
         builder.addMatcher(workspaceApi.endpoints.getUserWorkSpace.matchFulfilled, (state, action) => {
             const apiResp = action.payload as ApiResponse<GetWorkSpaceResp>
@@ -51,7 +65,8 @@ export const homeSlice = createSlice({
 
 export const {
     setSelectedButtonId,
-    addCreatedWorkSpace
+    addCreatedWorkSpace,
+    addCreatedBoard
 } = homeSlice.actions
 
 export default homeSlice.reducer
