@@ -3,6 +3,7 @@ import { boardApi } from './api/board.api'
 import boardSlice from './slices/boardSlice'
 import authSlice from './slices/authSlice'
 import homeSlice from './slices/homeSlice'
+import workspaceSlice from './slices/workspaceSlice'
 import { apiSlice } from '~/core/redux/api/base.api'
 
 export const store = configureStore({
@@ -10,7 +11,8 @@ export const store = configureStore({
         [apiSlice.reducerPath]: apiSlice.reducer,
         boardReducer: boardSlice,
         authReducer: authSlice,
-        homeReducer: homeSlice
+        homeReducer: homeSlice,
+        workspaceReducer: workspaceSlice
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(apiSlice.middleware),
     devTools: true

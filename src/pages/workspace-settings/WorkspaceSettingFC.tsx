@@ -2,9 +2,9 @@ import Box from '@mui/material/Box'
 import './WorkspaceSettingFC.scss'
 import SideBarButton from '~/components/Home/sidebar/SideBarButton'
 import List from '@mui/material/List'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import SquareAvatar from '~/components/Common/SquareAvatar'
-import React from 'react'
+import React, { useEffect } from 'react'
 import Button from '@mui/material/Button'
 import Link from '@mui/material/Link'
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined'
@@ -17,6 +17,10 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import CircleAvatar from '~/components/Common/CircleAvatar'
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined'
 import CreateRoleDialog from './Dialogs/CreateRoleDialog'
+
+import { Can } from '~/core/utils/access-control'
+import RoleSettingFC from './menu-tabs/RoleSettingFC'
+import { setSelectedButtonId } from '~/core/redux/slices/homeSlice'
 
 
 const headingSx = {
@@ -60,7 +64,6 @@ const WorkspaceSettingFC = () => {
     // const currentActiveWorkspaceId = useSelector((state: any) => state.homeReducer.currentActiveWorkspaceId)
     const selectedButtonId = useSelector((state: any) => state.homeReducer.selectedButtonId)
     const [open, setOpen] = React.useState(false)
-    const [openCreateRole, setOpenCreateRole] = React.useState(false)
 
     // const { error, isLoading } = useGetUserWorkSpaceQuery({})
     // const response = data as ApiResponse<GetWorkSpaceResp>
@@ -139,6 +142,8 @@ const WorkspaceSettingFC = () => {
                         {/*    <>workspace-join-request-button</>*/}
                         {/*)}*/}
 
+                        {console.log('render workspace setting', selectedButtonId)}
+
                         {(() => {
                             switch (selectedButtonId) {
                             case 'workspace-setting-info-button':
@@ -189,53 +194,7 @@ const WorkspaceSettingFC = () => {
                                     </Box>
                                 </>
                             case 'workspace-setting-role-button':
-                                return <>
-                                    <Box>
-                                        <Box sx={{ ...borderBottom, pb: '14px' }}>
-                                            <Box sx={headingSx}>Roles (1)</Box>
-                                            <Box sx={textSx}>Use roles to group your members and assign permissions.</Box>
-                                        </Box>
-                                        <Box sx={{ ...borderBottom, p: '24px 0 24px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <Box sx={{ maxWidth: '600px' }}>
-                                                <TextField
-                                                    placeholder='Filter by name...'
-                                                    size='small'
-                                                    sx={{ width: '450px' }}
-                                                />
-                                            </Box>
-                                            <Button
-                                                sx={{ ...buttonSx, mr: 0 }}
-                                                variant='contained'
-                                                startIcon={<BadgeOutlinedIcon sx={{ mb: '4px' }} />}
-                                                onClick={() => setOpenCreateRole(true)}
-                                            >Create Role</Button>
-                                        </Box>
-                                        <Box>
-                                            {new Array(4).fill(null).map((item, index) => (
-                                                <Box key={index} sx={{ ...borderBottom, p: '16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                        <CircleAvatar sx={{ minWidth: '42px', minHeight: '42px', fontSize: '16px', mr: '12px', background: '#5243AA' }} src={null} alt='V' />
-                                                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                                            <Box sx={{ fontSize: '16px', fontWeight: '800', color: '#172B4D' }}>Việt Hưng Nguyễn</Box>
-                                                            <Box sx={{ fontSize: '14px', fontWeight: '400', color: '#44546f', display: 'flex' }}>
-                                                                <Box>@vithngnguyn16</Box>
-                                                                <Box sx={{ fontSize: '20px', display: 'flex', alignItems: 'center', lineHeight: '14px' }}>
-                                                                                                                &nbsp;•&nbsp;
-                                                                </Box>
-                                                                <Box>Joined 1 month ago</Box>
-                                                            </Box>
-                                                        </Box>
-                                                    </Box>
-                                                    <Box>
-                                                        <Button sx={{ ...buttonSx }} variant='contained'>View permissions(3)</Button>
-                                                        <Button sx={{ ...buttonSx }} variant='contained' startIcon={<PeopleAltOutlinedIcon />}>Member (7)</Button>
-                                                        <Button sx={{ ...buttonSx, mr: 0 }} variant='contained' startIcon={<CloseOutlinedIcon />}>Delete&nbsp;...</Button>
-                                                    </Box>
-                                                </Box>
-                                            ))}
-                                        </Box>
-                                    </Box>
-                                </>
+                                return <RoleSettingFC/>
                             case 'workspace-join-request-button':
                                 return <>
                                     <Box>
@@ -271,7 +230,6 @@ const WorkspaceSettingFC = () => {
                     </Box>
                 </Box>
             </Box>
-            <CreateRoleDialog open={openCreateRole} setOpen={setOpenCreateRole} />
         </>
     )
 }

@@ -37,3 +37,13 @@ export enum Actions {
     EDIT_CARD_TEMPLATE = 'EDIT_CARD_TEMPLATE',
     EDIT_CARD = 'EDIT_CARD'
 }
+
+export class ActionsBoolean {
+    EDIT_WORKSPACE: boolean
+    MANAGE_USER: boolean
+    EDIT_ROLE: boolean
+    EDIT_BOARD: boolean
+    DELETE_BOARD: boolean
+    EDIT_CARD_TEMPLATE: boolean
+    EDIT_CARD: boolean
+}

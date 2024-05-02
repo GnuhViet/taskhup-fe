@@ -9,7 +9,7 @@ import RequireAuth from '~/pages/Auth/RequireAuth'
 import BoardComponentWrap from './pages/Boards/BoardComponentWrap'
 import LoginFC from './pages/Auth/LoginFC'
 import RegisterFC from '~/pages/Auth/RegisterFC'
-import MemberFC from '~/pages/member/MemberFC'
+import MemberFC from '~/pages/member-settings/MemberFC'
 import RequireRole from './pages/Auth/RequireRole'
 import WorkspaceSettingFC from './pages/workspace-settings/WorkspaceSettingFC'
 
