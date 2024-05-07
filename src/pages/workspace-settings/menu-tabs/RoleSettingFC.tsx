@@ -11,7 +11,6 @@ import CreateRoleDialog from '../Dialogs/CreateRoleDialog'
 import { Can } from '~/core/utils/access-control'
 import { useGetWorkspaceRolesQuery } from '~/core/redux/api/role.api'
 import { useSelector } from 'react-redux'
-import { isError } from 'lodash'
 import { Role } from '~/core/model/role.model'
 import PermissionPopover from './pop-overs/PermissionPopover'
 
@@ -115,14 +114,23 @@ const RoleSettingFC = () => {
                                 </Box>
                             </Box>
                             <Box>
-                                <Button sx={{ ...buttonSx }} variant='contained'
+                                <Button
+                                    sx={{ ...buttonSx }}
+                                    variant='contained'
                                     onClick={(event) => {
                                         handleClick(event)
-                                        setCurrentSelectedRole(item.id)}
-                                    }>
-                                        View permissions({item.actionCode.length})
+                                        setCurrentSelectedRole(item)}
+                                    }
+                                >
+                                    View permissions({item.actionCode.length})
                                 </Button>
-                                <Button sx={{ ...buttonSx }} variant='contained' startIcon={<PeopleAltOutlinedIcon />}>Member ({item.member.length})</Button>
+                                <Button
+                                    sx = {{ ...buttonSx, mr: item.id.includes('default-role') ? 0 : '14px' }}
+                                    variant='contained'
+                                    startIcon={<PeopleAltOutlinedIcon />}
+                                >
+                                    Member ({item.member?.length || 0})
+                                </Button>
                                 { !item.id.includes('default-role') &&
                                     <Can I='edit' a='role'>
                                         <Button
@@ -140,8 +148,7 @@ const RoleSettingFC = () => {
             <CreateRoleDialog open={openCreateRole} setOpen={setOpenCreateRole} />
             <PermissionPopover
                 id='role-permissions-popover'
-                roleId={currentSelectedRole}
-                actions={roles.find((role) => role.id === currentSelectedRole)?.actionCode}
+                roleItem={currentSelectedRole}
                 open={open} anchorEl={anchorEl} onClose={handleClose}
             />
         </>

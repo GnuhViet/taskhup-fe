@@ -4,7 +4,7 @@ import { ApiResponse } from '~/core/services/api.model'
 import { mapObject } from '~/core/utils/mapper'
 import { Role } from '~/core/model/role.model'
 import { roleApi } from '../api/role.api'
-import { RoleGetResp } from '~/core/services/role-services.model'
+import { RoleGetResp, RoleUpdateReq } from '~/core/services/role-services.model'
 import { forEach } from 'lodash'
 
 export interface WorkspaceSate {
@@ -26,6 +26,19 @@ export const workspaceSlice = createSlice({
             // state.board = {} as Board
             // console.log('finish set board!!')
         },
+        addRole: (state, action: PayloadAction<RoleGetResp>) => {
+            const role = mapObject<Role>(action.payload, new Role())
+            state.roles.push(role)
+        },
+        updateActions: (state, action: PayloadAction<RoleUpdateReq>) => {
+            const data = action.payload
+
+            const role = state.roles.find((item) => item.id === action.payload.id)
+            if (role) {
+                // role.name = data.name
+                role.actionCode = data.actionCode
+            }
+        }
     },
     extraReducers: (builder) => {
         builder.addMatcher(roleApi.endpoints.getWorkspaceRoles.matchFulfilled, (state, action) => {
@@ -43,7 +56,9 @@ export const workspaceSlice = createSlice({
 })
 
 export const {
-    setRoles
+    setRoles,
+    addRole,
+    updateActions
 } = workspaceSlice.actions
 
 export default workspaceSlice.reducer

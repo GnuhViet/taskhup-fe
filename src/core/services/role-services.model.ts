@@ -7,3 +7,15 @@ export class RoleGetResp {
     actionCode: string[]
     member: string[]
 }
+
+export class RoleCreateReq {
+    name: string
+    color: string
+    actionCode: string[]
+}
+
+export class RoleUpdateReq {
+    id: string
+    name: string
+    actionCode: string[]
+}

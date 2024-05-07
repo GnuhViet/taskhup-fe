@@ -10,14 +10,29 @@ import { Actions, ActionsBoolean } from '~/core/services/auth-services.model'
 import { Can } from '~/core/utils/access-control'
 import { useForm, SubmitHandler, Controller } from 'react-hook-form'
 import { Button } from '@mui/material'
+import CircularProgress from '@mui/material/CircularProgress'
+import { useUpdateRoleMutation } from '~/core/redux/api/role.api'
+import { useDispatch, useSelector } from 'react-redux'
+import { RoleUpdateReq } from '~/core/services/role-services.model'
+import { toast } from 'react-toastify'
+import { ApiResponse } from '~/core/services/api.model'
+import { updateActions } from '~/core/redux/slices/workspaceSlice'
+import { Role } from '~/core/model/role.model'
+import { handleError } from '~/core/utils/api-utils'
 
-export interface CreateBoardPopoverProps {
+export interface PermissionPopoverProps {
     id: string
-    roleId: string
+    roleItem: Role
     open: boolean
     anchorEl: HTMLElement
-    actions: string[]
     onClose?: () => void
+}
+
+export interface RoleSwitchProps {
+    item: any
+    label: string
+    helperText: string
+    subHelperText?: string
 }
 
 const borderBottom = {
@@ -32,10 +47,10 @@ const permissionsSwitch = {
     pb: '8px'
 }
 
-const switchSx = {
-    PointerEvent: 'none',
-    cursor: 'default'
-}
+// const switchSx = {
+//     PointerEvent: 'none',
+//     cursor: 'default'
+// }
 
 const primaryBoxButtonSx = {
     cursor: 'pointer',
@@ -60,9 +75,11 @@ const roleTitleSx = {
 }
 
 
-const PermissionPopover: React.FC<CreateBoardPopoverProps> = ({ id, roleId, actions, open, anchorEl, onClose }) => {
-    const isDefaultRole = roleId?.includes('default-role')
-    const checked = {
+const PermissionPopover: React.FC<PermissionPopoverProps> = ({ id, roleItem, open, anchorEl, onClose }) => {
+    const isDefaultRole = roleItem?.id.includes('default-role')
+    const actions = roleItem?.actionCode
+    const dispatch = useDispatch()
+    const checked = React.useMemo(() => ({
         EDIT_WORKSPACE: actions?.indexOf(Actions.EDIT_WORKSPACE) > -1,
         MANAGE_USER: actions?.indexOf(Actions.MANAGE_USER) > -1,
         EDIT_ROLE: actions?.indexOf(Actions.EDIT_ROLE) > -1,
@@ -70,57 +87,99 @@ const PermissionPopover: React.FC<CreateBoardPopoverProps> = ({ id, roleId, acti
         DELETE_BOARD: actions?.indexOf(Actions.DELETE_BOARD) > -1,
         EDIT_CARD_TEMPLATE: actions?.indexOf(Actions.EDIT_CARD_TEMPLATE) > -1,
         EDIT_CARD: actions?.indexOf(Actions.EDIT_CARD) > -1
-    } as ActionsBoolean
-    const countChecked = Object.values(checked).filter((value) => value).length
+    }), [actions]) as ActionsBoolean
+    const [roleCounter, setRoleCounter] = React.useState(() => {
+        const initialCount = Object.values(checked).filter((value) => value).length;
+        return initialCount
+    })
+    // const countChecked = Object.values(checked).filter((value) => value).length
     const [editMode, setEditMode] = React.useState(false)
 
-    React.useEffect(() => {
-        if (open) {
-            setEditMode(false)
-        }
-    }, [open])
-
     const form = useForm<ActionsBoolean>({
-        defaultValues: {
-            EDIT_WORKSPACE: actions?.indexOf(Actions.EDIT_WORKSPACE) > -1,
-            MANAGE_USER: actions?.indexOf(Actions.MANAGE_USER) > -1,
-            EDIT_ROLE: actions?.indexOf(Actions.EDIT_ROLE) > -1,
-            EDIT_BOARD: actions?.indexOf(Actions.EDIT_BOARD) > -1,
-            DELETE_BOARD: actions?.indexOf(Actions.DELETE_BOARD) > -1,
-            EDIT_CARD_TEMPLATE: actions?.indexOf(Actions.EDIT_CARD_TEMPLATE) > -1,
-            EDIT_CARD: actions?.indexOf(Actions.EDIT_CARD) > -1
-        }
+        defaultValues: { ...checked }
     })
 
     const formRef = useRef(null)
-    const { register, handleSubmit, formState, control } = form
-    const { errors } = formState
+    const { handleSubmit, formState: { errors }, control } = form
+
+    const [updateRole, { isLoading }] = useUpdateRoleMutation()
+    // const role = useSelector((state: any) => state.workspaceReducer.roles.find((role: Role) => role.id === roleId))
 
     const onSubmit: SubmitHandler<ActionsBoolean> = async (data: ActionsBoolean) => {
         console.log('clicked on submit')
         console.log(data)
+
+        const req = {} as RoleUpdateReq
+        req.id = roleItem.id
+        req.name = ''
+        req.actionCode = Object.keys(data).filter((key: keyof typeof data) => data[key])
+
+        // bottom right toast
+        await toast.promise(
+            updateRole(req),
+            {
+                pending: 'Updating Role... 🕒',
+                success: 'Role updated 👌'
+            },
+            {
+                position: 'bottom-right',
+                autoClose: 2000
+            }
+        ).catch((err) => { // internal error, ect...
+            handleError( //todo fix error
+                err?.originalStatus,
+                [
+                    { code: 'ROLE_NAME_EXIST', message: 'Role name already exists' },
+                    { code: 'ROLE_NAME_REQUIRED', message: 'Role name is required' },
+                    { code: 'ROLE_NOT_FOUND', message: 'Role not found' },
+                    { code: 'ROLE_NOT_FOUND', message: 'Role not found' }
+                ],
+                toast
+            )
+        }).then((body: any) => {
+            const resp = body.data as ApiResponse<RoleUpdateReq>
+            if (resp.code === 'OK') {
+                dispatch(updateActions(resp.data))
+            }
+            else {
+                handleError( //todo fix error
+                    resp.code,
+                    [
+                        { code: 'ROLE_NAME_EXIST', message: 'Role name already exists' },
+                        { code: 'ROLE_NAME_REQUIRED', message: 'Role name is required' },
+                        { code: 'ROLE_NOT_FOUND', message: 'Role not found' },
+                        { code: 'ROLE_NOT_FOUND', message: 'Role not found' }
+                    ],
+                    toast
+                )
+            }
+        })
     }
 
-    const RoleSwitch: React.FC<{ name, label, helperText, defaultChecked: boolean}> = ({ name, label, helperText, defaultChecked }) => {
+    React.useEffect(() => {
+        if (open) {
+            setEditMode(false)
+            setRoleCounter(Object.values(checked).filter((value) => value).length)
+            form.reset({ ...checked })
+        }
+    }, [checked, open, form])
+
+    const RoleSwitch: React.FC<RoleSwitchProps> = ({ item, label, helperText, subHelperText }) => {
         return (
-            <Controller
-                name={name}
-                control={control}
-                render={(item) => (
-                    <Box sx={permissionsSwitch}>
-                        <Box sx={roleTitleSx}>
-                            <FormLabel sx={{ mb: 0 }}>{label}</FormLabel>
-                            <FormHelperText sx={{ mt: 0 }}>{helperText}</FormHelperText>
-                        </Box>
-                        <Switch
-                            disabled={!editMode}
-                            defaultChecked={defaultChecked}
-                            onChange={(e) => item.field.onChange(e.target.checked)}
-                            {...item}
-                        />
-                    </Box>
-                )}
-            />
+            <Box sx={permissionsSwitch}>
+                <Box sx={roleTitleSx}>
+                    <FormLabel sx={{ mb: 0, textDecoration: !item.field.value ? 'line-through' : 'none' }}>{label}</FormLabel>
+                    <FormHelperText sx={{ mt: 0 }}>{helperText} {subHelperText && <><br /> {subHelperText}</>}</FormHelperText>
+                </Box>
+                <Switch
+                    disabled={!editMode}
+                    checked={item.field.value}
+                    onChange={(e) => {
+                        setRoleCounter(e.target.checked ? roleCounter + 1 : roleCounter - 1)
+                        item.field.onChange(e.target.checked)
+                    }}
+                />
+            </Box>
         )
     }
 
@@ -156,9 +215,9 @@ const PermissionPopover: React.FC<CreateBoardPopoverProps> = ({ id, roleId, acti
                     <FormLabel sx={{ ...borderBottom, fontSize: '16px', width: '100%', mb: '14px', pb: '6px', display: 'flex', justifyContent: 'space-between' }}>
                         <Box sx={{ display: 'flex' }}>
                             Permissions&nbsp;&nbsp;
-                            <Box sx={{ backgroundColor: '#c5cdd88c', borderRadius: '80px', p: '0 12px', lineHeight: '22px' }}>{countChecked}/7</Box>
+                            <Box sx={{ backgroundColor: '#c5cdd88c', borderRadius: '80px', p: '0 12px', lineHeight: '22px' }}>{roleCounter}/7</Box>
                         </Box>
-                        {isDefaultRole &&
+                        {!isDefaultRole &&
                             <Can I="edit" a="role">
                                 {!editMode
                                     ? (
@@ -173,8 +232,12 @@ const PermissionPopover: React.FC<CreateBoardPopoverProps> = ({ id, roleId, acti
                                             </Box>
                                             <Box
                                                 sx={{ ...primaryBoxButtonSx, ml: '16px' }}
+                                                onClick={() => {
+                                                    formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+                                                    setEditMode(false)
+                                                }}
                                             >
-                                                <input type="submit" value="Save" />
+                                                Save
                                             </Box>
                                         </Box>
                                     )
@@ -183,100 +246,85 @@ const PermissionPopover: React.FC<CreateBoardPopoverProps> = ({ id, roleId, acti
                         }
                     </FormLabel>
                     <Box>
-                        <Button type='submit'>Submit</Button>
-                        <RoleSwitch
-                            name='EDIT_WORKSPACE'
-                            label='Edit Workspace'
-                            helperText='Allow members to edit workspace (title, name, ...).'
-                            defaultChecked={checked.EDIT_WORKSPACE}
-                        />
-                        {/* <Controller
-                            name='EDIT_WORKSPACE'
+                        <Controller
+                            name="EDIT_WORKSPACE"
                             control={control}
-                            render={(item) => (
-                                <Box sx={permissionsSwitch}>
-                                    <Box sx={roleTitleSx}>
-                                        <FormLabel sx={{ mb: 0 }}>Edit Workspace</FormLabel>
-                                        <FormHelperText sx={{ mt: 0 }}>Allow members to edit workspace (title, name, ...).</FormHelperText>
-                                    </Box>
-                                    <Switch
-                                        disabled={!editMode}
-                                        defaultChecked={checked.EDIT_WORKSPACE}
-                                        onChange={(e) => item.field.onChange(e.target.checked)}
-                                        {...item}
-                                    />
-                                </Box>
+                            render={(field) => (
+                                <RoleSwitch
+                                    item={field}
+                                    label='Edit Workspace'
+                                    helperText='Allow members to edit workspace (title, name, ...).'
+                                />
                             )}
-                        /> */}
-
-                        <Box sx={permissionsSwitch}>
-                            <Box sx={roleTitleSx}>
-                                <FormLabel sx={{ mb: 0 }}>Manage User</FormLabel>
-                                <FormHelperText sx={{ mt: 0 }}>Allow members to manage workspace user<br />(create invite link, accept join request, remove member).</FormHelperText>
-                            </Box>
-                            <Switch
-                                disabled={!editMode}
-                                defaultChecked={checked.MANAGE_USER}
-                                {...register('MANAGE_USER')}
-                            />
-                        </Box>
-                        <Box sx={permissionsSwitch}>
-                            <Box sx={roleTitleSx}>
-                                <FormLabel sx={{ mb: 0 }}>Edit Role</FormLabel>
-                                <FormHelperText sx={{ mt: 0 }}>Allow members to edit Role (create, edit permissions).</FormHelperText>
-                            </Box>
-                            <Switch
-                                disabled={!editMode}
-                                defaultChecked={checked.EDIT_ROLE}
-                                {...register('EDIT_ROLE')}
-                            />
-                        </Box>
-                        <Box sx={permissionsSwitch}>
-                            <Box sx={roleTitleSx}>
-                                <FormLabel sx={{ mb: 0 }}>Edit Board</FormLabel>
-                                <FormHelperText sx={{ mt: 0 }}>Allow members to create new board.(create, edit)</FormHelperText>
-                            </Box>
-                            <Switch
-                                disabled={!editMode}
-                                defaultChecked={checked.EDIT_BOARD}
-                                {...register('EDIT_BOARD')}
-                            />
-                        </Box>
-                        <Box sx={permissionsSwitch}>
-                            <Box sx={roleTitleSx}>
-                                <FormLabel sx={{ mb: 0 }}>Delete Board</FormLabel>
-                                <FormHelperText sx={{ mt: 0 }}>Allow members to delete board.</FormHelperText>
-                            </Box>
-                            <Switch
-                                disabled={!editMode}
-                                defaultChecked={checked.DELETE_BOARD}
-                                {...register('DELETE_BOARD')}
-                            />
-                        </Box>
-                        <Box sx={permissionsSwitch}>
-                            <Box sx={roleTitleSx}>
-                                <FormLabel sx={{ mb: 0 }}>Edit Card Template</FormLabel>
-                                <FormHelperText sx={{ mt: 0 }}>Allow members to create/update/delete card template.</FormHelperText>
-                            </Box>
-                            <Switch
-                                disabled={!editMode}
-                                defaultChecked={checked.EDIT_CARD_TEMPLATE}
-                                {...register('EDIT_CARD_TEMPLATE')}
-                            />
-                        </Box>
-                        <Box sx={permissionsSwitch}>
-                            <Box sx={roleTitleSx}>
-                                <FormLabel sx={{ mb: 0 }}>Edit Card</FormLabel>
-                                <FormHelperText sx={{ mt: 0 }}>Allow members to create/update/delete card.</FormHelperText>
-                            </Box>
-                            <Switch
-                                disabled={!editMode}
-                                defaultChecked={checked.EDIT_CARD}
-                                {...register('EDIT_CARD')}
-                            />
-                        </Box>
+                        />
+                        <Controller
+                            name='MANAGE_USER'
+                            control={control}
+                            render={(field) => (
+                                <RoleSwitch
+                                    item={field}
+                                    label='Manage User'
+                                    helperText='Allow members to manage workspace user'
+                                    subHelperText='(create invite link, accept join request, remove member).'
+                                />
+                            )}
+                        />
+                        <Controller
+                            name='EDIT_ROLE'
+                            control={control}
+                            render={(field) => (
+                                <RoleSwitch
+                                    item={field}
+                                    label='Edit Role'
+                                    helperText='Allow members to edit Role (create, edit permissions).'
+                                />
+                            )}
+                        />
+                        <Controller
+                            name='EDIT_BOARD'
+                            control={control}
+                            render={(field) => (
+                                <RoleSwitch
+                                    item={field}
+                                    label='Edit Board'
+                                    helperText='Allow members to create new board (create, edit).'
+                                />
+                            )}
+                        />
+                        <Controller
+                            name='DELETE_BOARD'
+                            control={control}
+                            render={(field) => (
+                                <RoleSwitch
+                                    item={field}
+                                    label='Delete Board'
+                                    helperText='Allow members to delete board.'
+                                />
+                            )}
+                        />
+                        <Controller
+                            name='EDIT_CARD_TEMPLATE'
+                            control={control}
+                            render={(field) => (
+                                <RoleSwitch
+                                    item={field}
+                                    label='Edit Card Template'
+                                    helperText='Allow members to create/update/delete card template.'
+                                />
+                            )}
+                        />
+                        <Controller
+                            name='EDIT_CARD'
+                            control={control}
+                            render={(field) => (
+                                <RoleSwitch
+                                    item={field}
+                                    label='Edit Card'
+                                    helperText='Allow members to create/update/delete card.'
+                                />
+                            )}
+                        />
                     </Box>
-
                 </form>
             </Box>
         </Popover >
