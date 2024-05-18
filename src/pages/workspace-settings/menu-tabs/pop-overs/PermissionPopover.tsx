@@ -9,10 +9,8 @@ import FormHelperText from '@mui/joy/FormHelperText'
 import { Actions, ActionsBoolean } from '~/core/services/auth-services.model'
 import { Can } from '~/core/utils/access-control'
 import { useForm, SubmitHandler, Controller } from 'react-hook-form'
-import { Button } from '@mui/material'
-import CircularProgress from '@mui/material/CircularProgress'
 import { useUpdateRoleMutation } from '~/core/redux/api/role.api'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { RoleUpdateReq } from '~/core/services/role-services.model'
 import { toast } from 'react-toastify'
 import { ApiResponse } from '~/core/services/api.model'
@@ -76,9 +74,13 @@ const roleTitleSx = {
 
 
 const PermissionPopover: React.FC<PermissionPopoverProps> = ({ id, roleItem, open, anchorEl, onClose }) => {
+    const [updateRole] = useUpdateRoleMutation()
+
     const isDefaultRole = roleItem?.id.includes('default-role')
     const actions = roleItem?.actionCode
+
     const dispatch = useDispatch()
+
     const checked = React.useMemo(() => ({
         EDIT_WORKSPACE: actions?.indexOf(Actions.EDIT_WORKSPACE) > -1,
         MANAGE_USER: actions?.indexOf(Actions.MANAGE_USER) > -1,
@@ -88,27 +90,25 @@ const PermissionPopover: React.FC<PermissionPopoverProps> = ({ id, roleItem, ope
         EDIT_CARD_TEMPLATE: actions?.indexOf(Actions.EDIT_CARD_TEMPLATE) > -1,
         EDIT_CARD: actions?.indexOf(Actions.EDIT_CARD) > -1
     }), [actions]) as ActionsBoolean
+
     const [roleCounter, setRoleCounter] = React.useState(() => {
         const initialCount = Object.values(checked).filter((value) => value).length;
         return initialCount
     })
-    // const countChecked = Object.values(checked).filter((value) => value).length
+
     const [editMode, setEditMode] = React.useState(false)
 
     const form = useForm<ActionsBoolean>({
         defaultValues: { ...checked }
     })
 
-    const formRef = useRef(null)
-    const { handleSubmit, formState: { errors }, control } = form
+    const { handleSubmit, control } = form
 
-    const [updateRole, { isLoading }] = useUpdateRoleMutation()
+    const formRef = useRef(null)
+
     // const role = useSelector((state: any) => state.workspaceReducer.roles.find((role: Role) => role.id === roleId))
 
     const onSubmit: SubmitHandler<ActionsBoolean> = async (data: ActionsBoolean) => {
-        console.log('clicked on submit')
-        console.log(data)
-
         const req = {} as RoleUpdateReq
         req.id = roleItem.id
         req.name = ''

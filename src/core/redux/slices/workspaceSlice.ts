@@ -32,11 +32,16 @@ export const workspaceSlice = createSlice({
         },
         updateActions: (state, action: PayloadAction<RoleUpdateReq>) => {
             const data = action.payload
-
             const role = state.roles.find((item) => item.id === action.payload.id)
             if (role) {
-                // role.name = data.name
                 role.actionCode = data.actionCode
+            }
+        },
+        updateName: (state, action: PayloadAction<RoleUpdateReq>) => {
+            const data = action.payload
+            const role = state.roles.find((item) => item.id === action.payload.id)
+            if (role) {
+                role.name = data.name
             }
         }
     },
@@ -58,7 +63,8 @@ export const workspaceSlice = createSlice({
 export const {
     setRoles,
     addRole,
-    updateActions
+    updateActions,
+    updateName
 } = workspaceSlice.actions
 
 export default workspaceSlice.reducer

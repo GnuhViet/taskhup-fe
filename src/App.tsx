@@ -12,6 +12,7 @@ import RegisterFC from '~/pages/Auth/RegisterFC'
 import MemberFC from '~/pages/member-settings/MemberFC'
 import RequireRole from './pages/Auth/RequireRole'
 import WorkspaceSettingFC from './pages/workspace-settings/WorkspaceSettingFC'
+import JoinInviteFC from './pages/Auth/JoinInviteFC'
 
 const router = createBrowserRouter([
     {
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
                 element: <RequireAuth />,
                 children: [
                     { path: '/home', element: <HomeFC /> },
+                    { path: '/invite/:id', element: <JoinInviteFC /> },
                     { path: '/error', element: <ErrorPage /> },
                     {
                         element: <RequireRole />,

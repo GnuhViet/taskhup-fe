@@ -17,11 +17,18 @@ export const workspaceApi = apiSlice.injectEndpoints({
                 url: API_URL,
                 method: 'GET'
             })
+        }),
+        getWorkspaceMember: builder.query({
+            query: () => ({
+                url: `${API_URL}/members`,
+                method: 'GET'
+            })
         })
     })
 })
 
 export const {
     useCreateWorkspaceMutation,
-    useGetUserWorkSpaceQuery
+    useGetUserWorkSpaceQuery,
+    useGetWorkspaceMemberQuery,
 } = workspaceApi

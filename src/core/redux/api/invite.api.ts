@@ -7,9 +7,15 @@ export const inviteApi = apiSlice.injectEndpoints({
     endpoints: (builder: any) => ({
         createInviteLink: builder.mutation({
             query: (data: WorkSpaceCreateReq) => ({
-                url: API_URL,
+                url: `${API_URL}/create`,
                 method: 'POST',
                 body: data
+            })
+        }),
+        joinWorkspace: builder.query({
+            query: (id: string) => ({
+                url: `${API_URL}/join/${id}`,
+                method: 'GET'
             })
         }),
         getInviteLink: builder.query({
@@ -23,5 +29,6 @@ export const inviteApi = apiSlice.injectEndpoints({
 
 export const {
     useCreateInviteLinkMutation,
-    useGetInviteLinkQuery
+    useGetInviteLinkQuery,
+    useJoinWorkspaceQuery
 } = inviteApi

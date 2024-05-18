@@ -24,6 +24,10 @@ import AddLinkIcon from '@mui/icons-material/AddLink'
 import DialogActions from '@mui/material/DialogActions'
 import Textarea from '@mui/joy/Textarea'
 import Input from '@mui/joy/Input'
+import { InviteLinkCreateReq } from '~/core/services/invite-services.model'
+import { useParams } from 'react-router-dom'
+import { useCreateInviteLinkMutation } from '~/core/redux/api/invite.api'
+import { toast } from 'react-toastify'
 
 const headingSx = {
     fontSize: '18px',
@@ -63,17 +67,29 @@ const buttonSx = {
     }
 }
 const MemberFC = () => {
+    const { workspaceId } = useParams()
     const selectedButtonId = useSelector((state: any) => state.homeReducer.selectedButtonId)
     const [open, setOpen] = React.useState(false)
 
-    // const { error, isLoading } = useGetUserWorkSpaceQuery({})
-    // const response = data as ApiResponse<GetWorkSpaceResp>
+    const [createLink, { isLoading }] = useCreateInviteLinkMutation()
 
-    // if (error) {
-    //     // do something
-    // }
-
-    // if (isLoading) return <div>Loading...</div>
+    const createInviteLinkMember = async () => {
+        try {
+            const request = {} as InviteLinkCreateReq
+            request.type = 'WORKSPACE'
+            request.destinationId = workspaceId
+            const resp = await createLink(request).unwrap() as any
+            if (resp.data) {
+                const link = 'http://localhost:5173/invite/' + resp.data
+                navigator.clipboard.writeText(link)
+                toast.success('Invite link copied to clipboard, link will expire in 1 days.', {
+                    position: 'bottom-right'
+                })
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    }
 
     return (
         <>
@@ -157,7 +173,12 @@ const MemberFC = () => {
                                                 <Box sx={headingSx}>Invite members to join you</Box>
                                                 <Box sx={textSx}>Anyone with an invite link can join this paid Workspace. You’ll be billed for each member that joins. You can also disable and create a new invite link for this Workspace at any time.</Box>
                                             </Box>
-                                            <Button sx={{ ...buttonSx, mr: 0 }} variant='contained' startIcon={<GroupAddOutlinedIcon />}>Invite with link</Button>
+                                            <Button
+                                                sx={{ ...buttonSx, mr: 0 }}
+                                                variant='contained'
+                                                startIcon={<GroupAddOutlinedIcon />}
+                                                onClick={createInviteLinkMember}
+                                            >Invite with link</Button>
                                         </Box>
                                         <Box sx={{ ...borderBottom, p: '24px 0 12px 0' }}>
                                             <TextField
