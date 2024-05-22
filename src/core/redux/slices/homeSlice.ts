@@ -9,18 +9,22 @@ import { ApiResponse } from '~/core/services/api.model'
 import { BoardCreateResp } from '~/core/services/board-services.model'
 import { mapObject } from '~/core/utils/mapper'
 import { set } from 'lodash'
+import { userApi } from '../api/user.api'
+import { UserInfoResponse } from '~/core/services/user-services.model'
 
 export interface BoardState {
     selectedButtonId: string
     workspace: WorkSpace[]
     currentActiveWorkspaceId: string
+    userInfo: UserInfoResponse
     // board: Board[]
 }
 
 const initialState: BoardState = {
     selectedButtonId: '-1',
     workspace: [],
-    currentActiveWorkspaceId: ''
+    currentActiveWorkspaceId: '',
+    userInfo: null
     // board: [],
 }
 
@@ -59,6 +63,12 @@ export const homeSlice = createSlice({
             const resp = { ...apiResp?.data } as GetWorkSpaceResp
             const workspace = [...resp.joinedWorkSpaces, ...resp.guestWorkSpaces]
             state.workspace = workspace
+        })
+        builder.addMatcher(userApi.endpoints.getUserInfo.matchFulfilled, (state, action) => {
+            const apiResp = action.payload as ApiResponse<UserInfoResponse>
+
+            const resp = { ...apiResp?.data } as UserInfoResponse
+            state.userInfo = resp
         })
     }
 })

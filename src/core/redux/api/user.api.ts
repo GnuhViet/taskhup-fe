@@ -41,6 +41,7 @@ export const userApi = apiSlice.injectEndpoints({
 
 export const {
     useGetUserInfoQuery,
+    useLazyGetUserInfoQuery,
     useGetUserEmailInfoQuery,
     useUpdateAvatarMutation,
     useUpdateInfoMutation

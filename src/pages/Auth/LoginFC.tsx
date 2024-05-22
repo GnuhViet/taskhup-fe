@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setCredentials } from '~/core/redux/slices/authSlice'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { useGetUserInfoQuery, useLazyGetUserInfoQuery } from '~/core/redux/api/user.api'
 
 function Copyright(props: any) {
     return (
@@ -49,6 +50,7 @@ const LoginFC = () => {
 
 
     const [login, { isLoading }] = useLoginMutation()
+    const [triggerGetUserInfo] = useLazyGetUserInfoQuery()
 
     const form = useForm<AuthenticationRequest>({
         defaultValues: {
@@ -69,6 +71,8 @@ const LoginFC = () => {
 
             const authResp = await login(authReq).unwrap() as AuthenticationResponse
             await dispatch(setCredentials(authResp))
+            triggerGetUserInfo({})
+
             navigate('/home')
         } catch (err) {
             if (!err?.originalStatus) {

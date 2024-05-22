@@ -10,9 +10,10 @@ import IconButton from '@mui/material/IconButton'
 import PersonAdd from '@mui/icons-material/PersonAdd'
 import Settings from '@mui/icons-material/Settings'
 import Logout from '@mui/icons-material/Logout'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { logOut } from '~/core/redux/slices/authSlice'
 import { useNavigate } from 'react-router-dom'
+import { UserInfoResponse } from '~/core/services/user-services.model'
 
 const Profiles: React.FC = () => {
     const navigate = useNavigate()
@@ -26,6 +27,8 @@ const Profiles: React.FC = () => {
     }
 
     const dispatch = useDispatch()
+
+    const userInfo = useSelector((state: any) => state.homeReducer.userInfo) as UserInfoResponse
 
 
     return (
@@ -41,8 +44,8 @@ const Profiles: React.FC = () => {
                 >
                     <Avatar
                         sx={{ width: 36, height: 36 }}
-                        alt="TrungQuanDev"
-                        src="https://trungquandev.com/wp-content/uploads/2023/05/main-avatar-circle-min-trungquandev-codetq.jpeg"
+                        alt={userInfo?.fullName}
+                        src={userInfo?.avatar}
                     />
                 </IconButton>
             </Tooltip>
