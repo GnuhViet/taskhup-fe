@@ -61,18 +61,8 @@ const buttonSx = {
     }
 }
 const WorkspaceSettingFC = () => {
-    // const currentActiveWorkspaceId = useSelector((state: any) => state.homeReducer.currentActiveWorkspaceId)
     const selectedButtonId = useSelector((state: any) => state.homeReducer.selectedButtonId)
     const [open, setOpen] = React.useState(false)
-
-    // const { error, isLoading } = useGetUserWorkSpaceQuery({})
-    // const response = data as ApiResponse<GetWorkSpaceResp>
-
-    // if (error) {
-    //     // do something
-    // }
-
-    // if (isLoading) return <div>Loading...</div>
 
     return (
         <>

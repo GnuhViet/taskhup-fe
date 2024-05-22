@@ -47,3 +47,8 @@ export class ActionsBoolean {
     EDIT_CARD_TEMPLATE: boolean
     EDIT_CARD: boolean
 }
+
+export class ChangePasswordRequest {
+    oldPassword: string
+    newPassword: string
+}

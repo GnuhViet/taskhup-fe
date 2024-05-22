@@ -12,8 +12,10 @@ import Settings from '@mui/icons-material/Settings'
 import Logout from '@mui/icons-material/Logout'
 import { useDispatch } from 'react-redux'
 import { logOut } from '~/core/redux/slices/authSlice'
+import { useNavigate } from 'react-router-dom'
 
 const Profiles: React.FC = () => {
+    const navigate = useNavigate()
     const [anchorEl, setAnchorEl] = React.useState(null)
     const open = Boolean(anchorEl)
     const handleClick = (event: any) => {
@@ -53,7 +55,7 @@ const Profiles: React.FC = () => {
                     'aria-labelledby': 'basic-button-profiles'
                 }}
             >
-                <MenuItem>
+                <MenuItem onClick={() => navigate('/profile')}>
                     <Avatar sx={{ width: 28, height: 28, mr: 2 }} /> Profile
                 </MenuItem>
                 <MenuItem>

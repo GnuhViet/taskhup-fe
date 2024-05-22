@@ -35,7 +35,7 @@ const CircleAvatar: React.FC<SquareAvatarProps> = ({ src, alt, sx }) => {
 
     return (
         <Box sx={{ ...sx, boxSx }}>
-            <img src={src} alt={alt} style={{ width: '100%', height: '100%', borderRadius: '4px' }} />
+            <img src={src} alt={alt} style={{ width: '100%', height: '100%', borderRadius: '50%' }} />
         </Box>
     )
 }

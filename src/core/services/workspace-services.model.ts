@@ -10,3 +10,7 @@ export class GetWorkSpaceResp {
     joinedWorkSpaces: WorkSpace[]
     guestWorkSpaces: WorkSpace[]
 }
+
+export class JoinRequestADRequest {
+    userIds: string[]
+}

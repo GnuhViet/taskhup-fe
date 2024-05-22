@@ -28,6 +28,9 @@ import { InviteLinkCreateReq } from '~/core/services/invite-services.model'
 import { useParams } from 'react-router-dom'
 import { useCreateInviteLinkMutation } from '~/core/redux/api/invite.api'
 import { toast } from 'react-toastify'
+import JoinRequest from './menu-tabs/JoinRequest'
+import { Work } from '@mui/icons-material'
+import WorkSpaceMember from './menu-tabs/WorkSpaceMember'
 
 const headingSx = {
     fontSize: '18px',
@@ -139,11 +142,11 @@ const MemberFC = () => {
                     <Box className="home-left-sidebar-container">
                         <List className="top-button">
                             <Box className="title">Collaborators</Box>
-                            <SideBarButton id={'workspace-member-button'} text={'Workspace members (1)'} defaultSelected />
-                            <SideBarButton id={'workspace-guest-button'} text={'Guests (0)'} />
+                            <SideBarButton id={'workspace-member-button'} text={'Workspace members'} defaultSelected />
+                            <SideBarButton id={'workspace-guest-button'} text={'Guests'} />
                         </List>
                         <List className="work-spaces" sx={{ overflow: 'auto', maxHeight: 'calc(100vh - 200px)' }}>
-                            <SideBarButton id={'workspace-join-request-button'} text={'Join requests (0)'} />
+                            <SideBarButton id={'workspace-join-request-button'} text={'Join requests'} />
                         </List>
                     </Box>
 
@@ -163,55 +166,7 @@ const MemberFC = () => {
                             switch (selectedButtonId) {
                             case 'workspace-member-button':
                                 return <>
-                                    <Box>
-                                        <Box sx={{ ...borderBottom, pb: '14px' }}>
-                                            <Box sx={headingSx}>Workspace members (1)</Box>
-                                            <Box sx={textSx}>Workspace members can view and join all Workspace visible boards and create new boards in the Workspace. Adding new members will automatically update your billing.</Box>
-                                        </Box>
-                                        <Box sx={{ ...borderBottom, p: '24px 0 24px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <Box sx={{ maxWidth: '450px' }}>
-                                                <Box sx={headingSx}>Invite members to join you</Box>
-                                                <Box sx={textSx}>Anyone with an invite link can join this paid Workspace. You’ll be billed for each member that joins. You can also disable and create a new invite link for this Workspace at any time.</Box>
-                                            </Box>
-                                            <Button
-                                                sx={{ ...buttonSx, mr: 0 }}
-                                                variant='contained'
-                                                startIcon={<GroupAddOutlinedIcon />}
-                                                onClick={createInviteLinkMember}
-                                            >Invite with link</Button>
-                                        </Box>
-                                        <Box sx={{ ...borderBottom, p: '24px 0 12px 0' }}>
-                                            <TextField
-                                                placeholder='Filter by name...'
-                                                size='small'
-                                                sx={{ width: '450px' }}
-                                            />
-                                        </Box>
-                                        <Box>
-                                            {new Array(10).fill(null).map((item, index) => (
-                                                <Box key={index} sx={{ ...borderBottom, p: '16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                        <CircleAvatar sx={{ minWidth: '42px', minHeight: '42px', fontSize: '16px', mr: '12px', background: '#172B4D' }} src={null} alt='V' />
-                                                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                                            <Box sx={{ fontSize: '16px', fontWeight: '800', color: '#172B4D' }}>Việt Hưng Nguyễn</Box>
-                                                            <Box sx={{ fontSize: '14px', fontWeight: '400', color: '#44546f', display: 'flex' }}>
-                                                                <Box>@vithngnguyn16</Box>
-                                                                <Box sx={{ fontSize: '20px', display: 'flex', alignItems: 'center', lineHeight: '14px' }}>
-                                                                                                                &nbsp;•&nbsp;
-                                                                </Box>
-                                                                <Box>Joined 1 month ago</Box>
-                                                            </Box>
-                                                        </Box>
-                                                    </Box>
-                                                    <Box>
-                                                        <Button sx={{ ...buttonSx }} variant='contained'>View boards (3)</Button>
-                                                        <Button sx={{ ...buttonSx }} variant='contained' startIcon={<BadgeOutlinedIcon sx={{ mb: '4px' }} />}>Role</Button>
-                                                        <Button sx={{ ...buttonSx, mr: 0 }} variant='contained' startIcon={<CloseOutlinedIcon />}>Leave&nbsp;...</Button>
-                                                    </Box>
-                                                </Box>
-                                            ))}
-                                        </Box>
-                                    </Box>
+                                    <WorkSpaceMember/>
                                 </>
                             case 'workspace-guest-button':
                                 return <>
@@ -262,31 +217,7 @@ const MemberFC = () => {
                                 </>
                             case 'workspace-join-request-button':
                                 return <>
-                                    <Box>
-                                        <Box sx={{ ...borderBottom, pb: '14px' }}>
-                                            <Box sx={headingSx}>Join requests (0)</Box>
-                                            <Box sx={textSx}>These people have requested to join this Workspace. Adding new Workspace members will automatically update your bill.</Box>
-                                        </Box>
-                                        <Box sx={{ ...borderBottom, p: '12px 0 12px 0' }}>
-                                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: '20px',
-                                                fontStyle: 'italic', fontSize: '14px', fontWeight: '400', color: '#44546f'
-                                            }}>
-                                                <span>There are no join requests.</span>
-                                            </Box>
-                                            <TextField
-                                                placeholder='Filter by name...'
-                                                size='small'
-                                                sx={{ width: '450px' }}
-                                            />
-                                            <Box sx={{ display: 'flex', mt: '12px', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <FormControlLabel control={<Checkbox />} label="Select all (0)" />
-                                                <Box>
-                                                    <Button sx={{ ...buttonSx }} variant='contained' disabled>Add selected to Workspace</Button>
-                                                    <Button sx={{ ...buttonSx }} variant='contained' disabled>Delete selected requests</Button>
-                                                </Box>
-                                            </Box>
-                                        </Box>
-                                    </Box>
+                                    <JoinRequest/>
                                 </>
                             default:
                                 return null
