@@ -37,7 +37,7 @@ const router = createBrowserRouter([
                         children: [
                             { path: 'settings', element: <WorkspaceSettingFC/> },
                             { path: 'member', element: <MemberFC /> },
-                            { path: 'board', element: <BoardComponentWrap /> }
+                            { path: 'b/:boardId', element: <BoardComponentWrap /> }
                             // { path: '/boards', element: <BoardComponentWrap /> }
                         ]
                     }

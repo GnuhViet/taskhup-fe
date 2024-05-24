@@ -11,19 +11,20 @@ import {
     BoardCardCreateResp,
     BoardCardMoveReq,
     BoardColumnCreateResp,
-    BoardColumnMoveReq,
-    BoardDtoResp
+    BoardColumnMoveReq
 } from '~/core/services/board-services.model'
 import { mapObject } from '~/core/utils/mapper'
 
 export interface BoardState {
     board: Board
     boardId: string
+    disableDrag: boolean
 }
 
 const initialState: BoardState = {
     board: {} as Board,
-    boardId: '8b23da02-016c-463c-9988-d8ac4fce6718'
+    boardId: null,
+    disableDrag: false
 }
 
 export const boardSlice = createSlice({
@@ -87,6 +88,11 @@ export const boardSlice = createSlice({
 
                 fromColumn.cards = mapOrder(fromColumn.cards, fromColumn.cardOrderIds, 'id')
                 toColumn.cards = mapOrder(toColumn.cards, toColumn.cardOrderIds, 'id')
+
+                if (isEmpty(fromColumn.cards)) {
+                    fromColumn.cards = [generatePlaceholderCard(fromColumn)]
+                    fromColumn.cardOrderIds = [generatePlaceholderCard(fromColumn).id]
+                }
             }
         },
         updateColumnOrder: (state, action: PayloadAction<Column[]>) => {
@@ -98,11 +104,15 @@ export const boardSlice = createSlice({
         },
         websocketReady(state, action) {
             // state.readyState = action.payload
-        }
+        },
+        setDisableDrag: (state, action: PayloadAction<boolean>) => {
+            state.disableDrag = action.payload
+        },
     },
     extraReducers: (builder) => {
         builder.addMatcher(boardApi.endpoints.getBoardByCode.matchFulfilled, (state, action) => {
-            console.log('getBoardByCode.matchFulfilled')
+
+            state.board = null
 
             const board = JSON.parse(JSON.stringify({ ...action.payload as Board })) // make object not readonly
 
@@ -136,6 +146,7 @@ export const {
     updateColumnOrderResponse,
     updateCardOrderResponse,
     messageReceived,
+    setDisableDrag,
     websocketReady
 } = boardSlice.actions
 

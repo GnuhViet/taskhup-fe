@@ -44,15 +44,14 @@ export interface BoardItemProps {
 }
 
 const BoardItem: React.FC<BoardItemProps> = ({ id, title, workspaceId, desc, starred, backgroundUrl, backgroundColor }) => {
-    const dispatch = useDispatch()
     const [isBoardItemHover, setIsBoardItemHover] = React.useState(false)
     const [isStarHover, setIsStarHover] = React.useState(false)
     const navigate = useNavigate()
 
     const onBoardClick = async () => {
         // console.log('board clicked')
-        await dispatch(setBoard(id))
-        navigate(`/w/${workspaceId}/board`)
+        // await dispatch(setBoard(id))
+        navigate(`/w/${workspaceId}/b/${id}`)
     }
 
     return (

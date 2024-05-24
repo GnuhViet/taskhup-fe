@@ -96,7 +96,6 @@ const CreateMenu: React.FC = () => {
                     </MenuItem>
                 </Menu>
             </Box>
-            {console.log('popoverid', popOverId)}
             <CreateBoardPopover id={popOverId} open={openPopover} anchorEl={anchorElClone} onClose={() => setOpenPopover(false)} />
             <CreateWorkSpaceDialog open={openCreateWorkspaceDialog} handleClose={() => setOpenCreateWorkspaceDialog(false)} />
         </>

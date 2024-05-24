@@ -28,17 +28,17 @@ export const handleSocketEvent = (event: IMessage, dispatch: Dispatch) => {
         dispatch(updateColumnOrderResponse(resp.data))
         break
     case ACTION.DELETE_COLUMN:
-        console.log('DELETE_COLUMN', resp)
+        // console.log('DELETE_COLUMN', resp)
         break
     case ACTION.CREATE_CARD:
         dispatch(addCard(resp.data))
         break
     case ACTION.MOVE_CARD:
         dispatch(updateCardOrderResponse(resp.data))
-        console.log('MOVE_CARD', resp)
+        // console.log('MOVE_CARD', resp)
         break
     case ACTION.DELETE_CARD:
-        console.log('DELETE_CARD', resp)
+        // console.log('DELETE_CARD', resp)
         break
     default:
         break

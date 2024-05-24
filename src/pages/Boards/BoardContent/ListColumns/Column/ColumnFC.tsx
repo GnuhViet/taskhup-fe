@@ -24,8 +24,6 @@ import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
 import { useConfirm } from 'material-ui-confirm'
 import React from 'react'
-import { useContext } from 'react'
-import { AppContext } from '~/pages/Boards/BoardContent/BoardContentFC'
 import { Column } from '~/core/model/column.model'
 import { useStompClient } from 'react-stomp-hooks'
 import { useSelector } from 'react-redux'
@@ -41,7 +39,7 @@ const ColumnFC: React.FC<ColumnFCProps> = ({ column, deleteColumnDetails }) => {
     const stompClient = useStompClient()
     const boardId = useSelector((state: any) => state.boardReducer.boardId)
 
-    const isPopUpOpen = useContext(AppContext)
+    const disableDrag = useSelector((state: any) => state.boardReducer.disableDrag)
     const [anchorEl, setAnchorEl] = useState(null)
     const [openNewCardForm, setOpenNewCardForm] = useState(false)
     const [newCardTitle, setNewCardTitle] = useState('')
@@ -56,7 +54,7 @@ const ColumnFC: React.FC<ColumnFCProps> = ({ column, deleteColumnDetails }) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: column.id,
         data: { ...column },
-        disabled: isPopUpOpen
+        disabled: disableDrag
     })
     const dndKitColumnStyles = {
     // touchAction: 'none', // Dành cho sensor default dạng PointerSensor

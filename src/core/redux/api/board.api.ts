@@ -66,6 +66,7 @@ export const boardApi = apiSlice.injectEndpoints({
 
 export const {
     useGetBoardByCodeQuery,
+    useLazyGetBoardByCodeQuery,
     useGetAllBoardQuery,
     useCreateBoardMutation
 } = boardApi

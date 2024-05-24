@@ -58,8 +58,6 @@ class MoveInfo {
 
 const moveInfo = new MoveInfo()
 
-export const AppContext = createContext(null)
-
 interface BoadContentFCProps {
     // board: Board,
     // moveCardInTheSameColumn: () => void,
@@ -67,11 +65,9 @@ interface BoadContentFCProps {
     // deleteColumnDetails: () => void
 }
 
-const BoardContentFC: React.FC<BoadContentFCProps> = ({
-    // moveCardInTheSameColumn,
-    // moveCardToDifferentColumn,
-    // deleteColumnDetails
-}) => {
+const BoardContentFC: React.FC<BoadContentFCProps> = () => {
+    const disableDrag = useSelector((state: any) => state.boardReducer.disableDrag)
+
     //<editor-fold desc="Sensor custom">
     // https://docs.dndkit.com/api-documentation/sensors
     // Nếu dùng PointerSensor mặc định thì phải kết hợp thuộc tính CSS touch-action: none ở những phần tử kéo thả - nhưng mà còn bug
@@ -88,7 +84,6 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
     //</editor-fold>
 
     //<editor-fold desc="Hook & init state">
-    const [isPopUpOpen, setIsPopUpOpen] = useState(false)
 
     const board: Board = useSelector((state: any) => state.boardReducer.board)
     const boardId = useSelector((state: any) => state.boardReducer.boardId)
@@ -139,7 +134,6 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
         // Tìm vị trí (index) của cái overCard trong column đích (nơi mà activeCard sắp được thả)
         const overCardIndex = overColumn?.cards?.findIndex((card: Card) => card.id === overCardId)
 
-        console.log('overCardIndex: ', overCardIndex)
 
         // Logic tính toán "cardIndex mới" (trên hoặc dưới của overCard) lấy chuẩn ra từ code của thư viện - nhiều khi muốn từ chối hiểu =))
         const isBelowOverItem = active.rect.current.translated &&
@@ -222,7 +216,7 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
                     cardOrderIds: nextOverColumn.cardOrderIds
                 } as BoardCardMoveReq
 
-                console.log('req: ', req)
+                // console.log('req: ', req)
 
                 stompClient.publish({
                     destination: `/app/board/${boardId}/moveCard`,
@@ -250,6 +244,7 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
     //<editor-fold desc="DnD handler">
     // Trigger khi bắt đầu kéo (drag) một phần tử
     const handleDragStart = (event: any) => {
+        if (disableDrag) return
 
         moveInfo.currentDragItemId = event?.active?.id
         moveInfo.currentDragItemData = event?.active?.data?.current
@@ -269,6 +264,8 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
 
     // Trigger trong quá trình kéo (drag) một phần tử
     const handleDragOver = (event: any) => {
+        if (disableDrag) return
+
         if (ActiveDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) return
 
         // xử lý move card
@@ -278,8 +275,6 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
         // thì không làm gì (tránh crash trang)
         if (!active || !over) return
 
-        console.log('active', active)
-        console.log('over', over)
         if (active.id === over.id) return
 
         // activeDraggingCard: Là cái card đang được kéo
@@ -323,6 +318,8 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
 
     // Trigger khi kết thúc hành động kéo (drag) một phần tử => hành động thả (drop)
     const handleDragEnd = (event: any) => {
+        if (disableDrag) return
+
         const {
             oldColumnWhenDragCard: OldColumnWhenDragCard,
             currentDragItemId: CurrentDragItemId,
@@ -513,47 +510,44 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
     //</editor-fold>
 
     return (
-        <AppContext.Provider value={{ isPopUpOpen, setIsPopUpOpen }}>
-            <DndContext
-                // Cảm biến (đã giải thích kỹ ở video số 30)
-                sensors={sensors}
-                // Thuật toán phát hiện va chạm (nếu không có nó thì card với cover lớn sẽ không kéo qua ColumnFC được vì lúc này nó đang bị conflict giữa card và column), chúng ta sẽ dùng closestCorners thay vì closestCenter
-                // https://docs.dndkit.com/api-documentation/context-provider/collision-detection-algorithms
-                // Update video 37: nếu chỉ dùng closestCorners sẽ có bug flickering + sai lệch dữ liệu (vui lòng xem video 37 sẽ rõ)
-                // collisionDetection={closestCorners}
+        <DndContext
+            // Cảm biến (đã giải thích kỹ ở video số 30)
+            sensors={sensors}
+            // Thuật toán phát hiện va chạm (nếu không có nó thì card với cover lớn sẽ không kéo qua ColumnFC được vì lúc này nó đang bị conflict giữa card và column), chúng ta sẽ dùng closestCorners thay vì closestCenter
+            // https://docs.dndkit.com/api-documentation/context-provider/collision-detection-algorithms
+            // Update video 37: nếu chỉ dùng closestCorners sẽ có bug flickering + sai lệch dữ liệu (vui lòng xem video 37 sẽ rõ)
+            // collisionDetection={closestCorners}
 
-                // Tự custom nâng cao thuật toán phát hiện va chạm (video fix bug số 37)
-                collisionDetection={collisionDetectionStrategy}
+            // Tự custom nâng cao thuật toán phát hiện va chạm (video fix bug số 37)
+            collisionDetection={collisionDetectionStrategy}
 
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-                onDragEnd={handleDragEnd}
-            >
-                <Box sx={{
-                    bgcolor: (theme: any) => (theme.palette.mode === 'dark' ? '#34495e' : '#1976d2'),
-                    width: '100%',
-                    height: (theme: any) => theme.trello.boardContentHeight,
-                    p: '10px 0'
-                }}>
-                    <>
-                        <ListColumnsFC
-                            // columns={orderedColumns}
-                            // createNewColumn={createNewColumn}
-                            // createNewCard={createNewCard}
-                            deleteColumnDetails={null}
-                        />
-                        {console.log('render board content fc!!')}
-                        <DragOverlay dropAnimation={customDropAnimation}>
-                            {!ActiveDragItemType && null}
-                            {(ActiveDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) &&
-                              <ColumnFC column={CurrentDragItemData} /*createNewCard={undefined}*/ deleteColumnDetails={undefined}/>}
-                            {(ActiveDragItemType === ACTIVE_DRAG_ITEM_TYPE.CARD) &&
-                              <CardFC card={CurrentDragItemData} modalRender={undefined}/>}
-                        </DragOverlay>
-                    </>
-                </Box>
-            </DndContext>
-        </AppContext.Provider>
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+        >
+            <Box sx={{
+                bgcolor: (theme: any) => (theme.palette.mode === 'dark' ? '#34495e' : '#1976d2'),
+                width: '100%',
+                height: (theme: any) => theme.trello.boardContentHeight,
+                p: '10px 0'
+            }}>
+                <>
+                    <ListColumnsFC
+                        // columns={orderedColumns}
+                        // createNewColumn={createNewColumn}
+                        // createNewCard={createNewCard}
+                        deleteColumnDetails={null}
+                    />
+                    <DragOverlay dropAnimation={customDropAnimation}>
+                        {!ActiveDragItemType && null}
+                        {(ActiveDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) &&
+                            <ColumnFC column={CurrentDragItemData} /*createNewCard={undefined}*/ deleteColumnDetails={undefined} />}
+                        {(ActiveDragItemType === ACTIVE_DRAG_ITEM_TYPE.CARD) &&
+                            <CardFC card={CurrentDragItemData} modalRender={undefined} />}
+                    </DragOverlay>
+                </>
+            </Box>
+        </DndContext>
     )
 }
 

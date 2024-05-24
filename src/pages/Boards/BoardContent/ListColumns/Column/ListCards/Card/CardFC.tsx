@@ -1,6 +1,5 @@
 import React from 'react'
 import { useContext } from 'react'
-import { AppContext } from '~/pages/Boards/BoardContent/BoardContentFC'
 import { Card as MuiCard } from '@mui/material'
 import CardActions from '@mui/material/CardActions'
 import CardContent from '@mui/material/CardContent'
@@ -15,6 +14,8 @@ import SimpleModal from './CardDetailModal/CardDialogFC'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Card } from '~/core/model/card.model'
+import { useDispatch } from 'react-redux'
+import { setDisableDrag } from '~/core/redux/slices/boardSlice'
 
 interface CardFCProps {
     card: Card
@@ -24,7 +25,7 @@ interface CardFCProps {
 const CardFC: React.FC<CardFCProps> = ({ card, modalRender }) => {
     //<editor-fold desc="Hook & State">
     const [open, setOpen] = React.useState(false)
-    const setIsPopUpOpen = useContext(AppContext)
+    const dispatch = useDispatch()
 
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: card.id,
@@ -44,12 +45,12 @@ const CardFC: React.FC<CardFCProps> = ({ card, modalRender }) => {
 
     const handleClose = () => {
         setOpen(false)
-        setIsPopUpOpen(false)
+        dispatch(setDisableDrag(false))
     }
 
     const handleClickOpen = () => {
         setOpen(true)
-        setIsPopUpOpen(true)
+        dispatch(setDisableDrag(true))
         return <SimpleModal open={open} handleClose={handleClose} card={card} />
     }
 
