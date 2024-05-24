@@ -60,7 +60,7 @@ const RequireRole = () => {
 
     }, [workspaceId])
 
-    if (isLoading) {
+    if (isLoading || authorToken === null || authorToken.workspaceId !== workspaceId) {
         return <div>Loading...</div>
     }
 
@@ -106,7 +106,7 @@ const RequireRole = () => {
     return (
         <AbilityContext.Provider value={buildAbility(authorToken)}>
             <Outlet />
-        </AbilityContext.Provider>  
+        </AbilityContext.Provider>
     )
 }
 export default RequireRole

@@ -9,6 +9,7 @@ import FormHelperText from '@mui/material/FormHelperText'
 
 import { Role } from '~/core/model/role.model'
 import CircleAvatar from '~/components/Common/CircleAvatar'
+import { convertDate } from '~/core/utils/data-utils'
 
 export interface MemberPopoverProps {
     id: string
@@ -16,13 +17,11 @@ export interface MemberPopoverProps {
     open: boolean
     anchorEl: HTMLElement
     onClose?: () => void
+    memberRoleMap: Map<string, any[]>
 }
 
 export interface MemberItemmProps {
-    item?: any
-    label?: any
-    helperText?: any
-    subHelperText?: any
+    item: any
 }
 
 const buttonSx = {
@@ -43,21 +42,34 @@ const borderBottom = {
     borderBottom: '1px solid #DCDFE4'
 }
 
-const MemberPopover: React.FC<MemberPopoverProps> = ({ id, roleItem, open, anchorEl, onClose }) => {
+const MemberPopover: React.FC<MemberPopoverProps> = ({ id, roleItem, open, anchorEl, onClose, memberRoleMap }) => {
+    const [fillterName, setFillterName] = React.useState(null)
 
-    const MemberItem: React.FC<MemberItemmProps> = () => {
+
+    const MemberItem: React.FC<MemberItemmProps> = ({ item }) => {
         return (
-            <Box key='5' sx={{ ...borderBottom, p: '16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '450px' }}>
+            <Box sx={{ ...borderBottom, p: '16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '450px' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <CircleAvatar sx={{ minWidth: '42px', minHeight: '42px', fontSize: '16px', mr: '12px', background: '#172B4D' }} src={null} alt='V' />
+                    <CircleAvatar
+                        sx={{
+                            width: '42px',
+                            height: '42px',
+                            fontSize: '16px',
+                            mr: '12px',
+                            background: item.avatarUrl ? '' : '#172B4D',
+                            borderRadius: '50%'
+                        }}
+                        src={item.avatarUrl}
+                        alt={item.fullName.charAt(0)}
+                    />
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                        <Box sx={{ fontSize: '16px', fontWeight: '800', color: '#172B4D' }}>Việt Hưng Nguyễn</Box>
+                        <Box sx={{ fontSize: '16px', fontWeight: '800', color: '#172B4D' }}>{item.fullName}</Box>
                         <Box sx={{ fontSize: '14px', fontWeight: '400', color: '#44546f', display: 'flex' }}>
-                            <Box>@vithngnguyn16</Box>
+                            <Box>@{item.userName}</Box>
                             <Box sx={{ fontSize: '20px', display: 'flex', alignItems: 'center', lineHeight: '14px' }}>
                                 &nbsp;•&nbsp;
                             </Box>
-                            <Box>Joined 1 month ago</Box>
+                            <Box>Joined on {convertDate(item.joinDate)}</Box>
                         </Box>
                     </Box>
                 </Box>
@@ -100,17 +112,25 @@ const MemberPopover: React.FC<MemberPopoverProps> = ({ id, roleItem, open, ancho
                 </form> */}
                 <Box sx={{ ...borderBottom, p: '24px 0 12px 0' }}>
                     <TextField
-                        placeholder='Add new member...'
+                        placeholder='John doe...'
                         size='small'
                         sx={{ width: '450px' }}
+                        onChange={(e) => setFillterName(e.target.value)}
                     />
                     <FormHelperText>Type name to search</FormHelperText>
                 </Box>
-
-                <MemberItem />
-                <MemberItem />
-                <MemberItem />
-                <MemberItem />
+                {(fillterName
+                    ? memberRoleMap.get(roleItem?.id)?.filter((item: any) =>
+                        item.fullName.toLowerCase().includes(fillterName.toLowerCase())
+                    )
+                    : memberRoleMap.get(roleItem?.id)
+                )?.map((item: any) => {
+                    return (
+                        <Box key={item.id}>
+                            <MemberItem item={item} />
+                        </Box>
+                    )
+                })}
             </Box>
         </Popover >
     )

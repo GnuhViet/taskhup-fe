@@ -50,7 +50,7 @@ const LoginFC = () => {
 
 
     const [login, { isLoading }] = useLoginMutation()
-    const [triggerGetUserInfo] = useLazyGetUserInfoQuery()
+    // const [triggerGetUserInfo] = useLazyGetUserInfoQuery()
 
     const form = useForm<AuthenticationRequest>({
         defaultValues: {
@@ -71,7 +71,7 @@ const LoginFC = () => {
 
             const authResp = await login(authReq).unwrap() as AuthenticationResponse
             await dispatch(setCredentials(authResp))
-            triggerGetUserInfo({})
+            // triggerGetUserInfo({})
 
             navigate('/home')
         } catch (err) {

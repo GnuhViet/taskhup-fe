@@ -278,6 +278,8 @@ const BoardContentFC: React.FC<BoadContentFCProps> = ({
         // thì không làm gì (tránh crash trang)
         if (!active || !over) return
 
+        console.log('active', active)
+        console.log('over', over)
         if (active.id === over.id) return
 
         // activeDraggingCard: Là cái card đang được kéo

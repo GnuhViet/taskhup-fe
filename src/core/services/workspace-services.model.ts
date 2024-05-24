@@ -14,3 +14,9 @@ export class GetWorkSpaceResp {
 export class JoinRequestADRequest {
     userIds: string[]
 }
+
+export interface UpdateWorkspaceInfoRequest {
+    title: string
+    website: string
+    description: string
+}

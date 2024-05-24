@@ -51,7 +51,7 @@ const WorkSpaceMember = () => {
     const [fillterName, setFillterName] = useState(null)
     const { workspaceId } = useParams()
     const [createLink, { isLoading }] = useCreateInviteLinkMutation()
-    const { data: apiResponse, isLoadingGetMember } = useGetWorkspaceMemberQuery({})
+    const { data: apiResponse, isLoading: isLoadingGetMember } = useGetWorkspaceMemberQuery({})
     const response = apiResponse as ApiResponse<any>
 
     const createInviteLinkMember = async () => {
@@ -108,7 +108,7 @@ const WorkSpaceMember = () => {
             </Box>
             <Box>
                 {(fillterName
-                    ? response?.data?.filter(item => item.fullName.includes(fillterName))
+                    ? response?.data?.filter(item => item.fullName.toLowerCase().includes(fillterName.toLowerCase()))
                     : response?.data
                 )?.map((item, index) => (
                     <Box key={index} sx={{ ...borderBottom, p: '16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

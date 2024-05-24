@@ -175,7 +175,7 @@ const JoinRequest = () => {
                             />
                         }
                         label={`Select all (${fillterName
-                            ? response?.data?.filter(item => item.fullName.includes(fillterName)).length
+                            ? response?.data?.filter(item => item.fullName.toLowerCase().includes(fillterName.toLowerCase())).length
                             : response?.data.length
                             })`}
                     />
@@ -197,7 +197,7 @@ const JoinRequest = () => {
             </Box>
             {
                 (fillterName
-                    ? response?.data?.filter(item => item.fullName.includes(fillterName))
+                    ? response?.data?.filter(item => item.fullName.toLowerCase().includes(fillterName.toLowerCase()))
                     : response?.data
                 )?.map((item: any, index) => (
                     <Box key={index} sx={{ ...borderBottom, p: '16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

@@ -17,8 +17,10 @@ import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
 import CreateMenu from './Menus/Create'
 import { useNavigate } from 'react-router-dom'
+import { useGetUserInfoQuery } from '~/core/redux/api/user.api'
 
 const AppBar: React.FC = () => {
+    const { isLoading } = useGetUserInfoQuery({})
     const [searchValue, setSearchValue] = useState('')
     const navigate = useNavigate()
 

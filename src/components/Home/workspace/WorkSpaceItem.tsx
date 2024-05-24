@@ -101,6 +101,7 @@ const WorkSpaceItem: React.FC<WorkSpaceItemProps> = ({ workspace }) => {
                         <BoardItem
                             id={`${board.id}`}
                             title={board.title}
+                            workspaceId={workspace.id}
                             desc={board.description}
                             starred={false}
                             backgroundUrl='https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x336/24baa6609b89fb8eb0cc0aceb70eaf36/photo-1557682250-33bd709cbe85.jpg'

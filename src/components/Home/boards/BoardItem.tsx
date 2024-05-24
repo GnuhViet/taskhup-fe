@@ -36,13 +36,14 @@ const starIconSx = {
 export interface BoardItemProps {
     id: string
     title: string
+    workspaceId: string
     desc?: string
     starred: boolean
     backgroundUrl?: string
     backgroundColor?: string
 }
 
-const BoardItem: React.FC<BoardItemProps> = ({ id, title, desc, starred, backgroundUrl, backgroundColor }) => {
+const BoardItem: React.FC<BoardItemProps> = ({ id, title, workspaceId, desc, starred, backgroundUrl, backgroundColor }) => {
     const dispatch = useDispatch()
     const [isBoardItemHover, setIsBoardItemHover] = React.useState(false)
     const [isStarHover, setIsStarHover] = React.useState(false)
@@ -51,9 +52,7 @@ const BoardItem: React.FC<BoardItemProps> = ({ id, title, desc, starred, backgro
     const onBoardClick = async () => {
         // console.log('board clicked')
         await dispatch(setBoard(id))
-
-        console.log('do navigate !!')
-        navigate('/workspace/board')
+        navigate(`/w/${workspaceId}/board`)
     }
 
     return (

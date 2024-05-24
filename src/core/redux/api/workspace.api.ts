@@ -1,5 +1,5 @@
 import { apiSlice } from '~/core/redux/api/base.api'
-import { JoinRequestADRequest, WorkSpaceCreateReq } from '~/core/services/workspace-services.model'
+import { JoinRequestADRequest, UpdateWorkspaceInfoRequest, WorkSpaceCreateReq } from '~/core/services/workspace-services.model'
 
 const API_URL = '/api/v1/workspace'
 
@@ -43,6 +43,31 @@ export const workspaceApi = apiSlice.injectEndpoints({
                 method: 'POST',
                 body: data
             })
+        }),
+        getWorkSpaceInfo: builder.query({
+            query: () => ({
+                url: `${API_URL}/info`,
+                method: 'GET'
+            })
+        }),
+        updateAvatar: builder.mutation({
+            query: (data: any) => {
+                const formData = new FormData()
+                formData.append('file', data)
+                return {
+                    url: `${API_URL}/update-avatar`,
+                    method: 'POST',
+                    body: formData,
+                    formData: true
+                }
+            }
+        }),
+        updateInfo: builder.mutation({
+            query: (data: UpdateWorkspaceInfoRequest) => ({
+                url: `${API_URL}/update-info`,
+                method: 'POST',
+                body: data
+            })
         })
     })
 })
@@ -53,5 +78,8 @@ export const {
     useGetWorkspaceMemberQuery,
     useGetWorkspaceJoinRequestQuery,
     useAcceptWorkspaceMemberMutation,
-    useDenyWorkspaceMemberMutation
+    useDenyWorkspaceMemberMutation,
+    useUpdateAvatarMutation,
+    useUpdateInfoMutation,
+    useGetWorkSpaceInfoQuery
 } = workspaceApi

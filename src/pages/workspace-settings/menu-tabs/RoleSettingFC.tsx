@@ -59,6 +59,7 @@ export class FormData {
 }
 
 const RoleSettingFC = () => {
+    const [fillterName, setFillterName] = React.useState('')
     const dispatch = useDispatch()
     const [updateRole] = useUpdateRoleMutation()
 
@@ -68,7 +69,20 @@ const RoleSettingFC = () => {
     const [editNameId, setEditNameId] = React.useState('')
 
     const { error, isLoading } = useGetWorkspaceRolesQuery({})
-    const {error1} = useGetWorkspaceMemberQuery({})
+    const { data: apiResponseWsMember, isLoading: isLoandingWsMember } = useGetWorkspaceMemberQuery({})
+    const wsMember = apiResponseWsMember?.data
+    const [wsMemberRoleMap, setWsMemberRoleMap] = React.useState(new Map<string, any[]>())
+
+    React.useEffect(() => {
+        const map = new Map<string, any[]>()
+        wsMember?.forEach((item: any) => {
+            if (!map.has(item.roleId)) {
+                map.set(item.roleId, [])
+            }
+            map.get(item.roleId).push(item)
+        })
+        setWsMemberRoleMap(map)
+    }, [wsMember])
 
     const roles = useSelector((state: any) => state.workspaceReducer.roles) as Role[]
 
@@ -120,7 +134,6 @@ const RoleSettingFC = () => {
     if (error) return <div>Error: {error.message}</div>
     if (isLoading) return <div>Loading...</div>
 
-
     return (
         <>
             <Box>
@@ -134,6 +147,7 @@ const RoleSettingFC = () => {
                             placeholder='Filter by name...'
                             size='small'
                             sx={{ width: '450px' }}
+                            onChange={(e) => setFillterName(e.target.value)}
                         />
                     </Box>
                     <Can I='edit' a='role'>
@@ -146,8 +160,10 @@ const RoleSettingFC = () => {
                     </Can>
                 </Box>
                 <Box>
-
-                    {roles.map((item) => (
+                    {(fillterName
+                        ? roles.filter((item) => item.name.toLowerCase().includes(fillterName.toLowerCase()))
+                        : roles
+                    ).map((item) => (
                         <Box key={item.id} sx={{ ...borderBottom, p: '16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                 <CircleAvatar sx={{ minWidth: '42px', minHeight: '42px', fontSize: '16px', mr: '12px', background: `${item.color}` }}
@@ -242,7 +258,7 @@ const RoleSettingFC = () => {
                                         setCurrentSelectedRole(item)
                                     }}
                                 >
-                                    Member ({item.member?.length || 0})
+                                    Member ({wsMemberRoleMap.get(item.id)?.length || 0})
                                 </Button>
                                 {!item.id.includes('default-role') &&
                                     <Can I='edit' a='role'>
@@ -267,7 +283,10 @@ const RoleSettingFC = () => {
             <MemberPopover
                 id='role-member-popover'
                 roleItem={currentSelectedRole}
-                open={openMember} anchorEl={anchorElMember} onClose={handleClose}
+                open={openMember}
+                anchorEl={anchorElMember}
+                onClose={handleClose}
+                memberRoleMap={wsMemberRoleMap}
             />
         </>
     )
