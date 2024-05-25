@@ -19,3 +19,8 @@ export class RoleUpdateReq {
     name: string
     actionCode: string[]
 }
+
+export class ChangeMemberRoleReq {
+    roleId: string
+    memberId: string
+}

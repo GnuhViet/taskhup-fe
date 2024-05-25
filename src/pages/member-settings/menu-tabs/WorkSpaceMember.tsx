@@ -14,6 +14,11 @@ import { toast } from 'react-toastify'
 import { useGetWorkspaceMemberQuery } from '~/core/redux/api/workspace.api'
 import { ApiResponse } from '~/core/services/api.model'
 import { convertDate } from '~/core/utils/data-utils'
+import { useGetWorkspaceRolesQuery } from '~/core/redux/api/role.api'
+import { getContrastTextColor } from '~/core/utils/common-used'
+import RoleSelectPopover from './Popover/RoleSelecPopover'
+import TextBoxToolTip from '~/components/Common/TextBoxToolTip'
+import { useSelector } from 'react-redux'
 
 const headingSx = {
     fontSize: '18px',
@@ -48,11 +53,21 @@ const buttonSx = {
 
 
 const WorkSpaceMember = () => {
+    const currentLoginUserName = useSelector((state: any) => state.homeReducer.userInfo.username)
+    const { data: apiResponseRole, error, isLoading: isLoadingRole } = useGetWorkspaceRolesQuery({})
+    const responseRole = apiResponseRole as ApiResponse<any>
+
     const [fillterName, setFillterName] = useState(null)
     const { workspaceId } = useParams()
     const [createLink, { isLoading }] = useCreateInviteLinkMutation()
-    const { data: apiResponse, isLoading: isLoadingGetMember } = useGetWorkspaceMemberQuery({})
+    const { data: apiResponse, isLoading: isLoadingGetMember, refetch: refectMember } = useGetWorkspaceMemberQuery({})
     const response = apiResponse as ApiResponse<any>
+
+    const [anchorElPermission, setAnchorElPermission] = React.useState(null)
+    const openPermission = Boolean(anchorElPermission)
+    const handleClose = () => {
+        setAnchorElPermission(null)
+    }
 
     const createInviteLinkMember = async () => {
         try {
@@ -72,7 +87,10 @@ const WorkSpaceMember = () => {
         }
     }
 
-    if (isLoadingGetMember) {
+    const [selectedMemberRole, setSelectedMemberRole] = useState(null)
+    const [selectedMember, setSelectedMember] = useState(null)
+
+    if (isLoadingGetMember || isLoadingRole) {
         return (
             <Box>
                 <CircularProgress />
@@ -113,9 +131,27 @@ const WorkSpaceMember = () => {
                 )?.map((item, index) => (
                     <Box key={index} sx={{ ...borderBottom, p: '16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <CircleAvatar sx={{ minWidth: '42px', minHeight: '42px', fontSize: '16px', mr: '12px', background: '#172B4D' }} src={null} alt='V' />
+                            <CircleAvatar
+                                sx={{
+                                    minWidth: '42px',
+                                    minHeight: '42px',
+                                    width: '42px',
+                                    height: '42px',
+                                    fontSize: '16px',
+                                    mr: '12px',
+                                    background: item.avatarUrl ? null : '#172B4D'
+                                }}
+                                src={item.avatarUrl}
+                                alt={item.fullName.charAt(0).toUpperCase()}
+                            />
                             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                <Box sx={{ fontSize: '16px', fontWeight: '800', color: '#172B4D' }}>{item.fullName}</Box>
+                                <Box sx={{
+                                    fontSize: '16px', fontWeight: '800', color: '#172B4D',
+                                    textDecoration: item.status === 'DISABLED' ? 'line-through' : 'none'
+                                }}>
+                                    {item.fullName}
+                                    {item.userName === currentLoginUserName && '  ( You )'}
+                                </Box>
                                 <Box sx={{ fontSize: '14px', fontWeight: '400', color: '#44546f', display: 'flex' }}>
                                     <Box>{item.userName}</Box>
                                     <Box sx={{ fontSize: '20px', display: 'flex', alignItems: 'center', lineHeight: '14px' }}>
@@ -126,9 +162,69 @@ const WorkSpaceMember = () => {
                             </Box>
                         </Box>
                         <Box>
-                            <Button sx={{ ...buttonSx }} variant='contained'>View boards (3)</Button>
-                            <Button sx={{ ...buttonSx }} variant='contained' startIcon={<BadgeOutlinedIcon sx={{ mb: '4px' }} />}>Role</Button>
-                            <Button sx={{ ...buttonSx, mr: 0 }} variant='contained' startIcon={<CloseOutlinedIcon />}>Leave&nbsp;...</Button>
+                            {(() => {
+                                const role = responseRole.data.find(role => role.id === item.roleId)
+                                return (
+                                    <>
+                                        <Button
+                                            sx={{
+                                                ...buttonSx,
+                                                minWidth: '150px',
+                                                maxWidth: '150px',
+                                                backgroundColor: role.color,
+                                                cursor: 'default',
+                                                color: getContrastTextColor(role.color),
+                                                '&:hover': {
+                                                    backgroundColor: role.color
+                                                }
+                                            }}
+                                            variant='contained'
+                                        >
+                                            <TextBoxToolTip sx={{ color: getContrastTextColor(role.color) }} id={role.id} text={role.name} breakOnLine={1} />
+                                            {/* {role.name} */}
+                                        </Button>
+                                        <Button
+                                            sx={{ ...buttonSx }}
+                                            variant='contained'
+                                            startIcon={<BadgeOutlinedIcon sx={{ mb: '4px' }} />}
+                                            disabled={
+                                                role.id.includes('owner')
+                                                || currentLoginUserName === item.userName
+                                                || item.status === 'DISABLED'
+                                            }
+                                            onClick={(e) => {
+                                                setAnchorElPermission(e.currentTarget)
+                                                setSelectedMemberRole(role)
+                                                setSelectedMember(item)
+                                            }}
+                                        >
+                                            Role
+                                        </Button>
+                                        <Button
+                                            sx={{ ...buttonSx, mr: 0 }}
+                                            variant='contained'
+                                            startIcon={<CloseOutlinedIcon />}
+                                            disabled={
+                                                role.id.includes('owner')
+                                                || currentLoginUserName === item.userName
+                                                || item.status === 'DISABLED'
+                                            }
+                                        >
+                                            Disable&nbsp;...
+                                        </Button>
+                                        <RoleSelectPopover
+                                            id='role-select-popover'
+                                            roleItem={responseRole.data}
+                                            selectedRole={selectedMemberRole}
+                                            selectedMember={selectedMember}
+                                            open={openPermission}
+                                            anchorEl={anchorElPermission}
+                                            onClose={handleClose}
+                                            refecthMember={refectMember}
+                                        />
+                                    </>
+                                )
+                            })()}
                         </Box>
                     </Box>
                 ))}

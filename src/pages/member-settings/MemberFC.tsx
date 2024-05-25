@@ -2,8 +2,8 @@ import Box from '@mui/material/Box'
 import './MemberFC.scss'
 import SideBarButton from '~/components/Home/sidebar/SideBarButton'
 import List from '@mui/material/List'
-import { useGetUserWorkSpaceQuery } from '~/core/redux/api/workspace.api'
-import { useDispatch, useSelector } from 'react-redux'
+import { useGetWorkSpaceInfoQuery } from '~/core/redux/api/workspace.api'
+import { useSelector } from 'react-redux'
 import SquareAvatar from '~/components/Common/SquareAvatar'
 import React from 'react'
 import Button from '@mui/material/Button'
@@ -13,9 +13,6 @@ import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined'
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import TextField from '@mui/material/TextField'
-import Checkbox from '@mui/material/Checkbox'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import CircleAvatar from '~/components/Common/CircleAvatar'
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
@@ -24,13 +21,18 @@ import AddLinkIcon from '@mui/icons-material/AddLink'
 import DialogActions from '@mui/material/DialogActions'
 import Textarea from '@mui/joy/Textarea'
 import Input from '@mui/joy/Input'
-import { InviteLinkCreateReq } from '~/core/services/invite-services.model'
+import { SendEmailInviteLinkReq } from '~/core/services/invite-services.model'
 import { useParams } from 'react-router-dom'
-import { useCreateInviteLinkMutation } from '~/core/redux/api/invite.api'
+import { useSendLinkViaEmailMutation } from '~/core/redux/api/invite.api'
 import { toast } from 'react-toastify'
 import JoinRequest from './menu-tabs/JoinRequest'
-import { Work } from '@mui/icons-material'
 import WorkSpaceMember from './menu-tabs/WorkSpaceMember'
+import CircleAvatar from '~/components/Common/CircleAvatar'
+import CircularProgress from '@mui/material/CircularProgress'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import Typography from '@mui/material/Typography'
+import { ApiResponse } from '~/core/services/api.model'
+import { isBlank } from '~/core/utils/data-utils'
 
 const headingSx = {
     fontSize: '18px',
@@ -52,6 +54,8 @@ const borderBottom = {
 const avatarSx = {
     minWidth: '60px',
     minHeight: '60px',
+    width: '60px',
+    height: '60px',
     fontSize: '32px',
     mr: '12px'
 }
@@ -70,28 +74,44 @@ const buttonSx = {
     }
 }
 const MemberFC = () => {
+    const [createInviteLink, { isLoading: isLoadingInvite }] = useSendLinkViaEmailMutation()
+    const { data: apiResponse, isSuccess: isLoadingInfoSuccess } = useGetWorkSpaceInfoQuery({})
+    const response = apiResponse as ApiResponse<any>
+    const workspaceInfo = response?.data
     const { workspaceId } = useParams()
     const selectedButtonId = useSelector((state: any) => state.homeReducer.selectedButtonId)
     const [open, setOpen] = React.useState(false)
 
-    const [createLink, { isLoading }] = useCreateInviteLinkMutation()
-
-    const createInviteLinkMember = async () => {
-        try {
-            const request = {} as InviteLinkCreateReq
-            request.type = 'WORKSPACE'
-            request.destinationId = workspaceId
-            const resp = await createLink(request).unwrap() as any
-            if (resp.data) {
-                const link = 'http://localhost:5173/invite/' + resp.data
-                navigator.clipboard.writeText(link)
-                toast.success('Invite link copied to clipboard, link will expire in 1 days.', {
-                    position: 'bottom-right'
-                })
-            }
-        } catch (e) {
-            console.log(e)
+    const { register, handleSubmit, formState: { errors } } = useForm<SendEmailInviteLinkReq>({
+        defaultValues: {
+            email: null,
+            content: null,
+            destinationId: workspaceId
         }
+    })
+
+    const onSubmit: SubmitHandler<SendEmailInviteLinkReq> = async (data) => {
+        if (isBlank(data.content)) {
+            data.content = 'Join this Trello Workspace to start collaborating with me!'
+        }
+        try {
+            await createInviteLink(data).unwrap()
+            toast.success('Invite sent successfully', {
+                position: 'bottom-right'
+            })
+        } catch (error) {
+            toast.error('Invite link send failed', {
+                position: 'bottom-right'
+            })
+        }
+    }
+
+    if (!isLoadingInfoSuccess || isLoadingInvite) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '1000px' }}>
+                <CircularProgress />
+            </Box>
+        )
     }
 
     return (
@@ -101,18 +121,21 @@ const MemberFC = () => {
                     <Box className="section-header-content">
                         <Box className="workspace-title">
                             <Box className="title-main">
-                                <SquareAvatar sx={avatarSx} src={null} alt='T' />
+                                <SquareAvatar sx={avatarSx} src={workspaceInfo?.avatarUrl} alt={workspaceInfo.title.charAt(0)} />
                                 <Box className="title-info">
-                                    <Box className='title-name'>NAME HERE</Box>
-                                    <Box className='title-description'>DESCP HERE</Box>
+                                    <Box className='title-name'>{workspaceInfo.title}</Box>
+                                    <Box className='title-description'>{workspaceInfo.description}</Box>
                                 </Box>
                             </Box>
-                            <Box className="title-link-section">
-                                <ExploreOutlinedIcon sx={{ fontSize: '22px', mr: '4px', cursor: 'default' }} />
-                                <Link className="link-text">
-                                    abcdef.com
-                                </Link>
-                            </Box>
+                            {workspaceInfo.website && (
+                                <Box className="title-link-section">
+                                    <ExploreOutlinedIcon sx={{ fontSize: '22px', mr: '4px', cursor: 'default' }} />
+                                    <Link className="link-text">
+                                        {workspaceInfo.website}
+                                    </Link>
+                                </Box>
+                            )}
+
                         </Box>
                         <Box>
                             <Button
@@ -138,7 +161,7 @@ const MemberFC = () => {
                     />
                 </Box>
 
-                <Box className="home-sticky-container" sx={{ }}>
+                <Box className="home-sticky-container" sx={{}}>
                     <Box className="home-left-sidebar-container">
                         <List className="top-button">
                             <Box className="title">Collaborators</Box>
@@ -166,7 +189,7 @@ const MemberFC = () => {
                             switch (selectedButtonId) {
                             case 'workspace-member-button':
                                 return <>
-                                    <WorkSpaceMember/>
+                                    <WorkSpaceMember />
                                 </>
                             case 'workspace-guest-button':
                                 return <>
@@ -199,7 +222,7 @@ const MemberFC = () => {
                                                             <Box sx={{ fontSize: '14px', fontWeight: '400', color: '#44546f', display: 'flex' }}>
                                                                 <Box>@vithngnguyn16</Box>
                                                                 <Box sx={{ fontSize: '20px', display: 'flex', alignItems: 'center', lineHeight: '14px' }}>
-                                                                                                                &nbsp;•&nbsp;
+                                                                        &nbsp;•&nbsp;
                                                                 </Box>
                                                                 <Box>Joined 1 month ago</Box>
                                                             </Box>
@@ -217,7 +240,7 @@ const MemberFC = () => {
                                 </>
                             case 'workspace-join-request-button':
                                 return <>
-                                    <JoinRequest/>
+                                    <JoinRequest />
                                 </>
                             default:
                                 return null
@@ -226,6 +249,7 @@ const MemberFC = () => {
                     </Box>
                 </Box>
             </Box>
+
             <Dialog
                 fullWidth={true}
                 maxWidth='sm'
@@ -233,15 +257,7 @@ const MemberFC = () => {
                 open={open}
                 onClose={() => setOpen(false)}
                 PaperProps={{
-                    sx: { borderRadius: '15px', backgroundColor: '#F0F1F4' },
-                    onSubmit: (event: any) => {
-                        event.preventDefault()
-                        const formData = new FormData(event.currentTarget)
-                        const formJson = Object.fromEntries((formData).entries())
-                        const email = formJson.email
-                        console.log(email)
-                        // handleClose()
-                    }
+                    sx: { borderRadius: '15px', backgroundColor: '#F0F1F4' }
                 }}
             >
                 <Box className="closeIcon">
@@ -252,40 +268,59 @@ const MemberFC = () => {
                     Invite to Workspace
                 </DialogTitle>
 
-                <DialogContent sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <Input
-                        fullWidth
-                        placeholder='Email address'
-                        sx ={{ background: 'transparent', border: '2px #D5D9DF solid', borderRadius: '0' }}
-                    />
-                    <Textarea
-                        placeholder='Join this Trello Workspace to start collaborating with me!'
-                        variant="outlined"
-                        minRows={4}
-                        sx ={{ background: 'transparent', mt: '16px', border: '2px #D5D9DF solid', borderRadius: '0' }}
-                    />
-                    <Box sx={{ backgroundColor: '#FFF7D6', mt: '16px', pt: '16px' }}>
-                        <span style={{ fontSize: '14px', fontWeight: '600', color: '#172b4d', paddingLeft: '22px' }}>1 new member license</span>
-                        <ul style={{ margin: '10px 0 16px 0', fontSize: '12px', fontWeight: '300', color: '#626f86' }}>
-                            <li>You will be charged $0.00 now</li>
-                            <li>Your monthly bill will increase by $12.50 on May 20, 2024</li>
-                        </ul>
-                    </Box>
-                </DialogContent>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <DialogContent sx={{ display: 'flex', flexDirection: 'column' }}>
+                        <Input
+                            fullWidth
+                            placeholder='Member email address'
+                            sx={{ background: 'transparent', border: '2px #D5D9DF solid', borderRadius: '0' }}
+                            {...register('email', {
+                                required: 'Field is required',
+                                maxLength: {
+                                    value: 50,
+                                    message: 'Field is too long'
+                                },
+                                pattern: {
+                                    value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
+                                    message: 'Invalid email'
+                                }
+                            })}
+                        />
+                        {errors.email && (
+                            <Typography variant="caption" color="error">
+                                {errors.email.message}
+                            </Typography>
+                        )}
+                        <Textarea
+                            placeholder='Join this Trello Workspace to start collaborating with me!'
+                            variant="outlined"
+                            minRows={4}
+                            sx={{ background: 'transparent', mt: '16px', border: '2px #D5D9DF solid', borderRadius: '0' }}
+                            {...register('content')}
+                        />
+                        <Box sx={{ backgroundColor: '#FFF7D6', mt: '16px', pt: '16px' }}>
+                            <span style={{ fontSize: '14px', fontWeight: '600', color: '#172b4d', paddingLeft: '22px' }}>1 new member license</span>
+                            <ul style={{ margin: '10px 0 16px 0', fontSize: '12px', fontWeight: '300', color: '#626f86' }}>
+                                <li>You will be charged $0.00 now</li>
+                                <li>Your monthly bill will increase by $12.50 on May 20, 2024</li>
+                            </ul>
+                        </Box>
+                    </DialogContent>
 
-                <DialogActions sx={{ p: '0 24px 18px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Box sx={{ fontSize: '14px', fontWeight: '300', color: '#172b4d' }}>Invite someone to this Workspace with a link:</Box>
-                    <Button sx={{
-                        ...buttonSx,
-                        mr: 0,
-                        backgroundColor: '#DCDFE4',
-                        '&:hover': {
-                            backgroundColor: '#bac0ca'
-                        }
-                    }} variant='contained' startIcon={<AddLinkIcon/>}>
-                        Create invite link
-                    </Button>
-                </DialogActions>
+                    <DialogActions sx={{ p: '0 24px 18px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box sx={{ fontSize: '14px', fontWeight: '300', color: '#172b4d' }}>Invite someone to this Workspace with a link:</Box>
+                        <Button sx={{
+                            ...buttonSx,
+                            mr: 0,
+                            backgroundColor: '#DCDFE4',
+                            '&:hover': {
+                                backgroundColor: '#bac0ca'
+                            }
+                        }} variant='contained' startIcon={<AddLinkIcon />} type='submit'>
+                            Send invite link via email
+                        </Button>
+                    </DialogActions>
+                </form>
             </Dialog>
         </>
     )

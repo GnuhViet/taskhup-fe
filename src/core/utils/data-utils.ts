@@ -9,3 +9,7 @@ export function convertDate(dateStr: string) {
 
     return `${day}/${month}/${year}`
 }
+
+export function isBlank(value: any): boolean {
+    return value === null || value === undefined || value.toString().trim() === '';
+}

@@ -1,5 +1,5 @@
 import { apiSlice } from '~/core/redux/api/base.api'
-import { RoleCreateReq, RoleUpdateReq } from '~/core/services/role-services.model'
+import { ChangeMemberRoleReq, RoleCreateReq, RoleUpdateReq } from '~/core/services/role-services.model'
 // import { WorkSpaceCreateReq } from '~/core/services/workspace-services.model'
 
 const API_URL = '/api/v1/role'
@@ -25,6 +25,13 @@ export const roleApi = apiSlice.injectEndpoints({
                 method: 'POST',
                 body: data
             })
+        }),
+        changeMemberRole: builder.mutation({
+            query: (data: ChangeMemberRoleReq) => ({
+                url: `${API_URL}/change-member-role`,
+                method: 'POST',
+                body: data
+            })
         })
         // createWorkspace: builder.mutation({
         //     query: (data: WorkSpaceCreateReq) => ({
@@ -40,5 +47,6 @@ export const {
     // useCreateWorkspaceMutation,
     useGetWorkspaceRolesQuery,
     useCreateRoleMutation,
-    useUpdateRoleMutation
+    useUpdateRoleMutation,
+    useChangeMemberRoleMutation
 } = roleApi

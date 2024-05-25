@@ -1,4 +1,5 @@
 import { apiSlice } from '~/core/redux/api/base.api'
+import { SendEmailInviteLinkReq } from '~/core/services/invite-services.model'
 import { WorkSpaceCreateReq } from '~/core/services/workspace-services.model'
 
 const API_URL = '/api/v1/invite'
@@ -23,6 +24,13 @@ export const inviteApi = apiSlice.injectEndpoints({
                 url: API_URL,
                 method: 'GET'
             })
+        }),
+        sendLinkViaEmail: builder.mutation({
+            query: (data: SendEmailInviteLinkReq) => ({
+                url: `${API_URL}/send-email`,
+                method: 'POST',
+                body: data
+            })
         })
     })
 })
@@ -30,5 +38,6 @@ export const inviteApi = apiSlice.injectEndpoints({
 export const {
     useCreateInviteLinkMutation,
     useGetInviteLinkQuery,
-    useJoinWorkspaceQuery
+    useJoinWorkspaceQuery,
+    useSendLinkViaEmailMutation
 } = inviteApi
