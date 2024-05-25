@@ -50,7 +50,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
                 method: 'GET'
             })
         }),
-        updateAvatar: builder.mutation({
+        updateWorkSpaceAvatar: builder.mutation({
             query: (data: any) => {
                 const formData = new FormData()
                 formData.append('file', data)
@@ -62,7 +62,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
                 }
             }
         }),
-        updateInfo: builder.mutation({
+        updateWorkSpaceInfo: builder.mutation({
             query: (data: UpdateWorkspaceInfoRequest) => ({
                 url: `${API_URL}/update-info`,
                 method: 'POST',
@@ -79,7 +79,7 @@ export const {
     useGetWorkspaceJoinRequestQuery,
     useAcceptWorkspaceMemberMutation,
     useDenyWorkspaceMemberMutation,
-    useUpdateAvatarMutation,
-    useUpdateInfoMutation,
+    useUpdateWorkSpaceAvatarMutation,
+    useUpdateWorkSpaceInfoMutation,
     useGetWorkSpaceInfoQuery
 } = workspaceApi

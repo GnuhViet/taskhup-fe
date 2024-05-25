@@ -15,7 +15,7 @@ import { SubmitHandler } from 'react-hook-form'
 import { ApiResponse } from '~/core/services/api.model'
 import { toast } from 'react-toastify'
 import { UpdateInfoRequest } from '~/core/services/user-services.model'
-import { useGetWorkSpaceInfoQuery, useUpdateAvatarMutation, useUpdateInfoMutation } from '~/core/redux/api/workspace.api'
+import { useGetWorkSpaceInfoQuery, useUpdateWorkSpaceAvatarMutation, useUpdateWorkSpaceInfoMutation } from '~/core/redux/api/workspace.api'
 import SquareAvatar from '~/components/Common/SquareAvatar'
 import { UpdateWorkspaceInfoRequest } from '~/core/services/workspace-services.model'
 import { Can } from '~/core/utils/access-control'
@@ -33,10 +33,10 @@ const avatarSx = {
 const WorkSpaceInfoFC = () => {
     const ability = React.useContext(AbilityContext)
     const { data: apiResponse, isSuccess: isLoadingInfoSuccess, refetch } = useGetWorkSpaceInfoQuery({})
-    const [updateInfo, { isLoading: isUpdatingInfo }] = useUpdateInfoMutation()
+    const [updateInfo, { isLoading: isUpdatingInfo }] = useUpdateWorkSpaceInfoMutation()
     const response = apiResponse as ApiResponse<any>
     const workspaceInfo = response?.data
-    const [updateAvatar, { isLoading: isUpdatingAvatar }] = useUpdateAvatarMutation()
+    const [updateAvatar, { isLoading: isUpdatingAvatar }] = useUpdateWorkSpaceAvatarMutation()
     const { register, handleSubmit, formState: { errors, isDirty, isValid }, reset } = useForm<UpdateWorkspaceInfoRequest>({
         defaultValues: {
             title: workspaceInfo?.title,
@@ -129,7 +129,7 @@ const WorkSpaceInfoFC = () => {
                         {
                             true
                                 ? (
-                                    <Typography variant='body1'>Upgraded ✅</Typography>
+                                    <Typography variant='body1'>Upgraded ✅ -- todo</Typography>
                                 )
                                 : (
                                     <Typography variant='body1'>Un Upgraded</Typography>

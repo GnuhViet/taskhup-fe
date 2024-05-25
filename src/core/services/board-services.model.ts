@@ -80,3 +80,9 @@ export class BoardCreateResp {
     background: string
     workspaceId: string
 }
+
+export class CardTemplateCreateLabelReq {
+    title: string
+    colorCode: string
+    templateId: string
+}

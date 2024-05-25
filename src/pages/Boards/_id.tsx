@@ -23,7 +23,7 @@ const BoardComponent: React.FC = () => {
     const board = boardState.board
 
     return (
-        <Container disableGutters maxWidth={false} sx={{ height: '100vh' }}>
+        <Container disableGutters maxWidth={false} sx={{ height: 'auto' }}>
             <>
                 <BoardBarFC board={board} />
                 <BoardContentFC

@@ -3,7 +3,7 @@ import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { StompSessionProvider } from 'react-stomp-hooks'
-import { useGetBoardByCodeQuery, useLazyGetBoardByCodeQuery } from '~/core/redux/api/board.api'
+import { useGetBoardByCodeQuery } from '~/core/redux/api/board.api'
 import { setBoard } from '~/core/redux/slices/boardSlice'
 import BoardComponent from '~/pages/Boards/_id'
 import Box from '@mui/material/Box'
@@ -33,7 +33,7 @@ const BoardComponentWrap = () => {
                 justifyContent: 'center',
                 gap: 2,
                 width: '100vw',
-                height: '100vh'
+                height: 'auto'
             }}>
                 <CircularProgress />
                 <Typography>Loading Board...</Typography>

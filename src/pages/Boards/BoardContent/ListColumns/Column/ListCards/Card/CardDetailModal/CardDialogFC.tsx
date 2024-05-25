@@ -91,20 +91,6 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, card }) =>
                 </DialogTitle>
 
                 <DialogContent className='dialog-content'>
-                    {/* <DialogContentText> test text from card
-          </DialogContentText> */}
-                    {/* <TextField
-            autoFocus
-            required
-            margin="dense"
-            id="name"
-            name="email"
-            label="Email Address"
-            type="email"
-            fullWidth
-            variant="standard"
-          /> */}
-
                     <Box className="body">
                         <Box className="card-details card-detail-title">
                             <Box className="field member-field">
