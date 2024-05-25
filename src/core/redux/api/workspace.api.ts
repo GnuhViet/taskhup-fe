@@ -68,6 +68,20 @@ export const workspaceApi = apiSlice.injectEndpoints({
                 method: 'POST',
                 body: data
             })
+        }),
+        disableMemberFromWs: builder.mutation({
+            query: (data: any) => ({
+                url: `${API_URL}/disable-member`,
+                method: 'POST',
+                body: data
+            })
+        }),
+        unDisableMemberFromWs: builder.mutation({
+            query: (data: any) => ({
+                url: `${API_URL}/active-member`,
+                method: 'POST',
+                body: data
+            })
         })
     })
 })
@@ -81,5 +95,7 @@ export const {
     useDenyWorkspaceMemberMutation,
     useUpdateWorkSpaceAvatarMutation,
     useUpdateWorkSpaceInfoMutation,
+    useDisableMemberFromWsMutation,
+    useUnDisableMemberFromWsMutation,
     useGetWorkSpaceInfoQuery
 } = workspaceApi

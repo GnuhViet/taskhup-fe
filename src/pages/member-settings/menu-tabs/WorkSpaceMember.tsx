@@ -11,7 +11,7 @@ import { useCreateInviteLinkMutation } from '~/core/redux/api/invite.api'
 import { InviteLinkCreateReq } from '~/core/services/invite-services.model'
 import { useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { useGetWorkspaceMemberQuery } from '~/core/redux/api/workspace.api'
+import { useGetWorkspaceMemberQuery, useUnDisableMemberFromWsMutation } from '~/core/redux/api/workspace.api'
 import { ApiResponse } from '~/core/services/api.model'
 import { convertDate } from '~/core/utils/data-utils'
 import { useGetWorkspaceRolesQuery } from '~/core/redux/api/role.api'
@@ -19,6 +19,8 @@ import { getContrastTextColor } from '~/core/utils/common-used'
 import RoleSelectPopover from './Popover/RoleSelecPopover'
 import TextBoxToolTip from '~/components/Common/TextBoxToolTip'
 import { useSelector } from 'react-redux'
+import ConfirmDisableFC from './Dialog/ConfirmDisableFC'
+import SettingsBackupRestoreOutlinedIcon from '@mui/icons-material/SettingsBackupRestoreOutlined'
 
 const headingSx = {
     fontSize: '18px',
@@ -53,6 +55,7 @@ const buttonSx = {
 
 
 const WorkSpaceMember = () => {
+    const [unDisableMember, { isLoading: isLoadingUnDisable }] = useUnDisableMemberFromWsMutation()
     const currentLoginUserName = useSelector((state: any) => state.homeReducer.userInfo.username)
     const { data: apiResponseRole, error, isLoading: isLoadingRole } = useGetWorkspaceRolesQuery({})
     const responseRole = apiResponseRole as ApiResponse<any>
@@ -68,6 +71,8 @@ const WorkSpaceMember = () => {
     const handleClose = () => {
         setAnchorElPermission(null)
     }
+
+    const [openDiaglogConfirmDisable, setOpenDiaglogConfirmDisable] = useState(false)
 
     const createInviteLinkMember = async () => {
         try {
@@ -89,6 +94,18 @@ const WorkSpaceMember = () => {
 
     const [selectedMemberRole, setSelectedMemberRole] = useState(null)
     const [selectedMember, setSelectedMember] = useState(null)
+
+    const handleActiveMember = async () => {
+        try {
+            await unDisableMember({ memberId: selectedMember?.userId })
+            refectMember()
+            toast.success('Member has been enabled', {
+                position: 'bottom-right'
+            })
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
     if (isLoadingGetMember || isLoadingRole) {
         return (
@@ -203,14 +220,29 @@ const WorkSpaceMember = () => {
                                         <Button
                                             sx={{ ...buttonSx, mr: 0 }}
                                             variant='contained'
-                                            startIcon={<CloseOutlinedIcon />}
+                                            startIcon={
+                                                item.status === 'DISABLED'
+                                                    ? <SettingsBackupRestoreOutlinedIcon />
+                                                    : <CloseOutlinedIcon />
+                                            }
                                             disabled={
                                                 role.id.includes('owner')
                                                 || currentLoginUserName === item.userName
-                                                || item.status === 'DISABLED'
                                             }
+                                            onClick={() => {
+                                                setSelectedMember(item)
+                                                if (item.status === 'DISABLED') {
+                                                    handleActiveMember()
+                                                    return
+                                                }
+                                                setOpenDiaglogConfirmDisable(true)
+                                            }}
                                         >
-                                            Disable&nbsp;...
+                                            {
+                                                item.status === 'DISABLED'
+                                                    ? 'Enable'
+                                                    : 'Disable'
+                                            }&nbsp;...
                                         </Button>
                                         <RoleSelectPopover
                                             id='role-select-popover'
@@ -229,6 +261,12 @@ const WorkSpaceMember = () => {
                     </Box>
                 ))}
             </Box>
+            <ConfirmDisableFC
+                memberId={selectedMember?.userId}
+                open={openDiaglogConfirmDisable}
+                handleClose={() => setOpenDiaglogConfirmDisable(false)}
+                refecthData={refectMember}
+            />
         </Box>
     )
 }

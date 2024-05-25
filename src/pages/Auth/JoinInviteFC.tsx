@@ -7,6 +7,10 @@ const JoinInviteFC = () => {
     const { error, isLoading, isSuccess } = useJoinWorkspaceQuery(id)
 
     if (isLoading) return <div>Loading...</div>
+    if (error) {
+        // redicrect to home
+        return <Navigate to="/home" replace />
+    }
 
     return (
         isSuccess &&
