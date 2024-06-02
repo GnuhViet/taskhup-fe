@@ -9,19 +9,18 @@ import { ReactComponent as TrelloIcon } from '~/assets/trello.svg'
 import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined'
 import PermIdentityOutlinedIcon from '@mui/icons-material/PermIdentityOutlined'
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
-import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined'
 import MovingOutlinedIcon from '@mui/icons-material/MovingOutlined'
-import { max } from 'lodash'
 import BoardItem from '../boards/BoardItem'
 import { WorkSpace } from '~/core/model/workspace.model'
 import { Board } from '~/core/model/board.model'
-import { Create } from '@mui/icons-material'
 import CreateBoardPopover from '../boards/createboard/CreateBoardPopover'
 import { useNavigate } from 'react-router-dom'
 
 const avatarSx = {
     minWidth: '32px',
     minHeight: '32px',
+    width: '32px',
+    height: '32px',
     mr: '12px'
 }
 
@@ -82,13 +81,17 @@ const WorkSpaceItem: React.FC<WorkSpaceItemProps> = ({ workspace }) => {
         <Box>
             <Box className='section-header' sx={{ display: 'flex', justifyContent: 'space-between', pr: '10px' }}>
                 <Box className='section-header-title' sx={{ display: 'flex', alignItems: 'center' }}>
-                    <SquareAvatar sx={avatarSx} src={null} alt='T' />
+                    <SquareAvatar
+                        sx={avatarSx}
+                        src={workspace.avatarUrl}
+                        alt={workspace.title.charAt(0).toUpperCase()}
+                    />
                     <TextBoxToolTip sx={titleSx} text={workspace?.title.toUpperCase()} id={workspace?.id} breakOnLine={1} />
                 </Box>
-                <Box>
+                <Box sx={{ minWidth: '592px' }}>
                     <Button sx={{ ...buttonSx }} variant='contained' startIcon={<TrelloIcon />}>Boards</Button>
                     <Button sx={{ ...buttonSx }} variant='contained' startIcon={<GridViewOutlinedIcon />}>Views</Button>
-                    <Button sx={{ ...buttonSx }} variant='contained' startIcon={<PermIdentityOutlinedIcon />} onClick={() => navigate(`/w/${workspace.id}/member`)}>Members (2)</Button>
+                    <Button sx={{ ...buttonSx }} variant='contained' startIcon={<PermIdentityOutlinedIcon />} onClick={() => navigate(`/w/${workspace.id}/member`)}>Members ({workspace.memberCount})</Button>
                     <Button sx={{ ...buttonSx }} variant='contained' startIcon={<SettingsOutlinedIcon />} onClick={() => navigate(`/w/${workspace.id}/settings`)}>Settings</Button>
                     <Button sx={{ ...buttonSx, ...upgradeButtonSx }} variant='contained' startIcon={<MovingOutlinedIcon />}>Upgrade</Button>
                     {/* <Button sx={{ ...buttonSx, ...verifiedButtonSx }} variant='contained' startIcon={<VerifiedOutlinedIcon />}>Ultimate</Button> */}

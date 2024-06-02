@@ -2,23 +2,14 @@ import Box from '@mui/material/Box'
 import { ReactComponent as TrelloIcon } from '~/assets/trello.svg'
 import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined'
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
-import { skipToken } from '@reduxjs/toolkit/query'
 import './HomeFC.scss'
 import SideBarButton from '~/components/Home/sidebar/SideBarButton'
 import List from '@mui/material/List'
 import SideBarExpandButton from '~/components/Home/sidebar/SideBarExpandsButton'
-import BoardItem from '~/components/Home/boards/BoardItem'
-import { useGetAllBoardQuery } from '~/core/redux/api/board.api'
-import { Board } from '~/core/model/board.model'
-import { redirect } from 'react-router-dom'
 import WorkSpaceItem from '~/components/Home/workspace/WorkSpaceItem'
 import { useGetUserWorkSpaceQuery } from '~/core/redux/api/workspace.api'
-import { GetWorkSpaceResp } from '~/core/services/workspace-services.model'
-import { ApiResponse } from '~/core/services/api.model'
 import { WorkSpace } from '~/core/model/workspace.model'
-import { useDispatch, useSelector } from 'react-redux'
-import { useEffect } from 'react'
-import { setSelectedButtonId } from '~/core/redux/slices/homeSlice'
+import { useSelector } from 'react-redux'
 
 const iconSx = {
     fontSize: '16px'
@@ -52,17 +43,20 @@ const HomeFC = () => {
                 <Box className="home-sticky-container">
                     <Box className="home-left-sidebar-container">
                         <List className="top-button">
-                            <SideBarButton id={'board-button'} text={'Boards'} icon={<TrelloIcon style={iconSx} />} defaultSelected/>
-                            <SideBarButton id={'template-button'} text={'Template'} icon={<InsightsOutlinedIcon sx={iconSx} />} />
+                            <SideBarButton id={'workspace-button'} text={'Word Spaces'} icon={<TrelloIcon style={iconSx} />} defaultSelected/>
+                            <SideBarButton id={'activity-button'} text={'My Activity'} icon={<InsightsOutlinedIcon sx={iconSx} />} />
                             <SideBarButton id={'home-button'} text={'Home'} icon={<HomeOutlinedIcon sx={iconSx} />} />
                         </List>
                         <List className="work-spaces" sx={{ overflow: 'auto', maxHeight: 'calc(100vh - 200px)' }}>
                             <Box className="title">WordSpaces</Box>
+                            {workspace.map((item: WorkSpace) => (
+                                <SideBarExpandButton workSpaceItem={item} key={item.id} />
+                            ))}
 
-                            <SideBarExpandButton workSpaceId='w1' text={'Home'} icon={<HomeOutlinedIcon sx={iconSx} />} />
+                            {/* <SideBarExpandButton workSpaceId='w1' text={'Home'} icon={<HomeOutlinedIcon sx={iconSx} />} />
                             <SideBarExpandButton workSpaceId='w2' text={'Home'} icon={<HomeOutlinedIcon sx={iconSx} />} />
                             <SideBarExpandButton workSpaceId='w3' text={'Home'} icon={<HomeOutlinedIcon sx={iconSx} />} />
-                            <SideBarExpandButton workSpaceId='w4' text={'Home'} icon={<HomeOutlinedIcon sx={iconSx} />} />
+                            <SideBarExpandButton workSpaceId='w4' text={'Home'} icon={<HomeOutlinedIcon sx={iconSx} />} /> */}
                         </List>
                     </Box>
                     {/* <Box className="all-boards">

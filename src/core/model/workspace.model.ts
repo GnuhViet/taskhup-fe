@@ -6,5 +6,7 @@ export class WorkSpace {
     description: string
     type: string
     canCreateBoard: boolean
+    avatarUrl: string
+    memberCount: number
     boards: Board[]
 }

@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router-dom'
 import { useGetUserInfoQuery } from '~/core/redux/api/user.api'
 
 const AppBar: React.FC = () => {
+    const [isFocusSreach, setIsFocusSearch] = useState(false)
     const { isLoading } = useGetUserInfoQuery({})
     const [searchValue, setSearchValue] = useState('')
     const navigate = useNavigate()
@@ -79,14 +80,20 @@ const AppBar: React.FC = () => {
                     </Box>
                 </Box>
 
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2
+                }}>
                     <TextField
                         id="outlined-search"
-                        label="Search..."
+                        placeholder='Search...'
                         type="text"
                         size="small"
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
+                        onFocus={() => setIsFocusSearch(true)}
+                        onBlur={() => setIsFocusSearch(false)}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
@@ -104,20 +111,19 @@ const AppBar: React.FC = () => {
                             )
                         }}
                         sx={{
-                            minWidth: '120px',
-                            maxWidth: '180px',
+                            width: isFocusSreach ? '700px' :'220px',
                             '& label': { color: 'black' },
                             '& input': { color: 'black' },
                             '& label.Mui-focused': { color: 'black' },
                             '& .MuiOutlinedInput-root': {
                                 '& fieldset': { borderColor: 'black' },
                                 '&:hover fieldset': { borderColor: 'black' },
-                                '&.Mui-focused fieldset': { borderColor: 'black' }
+                                '&.Mui-focused fieldset': { borderColor: 'black' },
                             }
                         }}
                     />
 
-                    <ModeSelect />
+                    {/* <ModeSelect /> */}
 
                     <Tooltip title="Notifications">
                         <Badge color="warning" variant="dot" sx={{ cursor: 'pointer' }}>

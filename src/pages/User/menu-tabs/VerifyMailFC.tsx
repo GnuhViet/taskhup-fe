@@ -138,7 +138,7 @@ const VerifyMailFC = () => {
                                     id="outlined-adornment-email"
                                     type="text"
                                     label="Email"
-                                    disabled
+                                    disabled={userInfo?.verify === true}
                                     {...register('email')}
                                 />
                             </FormControl>

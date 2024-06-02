@@ -8,12 +8,28 @@ import Collapse from '@mui/material/Collapse'
 import { ReactComponent as TrelloIcon } from '~/assets/trello.svg'
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
-import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined'
+// import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined'
+import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined'
+import PermIdentityOutlinedIcon from '@mui/icons-material/PermIdentityOutlined'
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
+import MovingOutlinedIcon from '@mui/icons-material/MovingOutlined'
 
 import SideBarButton from './SideBarButton'
 import { useSelector } from 'react-redux'
 
 import Box from '@mui/material/Box'
+import { WorkSpace } from '~/core/model/workspace.model'
+import SquareAvatar from '~/components/Common/SquareAvatar'
+import TextBoxToolTip from '~/components/Common/TextBoxToolTip'
+import { useNavigate } from 'react-router-dom'
+
+const avatarSx = {
+    minWidth: '32px',
+    minHeight: '32px',
+    width: '32px',
+    height: '32px',
+    // mr: '12px'
+}
 
 const buttonSx = {
     borderRadius: '8px',
@@ -51,38 +67,30 @@ const collapseButtonSx = {
 }
 
 export interface SideBarExpandButtonProps {
-    workSpaceId: string
-    text: string
+    workSpaceItem: WorkSpace
     onClick?: () => void
-    icon: React.ReactNode
+    // icon: React.ReactNode
 }
 
 
-const SideBarExpandButton: React.FC<SideBarExpandButtonProps> = ({ workSpaceId, text, icon }) => {
+const SideBarExpandButton: React.FC<SideBarExpandButtonProps> = ({ workSpaceItem }) => {
+    const navigate = useNavigate()
     const selectedButtonId = useSelector((state: any) => state.homeReducer.selectedButtonId)
 
     const [open, setOpen] = React.useState(false)
     const [selected, setSelected] = React.useState(false)
 
     const handleOpen = () => {
-        // const nextState = !open
-        // if (nextState === false) {
-        //     if (selectedButtonId.includes(workSpaceId)) {
-        //         setSelected(true)
-        //     }
-        // }
-
-        // if (nextState === true) {
-        //     setSelected(false)
-        // }
-
         setOpen(!open)
     }
 
     useEffect(() => {
         if (open === false) {
-            if (selectedButtonId.includes(workSpaceId)) {
+            if (selectedButtonId.includes(workSpaceItem.id)) {
                 setSelected(true)
+                return
+            } else {
+                setSelected(false)
                 return
             }
         }
@@ -90,34 +98,57 @@ const SideBarExpandButton: React.FC<SideBarExpandButtonProps> = ({ workSpaceId, 
         if (open === true) {
             setSelected(false)
         }
-    }, [open])
+    }, [open, selectedButtonId, workSpaceItem.id])
 
     return (
-        <>
+        <Box sx={{ maxWidth: '276px' }}>
             <ListItemButton sx={buttonSx} selected={selected} onClick={handleOpen}>
-                <ListItemIcon sx={itemSx}>{icon}</ListItemIcon>
-                <ListItemText sx={textSx}
-                    primaryTypographyProps={{ fontWeight: selected ? 'bold' : '400' }}
-                    primary={text} />
+                <ListItemIcon sx={itemSx}>
+                    <SquareAvatar
+                        sx={avatarSx}
+                        src={workSpaceItem.avatarUrl}
+                        alt={workSpaceItem.title.charAt(0).toUpperCase()}
+                    />
+                </ListItemIcon>
+                <ListItemText
+                    sx={textSx}
+                    primary={
+                        <TextBoxToolTip
+                            sx={{ fontWeight: selected ? 'bold' : '400', maxWidth: '260px', pl: '16px' }}
+                            text={workSpaceItem.title}
+                            id={`${workSpaceItem.id}-title`}
+                            breakOnLine={1}
+                        />
+                    }
+                />
                 {open ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
             <Collapse in={open} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                    <SideBarButton id={`${workSpaceId}-boards-button`}
-                        sx={collapseButtonSx} text={'Boards'} icon={<Box sx={iconSx}><TrelloIcon /></Box>} />
-                    <SideBarButton id={`${workSpaceId}-highlight-button`}
-                        sx={collapseButtonSx} text={'Highlights'} icon={<InsightsOutlinedIcon sx={iconSx} />} />
-                    <SideBarButton id={`${workSpaceId}-view-button`}
-                        sx={collapseButtonSx} text={'Views'} icon={<InsightsOutlinedIcon sx={iconSx} />} />
-                    <SideBarButton id={`${workSpaceId}-member-button`}
-                        sx={collapseButtonSx} text={'Members'} icon={<InsightsOutlinedIcon sx={iconSx} />} />
-                    <SideBarButton id={`${workSpaceId}-settings-button`}
-                        sx={collapseButtonSx} text={'Settings'} icon={<InsightsOutlinedIcon sx={iconSx} />} />
+                    <Box >
+                        <SideBarButton id={`${workSpaceItem.id}-boards-button`}
+                            sx={collapseButtonSx} text={'Boards'} icon={<Box sx={iconSx}><TrelloIcon /></Box>} />
+                    </Box >
+                    <Box>
+                        <SideBarButton id={`${workSpaceItem.id}-views-button`}
+                            sx={collapseButtonSx} text={'Views'} icon={<GridViewOutlinedIcon sx={iconSx} />} />
+                    </Box >
+                    <Box onClick={() => navigate(`/w/${workSpaceItem.id}/member`)}>
+                        <SideBarButton id={`${workSpaceItem.id}-members-button`}
+                            sx={collapseButtonSx} text={'Members'} icon={<PermIdentityOutlinedIcon sx={iconSx} />} />
+                    </Box>
+                    <Box onClick={() => navigate(`/w/${workSpaceItem.id}/settings`)}>
+                        <SideBarButton id={`${workSpaceItem.id}-settings-button`}
+                            sx={collapseButtonSx} text={'Settings'} icon={<SettingsOutlinedIcon sx={iconSx} />} />
+                    </Box>
+                    <Box >
+                        <SideBarButton id={`${workSpaceItem.id}-upgrades-button`}
+                            sx={collapseButtonSx} text={'Upgrade'} icon={<MovingOutlinedIcon sx={iconSx} />}
+                        />
+                    </Box>
                 </List>
             </Collapse>
-        </>
-
-
+        </Box>
     )
 }
 
