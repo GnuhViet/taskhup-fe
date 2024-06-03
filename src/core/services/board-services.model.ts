@@ -82,6 +82,7 @@ export class BoardCreateResp {
 }
 
 export class CardTemplateCreateLabelReq {
+    id: string
     title: string
     colorCode: string
     templateId: string
@@ -94,6 +95,7 @@ export interface OptionItem {
 }
 
 export class CardTemplateCreateFieldReq {
+    id: string
     title: string
     type: string
     option: OptionItem[]

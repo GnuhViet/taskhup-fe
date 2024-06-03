@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import Popover from '@mui/material/Popover'
 import Box from '@mui/material/Box'
@@ -16,6 +16,11 @@ import { CardTemplateCreateLabelReq } from '~/core/services/board-services.model
 import Typography from '@mui/material/Typography'
 import EditOffOutlinedIcon from '@mui/icons-material/EditOffOutlined'
 import DeleteIcon from '@mui/icons-material/Delete'
+import { useCreateLabelMutation, useDeleteLabelMutation, useGetLabelsQuery, useUpdateLabelMutation } from '~/core/redux/api/board-template.api'
+import { ApiResponse } from '~/core/services/api.model'
+import { set } from 'lodash'
+import { toast } from 'react-toastify'
+import ApiLoadingOverlay from '~/components/Common/ApiLoadingOverlay'
 
 export interface MemberPopoverProps {
     id: string
@@ -55,30 +60,38 @@ const checkBoxSx = {
 }
 
 const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, anchorEl, onClose }) => {
-    const data = [
-        { id: 1, title: 'test 1 abc', color: '#FF5733' },
-        { id: 2, title: 'test 2 abc', color: '#33FF57' },
-        { id: 3, title: 'test 3 abc', color: '#3357FF' },
-        { id: 4, title: 'test 4 abc', color: '#8D33FF' },
-        { id: 5, title: 'test 5 abc', color: '#808080' },
-        { id: 6, title: 'test 6 abc', color: '#FF0000' },
-        { id: 7, title: 'test 7 abc', color: '#00FF00' },
-        { id: 8, title: 'test 8 abc', color: '#0000FF' },
-        { id: 9, title: 'test 9 abc', color: '#FFFF00' },
-        { id: 10, title: 'test 10 abc', color: '#00FFFF' },
-        { id: 11, title: 'test 11 abc', color: '#FF00FF' },
-        { id: 12, title: 'test 12 abc', color: '#C0C0C0' },
-        { id: 13, title: 'test 13 abc', color: '#800000' },
-        { id: 14, title: 'test 14 abc', color: '#008000' },
-        { id: 15, title: 'test 15 abc', color: '#000080' }
-    ]
+    const { data: apiResponse, isLoading, refetch } = useGetLabelsQuery(templateItem?.id)
+    const [create, { isLoading: createLoading }] = useCreateLabelMutation()
+    const [updateLabel, { isLoading: updateLoading }] = useUpdateLabelMutation()
+    const [deleteLabel, { isLoading: deleteLoading }] = useDeleteLabelMutation()
 
+    const response = apiResponse as ApiResponse<any>
+    const data = response?.data
+
+    // const data = [
+    //     { id: 1, title: 'test 1 abc', color: '#FF5733' },
+    //     { id: 2, title: 'test 2 abc', color: '#33FF57' },
+    //     { id: 3, title: 'test 3 abc', color: '#3357FF' },
+    //     { id: 4, title: 'test 4 abc', color: '#8D33FF' },
+    //     { id: 5, title: 'test 5 abc', color: '#808080' },
+    //     { id: 6, title: 'test 6 abc', color: '#FF0000' },
+    //     { id: 7, title: 'test 7 abc', color: '#00FF00' },
+    //     { id: 8, title: 'test 8 abc', color: '#0000FF' },
+    //     { id: 9, title: 'test 9 abc', color: '#FFFF00' },
+    //     { id: 10, title: 'test 10 abc', color: '#00FFFF' },
+    //     { id: 11, title: 'test 11 abc', color: '#FF00FF' },
+    //     { id: 12, title: 'test 12 abc', color: '#C0C0C0' },
+    //     { id: 13, title: 'test 13 abc', color: '#800000' },
+    //     { id: 14, title: 'test 14 abc', color: '#008000' },
+    //     { id: 15, title: 'test 15 abc', color: '#000080' }
+    // ]
+
+    const [selectedItem, setSelectedItem] = React.useState(null)
     const [currentMenu, setCurrentMenu] = React.useState('setting') // setting, create-new, edit
     const [actionsShow, setActionsShow] = React.useState('edit')
 
     const MainContent: React.FC = () => {
         const [fillterName, setFillterName] = React.useState(null)
-
 
         const LabelItem: React.FC<MemberItemmProps> = ({ item }) => {
             return (
@@ -90,7 +103,7 @@ const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, 
                         <Box sx={{
                             display: 'flex',
                             flexDirection: 'column',
-                            backgroundColor: `${item.color}`,
+                            backgroundColor: `${item.colorCode}`,
                             borderRadius: '2px',
                             height: '34px',
                             paddingLeft: '8px',
@@ -100,7 +113,7 @@ const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, 
                         >
                             <TextBoxToolTip sx={{
                                 ...titleSx,
-                                color: getContrastTextColor(item.color)
+                                color: getContrastTextColor(item.colorCode)
                             }} id='1asd' text={item.title} breakOnLine={1} />
                         </Box>
                     </Box>
@@ -126,19 +139,30 @@ const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, 
                                         : <DeleteIcon />
                                     : <EditOffOutlinedIcon />
                             }
-                            onClick={() =>
+                            onClick={async () =>
                                 templateItem.usedIn === 0
-                                    ? (() => {
+                                    ? (async () => {
                                         switch (actionsShow) {
-                                        case 'edit':
-                                            setCurrentMenu('edit')
-                                            break
-                                        case 'delete':
-                                            console.log('delete')
-                                            break
-                                        default:
-                                            break
+                                            case 'edit':
+                                                setCurrentMenu('edit')
+                                                break
+                                            case 'delete':
+                                                try {
+                                                    await deleteLabel(
+                                                        { id: item.id, templateId: templateItem?.id }
+                                                    ).unwrap()
+                                                    await refetch()
+                                                } catch (error) {
+                                                    toast.error('Delete label failed', {
+                                                        position: 'bottom-right'
+                                                    })
+                                                }
+                                                break
+                                            default:
+                                                break
                                         }
+
+                                        setSelectedItem(item)
                                     })()
                                     : null
                             }
@@ -242,7 +266,10 @@ const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, 
                                     sx={{ width: '100%' }}
                                     className="button right-button"
                                     variant="contained"
-                                    onClick={() => setCurrentMenu('create-new')}
+                                    onClick={async () => {
+                                        await setSelectedItem(null)
+                                        setCurrentMenu('create-new')
+                                    }}
                                 >Create a new label</Button>
                             )
                             : null
@@ -253,8 +280,6 @@ const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, 
     }
 
     const CreateNewContent: React.FC = () => {
-
-        const [selectedId, setSelectedId] = React.useState(null)
 
         const ColorOptionsList: ColorOptionsListType = {
             1: { color: '#BAF3DB' },
@@ -291,6 +316,16 @@ const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, 
             30: { color: '#626F86' }
         }
 
+        const [selectedId, setSelectedId] = React.useState(null)
+
+        useEffect(() => {
+            setSelectedId(selectedItem?.colorCode
+                ?
+                Number(Object.keys(ColorOptionsList).find(key => ColorOptionsList[key].color === selectedItem.colorCode))
+                : null
+            )
+        }, [selectedItem])
+
         const ColorSelectOption: React.FC<ColorSelectOptionProps> = ({ id, data, selectedId }) => {
             return (
                 <Box
@@ -318,14 +353,35 @@ const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, 
 
         const { register, handleSubmit, formState: { errors }, setValue, clearErrors } = useForm<CardTemplateCreateLabelReq>({
             defaultValues: {
-                title: '',
-                colorCode: null,
+                id: selectedItem?.id || null,
+                title: selectedItem?.title || '',
+                colorCode: selectedItem?.colorCode || null,
                 templateId: templateItem?.id
             }
         })
 
         const onSubmit: SubmitHandler<CardTemplateCreateLabelReq> = async (data) => {
-            console.log(data)
+
+            try {
+                if (!selectedItem) { // create
+                    await create(data).unwrap()
+                } else { // edit
+                    await updateLabel(data).unwrap()
+                }
+                await refetch()
+                setCurrentMenu('setting')
+                if (!selectedItem) { // create
+                    toast.success('Create label successfully', {
+                        position: 'bottom-right'
+                    })
+                } else { // edit
+                    toast.success('Update label successfully', {
+                        position: 'bottom-right'
+                    })
+                }
+            } catch (error) {
+                // console.log(error)
+            }
         }
 
         const handleSelectBackground = (id: number) => {
@@ -356,7 +412,9 @@ const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, 
                             }}
                             icon={<ArrowBackIosOutlinedIcon sx={{ fontSize: '16px' }} />}
                             checkedIcon={<ArrowBackIosOutlinedIcon sx={{ fontSize: '16px' }} />}
-                            onClick={() => setCurrentMenu('setting')}
+                            onClick={() => {
+                                setCurrentMenu('setting')
+                            }}
                         />
                         <Box sx={{ justifyContent: 'center', width: '100%', display: 'flex', fontWeight: '500', color: '#44546f' }}>
                             {
@@ -469,8 +527,13 @@ const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, 
             }}
             style={{ zIndex: 999 }}
         >
-            <MainContent />
-            <CreateNewContent />
+            {isLoading
+                ? <ApiLoadingOverlay />
+                : <>
+                    <MainContent />
+                    <CreateNewContent />
+                </>
+            }
         </Popover >
     )
 }

@@ -1,3 +1,4 @@
+import { update } from 'lodash'
 import { apiSlice } from '~/core/redux/api/base.api'
 import { BoardTemplateCreateRequest } from '~/core/services/board-template-services.model'
 
@@ -24,6 +25,33 @@ export const boardTemplateApi = apiSlice.injectEndpoints({
                 method: 'POST',
                 body: data
             })
+        }),
+        getLabels: builder.query({
+            query: (data: string) => ({
+                url: `${API_URL}/labels/${data}`,
+                method: 'GET'
+            })
+        }),
+        createLabel: builder.mutation({
+            query: (data: any) => ({
+                url: `${API_URL}/labels/create`,
+                method: 'POST',
+                body: data
+            })
+        }),
+        updateLabel: builder.mutation({
+            query: (data: any) => ({
+                url: `${API_URL}/labels/update`,
+                method: 'POST',
+                body: data
+            })
+        }),
+        deleteLabel: builder.mutation({
+            query: (data: any) => ({
+                url: `${API_URL}/labels/delete`,
+                method: 'POST',
+                body: data
+            })
         })
     })
 })
@@ -31,5 +59,9 @@ export const boardTemplateApi = apiSlice.injectEndpoints({
 export const {
     useGetBoardTemplateQuery,
     useCreateBoardTemplateMutation,
-    useDeleteBoardTemplateMutation
+    useDeleteBoardTemplateMutation,
+    useGetLabelsQuery,
+    useCreateLabelMutation,
+    useUpdateLabelMutation,
+    useDeleteLabelMutation
 } = boardTemplateApi
