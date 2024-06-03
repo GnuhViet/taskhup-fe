@@ -107,6 +107,7 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
     const [optionsItemList, setOptionsItemList] = React.useState<OptionItem[]>([])
 
     const [currentMenu, setCurrentMenu] = React.useState('setting') // setting, create-new, edit
+    const [actionsShow, setActionsShow] = React.useState('edit')
 
     const MainContent: React.FC = () => {
         const [fillterName, setFillterName] = React.useState(null)
@@ -130,16 +131,16 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
                         >
                             {(() => {
                                 switch (item.type) {
-                                case 'DROPDOWN':
-                                    return <ListIcon sx={{ fontSize: '20px', color: '#5E6C84' }} />
-                                case 'TEXT':
-                                    return <TextFieldsIcon sx={{ fontSize: '20px', color: '#5E6C84' }} />
-                                case 'DATE':
-                                    return <CalendarMonthIcon sx={{ fontSize: '20px', color: '#5E6C84' }} />
-                                case 'CHECKBOX':
-                                    return <CheckCircleOutlineIcon sx={{ fontSize: '20px', color: '#5E6C84' }} />
-                                default:
-                                    return null
+                                    case 'DROPDOWN':
+                                        return <ListIcon sx={{ fontSize: '20px', color: '#5E6C84' }} />
+                                    case 'TEXT':
+                                        return <TextFieldsIcon sx={{ fontSize: '20px', color: '#5E6C84' }} />
+                                    case 'DATE':
+                                        return <CalendarMonthIcon sx={{ fontSize: '20px', color: '#5E6C84' }} />
+                                    case 'CHECKBOX':
+                                        return <CheckCircleOutlineIcon sx={{ fontSize: '20px', color: '#5E6C84' }} />
+                                    default:
+                                        return null
                                 }
                             })()}
                             <TextBoxToolTip sx={{
@@ -154,11 +155,36 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
                                 ...checkBoxSx,
                                 cursor: templateItem.usedIn === 0 ? 'pointer' : 'unset'
                             }}
-                            icon={templateItem.usedIn === 0 ? <ModeEditOutlinedIcon /> : <EditOffOutlinedIcon />}
-                            checkedIcon={templateItem.usedIn === 0 ? <ModeEditOutlinedIcon /> : <EditOffOutlinedIcon />}
+                            icon={
+                                templateItem.usedIn === 0
+                                    ?
+                                    actionsShow === 'edit'
+                                        ? <ModeEditOutlinedIcon />
+                                        : <DeleteIcon />
+                                    : <EditOffOutlinedIcon />
+                            }
+                            checkedIcon={
+                                templateItem.usedIn === 0
+                                    ?
+                                    actionsShow === 'edit'
+                                        ? <ModeEditOutlinedIcon />
+                                        : <DeleteIcon />
+                                    : <EditOffOutlinedIcon />
+                            }
                             onClick={() =>
                                 templateItem.usedIn === 0
-                                    ? setCurrentMenu('edit')
+                                    ? (() => {
+                                        switch (actionsShow) {
+                                            case 'edit':
+                                                setCurrentMenu('edit')
+                                                break
+                                            case 'delete':
+                                                console.log('delete')
+                                                break
+                                            default:
+                                                break
+                                        }
+                                    })()
                                     : null
                             }
                         />
@@ -182,7 +208,37 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
                     />
                     <FormHelperText>Type name to search</FormHelperText>
                 </Box>
-                <Box sx={{ fontSize: '12px', fontWeight: '500', color: '#44546f' }}>Fields</Box>
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between'
+                }}>
+                    <Box sx={{ fontSize: '12px', fontWeight: '500', color: '#44546f' }}>Fields</Box>
+                    {templateItem.usedIn === 0 && (
+                        <Box sx={{ display: 'flex' }}>
+                            <Box
+                                sx={{
+                                    fontSize: '12px',
+                                    fontWeight: '500',
+                                    cursor: 'pointer',
+                                    color: actionsShow === 'edit' ? '#0079BF' : '#44546f',
+                                    textDecoration: actionsShow === 'edit' ? 'underline' : 'none'
+                                }}
+                                onClick={() => setActionsShow('edit')}
+                            >Edit</Box>
+                            <Box
+                                sx={{
+                                    fontSize: '12px',
+                                    fontWeight: '500',
+                                    cursor: 'pointer',
+                                    ml: '12px',
+                                    color: actionsShow === 'delete' ? '#0079BF' : '#44546f',
+                                    textDecoration: actionsShow === 'delete' ? 'underline' : 'none'
+                                }}
+                                onClick={() => setActionsShow('delete')}
+                            >Delete</Box>
+                        </Box>
+                    )}
+                </Box>
                 <Box sx={{
                     ...borderBottom,
                     pb: '8px',
@@ -562,7 +618,7 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
                                         if (!optionsName) return
                                         setOptionsItemList(
                                             [...optionsItemList,
-                                                { id: optionsItemList.length, title: optionsName, color: null }
+                                            { id: optionsItemList.length, title: optionsName, color: null }
                                             ]
                                         )
                                     }}

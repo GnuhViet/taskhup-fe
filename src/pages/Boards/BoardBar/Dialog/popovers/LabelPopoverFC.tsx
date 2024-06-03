@@ -14,7 +14,8 @@ import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { CardTemplateCreateLabelReq } from '~/core/services/board-services.model'
 import Typography from '@mui/material/Typography'
-import EditOffOutlinedIcon from '@mui/icons-material/EditOffOutlined';
+import EditOffOutlinedIcon from '@mui/icons-material/EditOffOutlined'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 export interface MemberPopoverProps {
     id: string
@@ -73,6 +74,7 @@ const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, 
     ]
 
     const [currentMenu, setCurrentMenu] = React.useState('setting') // setting, create-new, edit
+    const [actionsShow, setActionsShow] = React.useState('edit')
 
     const MainContent: React.FC = () => {
         const [fillterName, setFillterName] = React.useState(null)
@@ -108,11 +110,36 @@ const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, 
                                 ...checkBoxSx,
                                 cursor: templateItem.usedIn === 0 ? 'pointer' : 'unset'
                             }}
-                            icon={templateItem.usedIn === 0 ? <ModeEditOutlinedIcon /> : <EditOffOutlinedIcon />}
-                            checkedIcon={templateItem.usedIn === 0 ? <ModeEditOutlinedIcon /> : <EditOffOutlinedIcon />}
+                            icon={
+                                templateItem.usedIn === 0
+                                    ?
+                                    actionsShow === 'edit'
+                                        ? <ModeEditOutlinedIcon />
+                                        : <DeleteIcon />
+                                    : <EditOffOutlinedIcon />
+                            }
+                            checkedIcon={
+                                templateItem.usedIn === 0
+                                    ?
+                                    actionsShow === 'edit'
+                                        ? <ModeEditOutlinedIcon />
+                                        : <DeleteIcon />
+                                    : <EditOffOutlinedIcon />
+                            }
                             onClick={() =>
                                 templateItem.usedIn === 0
-                                    ? setCurrentMenu('edit')
+                                    ? (() => {
+                                        switch (actionsShow) {
+                                        case 'edit':
+                                            setCurrentMenu('edit')
+                                            break
+                                        case 'delete':
+                                            console.log('delete')
+                                            break
+                                        default:
+                                            break
+                                        }
+                                    })()
                                     : null
                             }
                         />
@@ -136,7 +163,37 @@ const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, 
                     />
                     <FormHelperText>Type name to search</FormHelperText>
                 </Box>
-                <Box sx={{ fontSize: '12px', fontWeight: '500', color: '#44546f' }}>Labels</Box>
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between'
+                }}>
+                    <Box sx={{ fontSize: '12px', fontWeight: '500', color: '#44546f' }}>Labels</Box>
+                    {templateItem.usedIn === 0 && (
+                        <Box sx={{ display: 'flex' }}>
+                            <Box
+                                sx={{
+                                    fontSize: '12px',
+                                    fontWeight: '500',
+                                    cursor: 'pointer',
+                                    color: actionsShow === 'edit' ? '#0079BF' : '#44546f',
+                                    textDecoration: actionsShow === 'edit' ? 'underline' : 'none'
+                                }}
+                                onClick={() => setActionsShow('edit')}
+                            >Edit</Box>
+                            <Box
+                                sx={{
+                                    fontSize: '12px',
+                                    fontWeight: '500',
+                                    cursor: 'pointer',
+                                    ml: '12px',
+                                    color: actionsShow === 'delete' ? '#0079BF' : '#44546f',
+                                    textDecoration: actionsShow === 'delete' ? 'underline' : 'none'
+                                }}
+                                onClick={() => setActionsShow('delete')}
+                            >Delete</Box>
+                        </Box>
+                    )}
+                </Box>
                 <Box sx={{
                     ...borderBottom,
                     pb: '8px',
