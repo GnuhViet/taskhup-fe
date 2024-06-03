@@ -26,6 +26,7 @@ import ApiLoadingOverlay from '~/components/Common/ApiLoadingOverlay'
 import { BoardTemplateCreateRequest } from '~/core/services/board-template-services.model'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
+import CustomFieldPopoverFC from './popovers/CustomFieldPopoverFC'
 
 interface CardDialogProps {
     open: boolean
@@ -75,9 +76,15 @@ const TemplateDialogFC: React.FC<CardDialogProps> = ({ open, handleClose }) => {
 
     const TemplateItem: React.FC<TemplateItemProps> = ({ item }) => {
         const [anchorElMember, setAnchorElMember] = React.useState(null)
-        const openMember = Boolean(anchorElMember)
+        // const openMember = Boolean(anchorElMember)
+        // const openField = Boolean(anchorElMember)
+        const [isOpenLabel, setIsOpenLabel] = React.useState(false)
+        const [isOpenField, setIsOpenField] = React.useState(false)
+
         const handleClose = () => {
             setAnchorElMember(null)
+            setIsOpenLabel(false)
+            setIsOpenField(false)
         }
 
         return (
@@ -117,12 +124,17 @@ const TemplateDialogFC: React.FC<CardDialogProps> = ({ open, handleClose }) => {
                                                 startIcon={<BookmarksOutlinedIcon />}
                                                 onClick={(event) => {
                                                     setAnchorElMember(event.currentTarget)
+                                                    setIsOpenLabel(true)
                                                 }}
                                             >Labels</Button>
                                             <Button
                                                 className="button right-button"
                                                 variant="contained"
                                                 startIcon={<DriveFileRenameOutlineOutlinedIcon />}
+                                                onClick={(event) => {
+                                                    setAnchorElMember(event.currentTarget)
+                                                    setIsOpenField(true)
+                                                }}
                                             >Custom Fields</Button>
                                         </Box>
                                         <Typography variant="body2" color="text.secondary" sx={{ alignContent: 'end' }}>
@@ -154,7 +166,14 @@ const TemplateDialogFC: React.FC<CardDialogProps> = ({ open, handleClose }) => {
                 <LabelPopoverFC
                     id='label-popover'
                     templateItem={item}
-                    open={openMember}
+                    open={isOpenLabel}
+                    anchorEl={anchorElMember}
+                    onClose={handleClose}
+                />
+                <CustomFieldPopoverFC
+                    id='custom-field-popover'
+                    templateItem={item}
+                    open={isOpenField}
                     anchorEl={anchorElMember}
                     onClose={handleClose}
                 />

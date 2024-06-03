@@ -392,11 +392,11 @@ const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, 
             anchorEl={anchorEl}
             onClose={onClose}
             anchorOrigin={{
-                vertical: 'bottom',
+                vertical: 'top',
                 horizontal: 'left'
             }}
             transformOrigin={{
-                vertical: 'top',
+                vertical: 'bottom',
                 horizontal: 'left'
             }}
             slotProps={{

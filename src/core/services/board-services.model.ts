@@ -86,3 +86,16 @@ export class CardTemplateCreateLabelReq {
     colorCode: string
     templateId: string
 }
+
+export interface OptionItem {
+    id: number
+    title: string
+    color: string
+}
+
+export class CardTemplateCreateFieldReq {
+    title: string
+    type: string
+    option: OptionItem[]
+    templateId: string
+}
