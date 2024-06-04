@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import Popover from '@mui/material/Popover'
 import Box from '@mui/material/Box'
@@ -26,7 +26,11 @@ import { ButtonBase } from '@mui/material'
 import IconButton from '@mui/material/IconButton'
 import DeleteIcon from '@mui/icons-material/Delete'
 import Textarea from '@mui/joy/Textarea'
-
+import { useCreateFieldMutation, useDeleteFieldMutation, useLazyGetFieldsQuery, useUpdateFieldMutation } from '~/core/redux/api/board-template.api'
+import { ApiResponse } from '~/core/services/api.model'
+import { isBlank } from '~/core/utils/data-utils'
+import { toast } from 'react-toastify'
+import { set } from 'lodash'
 
 export interface CustomFieldPopoverProps {
     id: string
@@ -86,28 +90,60 @@ const checkBoxSx = {
 }
 
 const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateItem, open, anchorEl, onClose }) => {
-    const data = [
-        { id: 1, title: 'test 1 abc', type: 'DROPDOWN' },
-        { id: 2, title: 'test 2 abc', type: 'TEXT' },
-        { id: 3, title: 'test 3 abc', type: 'DATE' },
-        { id: 4, title: 'test 4 abc', type: 'CHECKBOX' },
-        { id: 5, title: 'test 5 abc', type: 'DROPDOWN' },
-        { id: 6, title: 'test 6 abc', type: 'DROPDOWN' },
-        { id: 7, title: 'test 7 abc', type: 'DROPDOWN' },
-        { id: 8, title: 'test 8 abc', type: 'DROPDOWN' },
-        { id: 9, title: 'test 9 abc', type: 'CHECKBOX' },
-        { id: 10, title: 'test 10 abc', type: 'CHECKBOX' },
-        { id: 11, title: 'test 11 abc', type: 'CHECKBOX' },
-        { id: 12, title: 'test 12 abc', type: 'DATE' },
-        { id: 13, title: 'test 13 abc', type: 'DATE' },
-        { id: 14, title: 'test 14 abc', type: 'TEXT' },
-        { id: 15, title: 'test 15 abc', type: 'TEXT' }
-    ]
+    // const { data: apiResponse, isLoading, refetch } = useGetFieldsQuery(templateItem?.id)
+    const [getField, { isLoading: getLoading }] = useLazyGetFieldsQuery()
+    const [createField, { isLoading: createLoading }] = useCreateFieldMutation()
+    const [updateField, { isLoading: updateLoading }] = useUpdateFieldMutation()
+    const [deleteField, { isLoading: deleteLoading }] = useDeleteFieldMutation()
+
+    const isLoading = getLoading || createLoading || updateLoading || deleteLoading
+
+    const [data, setData] = React.useState<any[]>([])
+
+    const fetchData = async () => {
+        const response = await getField(templateItem?.id).unwrap() as ApiResponse<any>
+        const newData = response.data.map((item: any) => {
+            if (item.type === 'DROPDOWN') {
+                return {
+                    ...item,
+                    options: item?.options.map((option: any, index: any) => ({
+                        ...option,
+                        id: index
+                    }))
+                }
+            } else {
+                return item
+            }
+        })
+        setData(newData)
+    }
+
+    useEffect(() => {
+        if (open) {
+            fetchData()
+        }
+    }, [open])
 
     const [optionsItemList, setOptionsItemList] = React.useState<OptionItem[]>([])
-
     const [currentMenu, setCurrentMenu] = React.useState('setting') // setting, create-new, edit
     const [actionsShow, setActionsShow] = React.useState('edit')
+
+    useEffect(() => {
+        setOptionsItemList([])
+        setSelectedType('TEXT')
+        reset()
+    }, [open])
+
+    const [selectedField, setSelectedField] = React.useState(null)
+
+    useEffect(() => {
+        setOptionsItemList(selectedField?.options?.map((option: any) => ({ ...option })) || [])
+        setSelectedType(selectedField?.type || 'TEXT')
+        setValue('id', selectedField?.id)
+        setValue('title', selectedField?.title)
+        setValue('type', selectedField?.type)
+        setValue('option', selectedField?.option)
+    }, [selectedField])
 
     const MainContent: React.FC = () => {
         const [fillterName, setFillterName] = React.useState(null)
@@ -173,17 +209,27 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
                             }
                             onClick={() =>
                                 templateItem.usedIn === 0
-                                    ? (() => {
+                                    ? (async () => {
                                         switch (actionsShow) {
                                             case 'edit':
                                                 setCurrentMenu('edit')
                                                 break
                                             case 'delete':
-                                                console.log('delete')
+                                                try {
+                                                    await deleteField(
+                                                        { id: item.id, templateId: templateItem?.id }
+                                                    ).unwrap()
+                                                    await fetchData()
+                                                } catch (error) {
+                                                    toast.error('Delete label failed', {
+                                                        position: 'bottom-right'
+                                                    })
+                                                }
                                                 break
                                             default:
                                                 break
                                         }
+                                        setSelectedField(item)
                                     })()
                                     : null
                             }
@@ -287,7 +333,12 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
                                     sx={{ width: '100%' }}
                                     className="button right-button"
                                     variant="contained"
-                                    onClick={() => setCurrentMenu('create-new')}
+                                    onClick={() => {
+                                        setSelectedField(null)
+                                        setOptionsItemList([])
+                                        setSelectedType('TEXT')
+                                        setCurrentMenu('create-new')
+                                    }}
                                 >Create a new field</Button>
                             )
                             : null
@@ -297,11 +348,12 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
         )
     }
 
-    const [selectedType, setSelectedType] = React.useState(null)
-    const { register, handleSubmit, formState: { errors }, setValue } = useForm<CardTemplateCreateFieldReq>({
+    const [selectedType, setSelectedType] = React.useState('TEXT')
+    const { register, handleSubmit, formState: { errors }, setValue, setError, reset, clearErrors } = useForm<CardTemplateCreateFieldReq>({
         defaultValues: {
+            id: null,
             title: null,
-            type: null,
+            type: 'TEXT',
             option: null,
             templateId: templateItem?.id
         }
@@ -309,12 +361,45 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
     const CreateNewContent: React.FC = () => {
 
         const onSubmit: SubmitHandler<CardTemplateCreateFieldReq> = async (data) => {
-            data.option = optionsItemList
-            console.log(data)
+            if (selectedType === 'DROPDOWN') {
+                if (optionsItemList.length === 0) {
+                    setError('option', {
+                        type: 'required',
+                        message: 'Options is required'
+                    })
+                    return
+                }
+                data.option = optionsItemList
+            }
+            try {
+                if (currentMenu === 'edit') {
+                    await updateField(data)
+                } else {
+                    await createField(data)
+                }
+                await fetchData()
+                toast.success('Template created successfully', {
+                    position: 'bottom-right'
+                })
+                setCurrentMenu('setting')
+            } catch (err) {
+                console.log(err)
+            }
+            // console.log(data)
         }
 
         const [optionsName, setOptionsName] = React.useState(null)
         const [clickedAddOptions, setClickedAddOptions] = React.useState(false)
+
+        useEffect(() => {
+            if (clickedAddOptions && optionsName) {
+                setOptionsItemList(
+                    [...optionsItemList,
+                        { id: optionsItemList.length, title: optionsName, color: null }
+                    ]
+                )
+            }
+        }, [clickedAddOptions, optionsName])
 
         const ColorPicker: React.FC<ColorPickerProps> = ({ id, open, anchorEl, onClose, onColorSelect, defaultSelectedColor }) => {
             const colors = [
@@ -457,7 +542,10 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
                             value={itemTitle}
                             onChange={(e) => {
                                 if (!e.target.value) return
-                                setItemTitle(e.target.value)
+                                const value = e.target.value
+                                if (!value.includes('-') && !value.includes(',')) {
+                                    setItemTitle(value)
+                                }
                             }}
                             onBlur={() => {
                                 setOptionsItemList(
@@ -518,11 +606,14 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
                             }}
                             icon={<ArrowBackIosOutlinedIcon sx={{ fontSize: '16px' }} />}
                             checkedIcon={<ArrowBackIosOutlinedIcon sx={{ fontSize: '16px' }} />}
-                            onClick={() => setCurrentMenu('setting')}
+                            onClick={() => {
+                                setSelectedField(null)
+                                setCurrentMenu('setting')
+                            }}
                         />
                         <Box sx={{ justifyContent: 'center', width: '100%', display: 'flex', fontWeight: '500', color: '#44546f' }}>
                             {
-                                currentMenu === 'edit' ? 'Edit Label' : 'Create a new field'
+                                currentMenu === 'edit' ? 'Edit Field' : 'Create a new Field'
                             }
                         </Box>
                     </Box>
@@ -559,7 +650,6 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
                                 onChange={(e) => {
                                     setSelectedType(e.target.value)
                                     setValue('type', e.target.value)
-                                    // clearErrors('type')
                                 }}
                                 value={selectedType === null ? 'TEXT' : selectedType}
                             >
@@ -602,7 +692,12 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
                                     placeholder='Add item ...'
                                     size='small'
                                     sx={{ width: '73%' }}
-                                    onChange={(e) => setOptionsName(e.target.value)}
+                                    onChange={(e) => {
+                                        const value = e.target.value
+                                        if (!value.includes('-') && !value.includes(',')) {
+                                            setOptionsName(value)
+                                        }
+                                    }}
                                     error={clickedAddOptions && !optionsName}
                                 />
                                 <Button
@@ -615,10 +710,11 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
                                     variant="contained"
                                     onClick={() => {
                                         setClickedAddOptions(true)
-                                        if (!optionsName) return
+                                        if (isBlank(optionsName)) return
+                                        clearErrors('option')
                                         setOptionsItemList(
                                             [...optionsItemList,
-                                            { id: optionsItemList.length, title: optionsName, color: null }
+                                                { id: optionsItemList.length, title: optionsName, color: null }
                                             ]
                                         )
                                     }}
@@ -636,7 +732,7 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
                     }}>
                         <Button
                             type='submit'
-                            id={`abc-${id}`}
+                            id={`submit-create-field-${id}`}
                             sx={{
                                 width: '100%',
                                 backgroundColor: '#0079BF'
@@ -644,7 +740,7 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
                             variant="contained"
                         >
                             {
-                                currentMenu === 'edit' ? 'Edit Label' : 'Create a new field'
+                                currentMenu === 'edit' ? 'Edit Field' : 'Create a new Field'
                             }
                         </Button>
                     </Box>

@@ -16,7 +16,7 @@ import { CardTemplateCreateLabelReq } from '~/core/services/board-services.model
 import Typography from '@mui/material/Typography'
 import EditOffOutlinedIcon from '@mui/icons-material/EditOffOutlined'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { useCreateLabelMutation, useDeleteLabelMutation, useGetLabelsQuery, useUpdateLabelMutation } from '~/core/redux/api/board-template.api'
+import { useCreateLabelMutation, useDeleteLabelMutation, useGetLabelsQuery, useLazyGetLabelsQuery, useUpdateLabelMutation } from '~/core/redux/api/board-template.api'
 import { ApiResponse } from '~/core/services/api.model'
 import { set } from 'lodash'
 import { toast } from 'react-toastify'
@@ -60,13 +60,24 @@ const checkBoxSx = {
 }
 
 const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, anchorEl, onClose }) => {
-    const { data: apiResponse, isLoading, refetch } = useGetLabelsQuery(templateItem?.id)
+    const [triggerGetLabels, { isLoading: getLoading }] = useLazyGetLabelsQuery()
     const [create, { isLoading: createLoading }] = useCreateLabelMutation()
     const [updateLabel, { isLoading: updateLoading }] = useUpdateLabelMutation()
     const [deleteLabel, { isLoading: deleteLoading }] = useDeleteLabelMutation()
 
-    const response = apiResponse as ApiResponse<any>
-    const data = response?.data
+    const isLoading = getLoading || createLoading || updateLoading || deleteLoading
+
+    const [data, setData] = React.useState<any>(null)
+    const fetchData = async () => {
+        const response = await triggerGetLabels(templateItem?.id).unwrap() as ApiResponse<any>
+        setData(response.data)
+    }
+
+    useEffect(() => {
+        if (open) {
+            fetchData()
+        }
+    }, [open])
 
     // const data = [
     //     { id: 1, title: 'test 1 abc', color: '#FF5733' },
@@ -151,7 +162,7 @@ const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, 
                                                     await deleteLabel(
                                                         { id: item.id, templateId: templateItem?.id }
                                                     ).unwrap()
-                                                    await refetch()
+                                                    await fetchData()
                                                 } catch (error) {
                                                     toast.error('Delete label failed', {
                                                         position: 'bottom-right'
@@ -321,7 +332,7 @@ const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, 
         useEffect(() => {
             setSelectedId(selectedItem?.colorCode
                 ?
-                Number(Object.keys(ColorOptionsList).find(key => ColorOptionsList[key].color === selectedItem.colorCode))
+                Number(Object.keys(ColorOptionsList).find(key => ColorOptionsList[Number(key)].color === selectedItem.colorCode))
                 : null
             )
         }, [selectedItem])
@@ -368,7 +379,7 @@ const LabelPopoverFC: React.FC<MemberPopoverProps> = ({ id, templateItem, open, 
                 } else { // edit
                     await updateLabel(data).unwrap()
                 }
-                await refetch()
+                await fetchData()
                 setCurrentMenu('setting')
                 if (!selectedItem) { // create
                     toast.success('Create label successfully', {

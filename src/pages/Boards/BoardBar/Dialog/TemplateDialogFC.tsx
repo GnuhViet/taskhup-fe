@@ -15,12 +15,12 @@ import PlaylistAddOutlinedIcon from '@mui/icons-material/PlaylistAddOutlined'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import SaveAsOutlinedIcon from '@mui/icons-material/SaveAsOutlined'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import SquareAvatar from '~/components/Common/SquareAvatar'
 import LabelPopoverFC from './popovers/LabelPopoverFC'
 import TextField from '@mui/material/TextField'
 import { useParams } from 'react-router-dom'
-import { useCreateBoardTemplateMutation, useDeleteBoardTemplateMutation, useGetBoardTemplateQuery } from '~/core/redux/api/board-template.api'
+import { useCreateBoardTemplateMutation, useDeleteBoardTemplateMutation, useLazyGetBoardTemplateQuery } from '~/core/redux/api/board-template.api'
 import { ApiResponse } from '~/core/services/api.model'
 import ApiLoadingOverlay from '~/components/Common/ApiLoadingOverlay'
 import { BoardTemplateCreateRequest } from '~/core/services/board-template-services.model'
@@ -54,11 +54,24 @@ const customScrollbarSx = {
 
 const TemplateDialogFC: React.FC<CardDialogProps> = ({ open, handleClose }) => {
     const boardId = useParams().boardId
-    const { data: apiResponse, isLoading, refetch } = useGetBoardTemplateQuery(boardId)
+    const [getTemplate, { isLoading: isLoadingGet }] = useLazyGetBoardTemplateQuery()
     const [createNew, { isLoading: isLoadingCreate }] = useCreateBoardTemplateMutation()
     const [deleteTemplate, { isLoading: isLoadingDelete }] = useDeleteBoardTemplateMutation()
-    const response = apiResponse as ApiResponse<any>
-    const template = response?.data
+
+    const isLoading = isLoadingGet || isLoadingCreate || isLoadingDelete
+
+    const [template, setTemplate] = React.useState<any>([])
+    const fetchData = async () => {
+        const response = await getTemplate(boardId).unwrap() as ApiResponse<any>
+        setTemplate(response.data)
+    }
+
+    useEffect(() => {
+        if (open) {
+            fetchData()
+        }
+    }, [open])
+
 
     const [showAddForm, setShowAddForm] = React.useState(false)
 
@@ -68,7 +81,7 @@ const TemplateDialogFC: React.FC<CardDialogProps> = ({ open, handleClose }) => {
             toast.success('Template deleted successfully', {
                 position: 'bottom-right'
             })
-            refetch()
+            fetchData()
         } catch (error) { // SWITCH CASE ???
             toast.error('INTERNAL SERVER ERROR!')
         }
@@ -181,7 +194,7 @@ const TemplateDialogFC: React.FC<CardDialogProps> = ({ open, handleClose }) => {
         )
     }
 
-    const { register, handleSubmit, formState: { errors }, reset } = useForm<BoardTemplateCreateRequest>({
+    const { register, handleSubmit, formState: { errors } } = useForm<BoardTemplateCreateRequest>({
         defaultValues: {
             title: '',
             boardId: boardId
@@ -190,11 +203,11 @@ const TemplateDialogFC: React.FC<CardDialogProps> = ({ open, handleClose }) => {
 
     const onSubmit: SubmitHandler<BoardTemplateCreateRequest> = async (data) => {
         try {
-            const resp = await createNew(data).unwrap() as ApiResponse<any>
+            await createNew(data).unwrap() as ApiResponse<any>
             toast.success('Template created successfully', {
                 position: 'bottom-right'
             })
-            refetch()
+            fetchData()
         } catch (error) { // SWITCH CASE ??
             toast.error('INTERAL SERVER ERROR!')
         }

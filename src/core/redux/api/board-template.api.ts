@@ -52,16 +52,50 @@ export const boardTemplateApi = apiSlice.injectEndpoints({
                 method: 'POST',
                 body: data
             })
+        }),
+        getFields: builder.query({
+            query: (data: string) => ({
+                url: `${API_URL}/fields/${data}`,
+                method: 'GET'
+            })
+        }),
+        createField: builder.mutation({
+            query: (data: any) => ({
+                url: `${API_URL}/fields/create`,
+                method: 'POST',
+                body: data
+            })
+        }),
+        updateField: builder.mutation({
+            query: (data: any) => ({
+                url: `${API_URL}/fields/update`,
+                method: 'POST',
+                body: data
+            })
+        }),
+        deleteField: builder.mutation({
+            query: (data: any) => ({
+                url: `${API_URL}/fields/delete`,
+                method: 'POST',
+                body: data
+            })
         })
     })
 })
 
 export const {
     useGetBoardTemplateQuery,
+    useLazyGetBoardTemplateQuery,
     useCreateBoardTemplateMutation,
     useDeleteBoardTemplateMutation,
     useGetLabelsQuery,
+    useLazyGetLabelsQuery,
     useCreateLabelMutation,
     useUpdateLabelMutation,
-    useDeleteLabelMutation
+    useDeleteLabelMutation,
+    useGetFieldsQuery,
+    useLazyGetFieldsQuery,
+    useCreateFieldMutation,
+    useUpdateFieldMutation,
+    useDeleteFieldMutation
 } = boardTemplateApi
