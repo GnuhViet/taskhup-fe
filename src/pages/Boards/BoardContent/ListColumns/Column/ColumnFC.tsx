@@ -28,6 +28,9 @@ import { Column } from '~/core/model/column.model'
 import { useStompClient } from 'react-stomp-hooks'
 import { useSelector } from 'react-redux'
 import { BoardCardCreateReq } from '~/core/services/board-services.model'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import Select from '@mui/material/Select'
 
 interface ColumnFCProps {
     column: Column
@@ -57,9 +60,9 @@ const ColumnFC: React.FC<ColumnFCProps> = ({ column, deleteColumnDetails }) => {
         disabled: disableDrag
     })
     const dndKitColumnStyles = {
-    // touchAction: 'none', // Dành cho sensor default dạng PointerSensor
-    // Nếu sử dụng CSS.Transform như docs sẽ lỗi kiểu stretch
-    // https://github.com/clauderic/dnd-kit/issues/117
+        // touchAction: 'none', // Dành cho sensor default dạng PointerSensor
+        // Nếu sử dụng CSS.Transform như docs sẽ lỗi kiểu stretch
+        // https://github.com/clauderic/dnd-kit/issues/117
         transform: CSS.Translate.toString(transform),
         transition,
         // Chiều cao phải luôn max 100% vì nếu không sẽ lỗi lúc kéo column ngắn qua một cái column dài thì phải kéo ở khu vực giữa giữa rất khó chịu (demo ở video 32). Lưu ý lúc này phải kết hợp với {...listeners} nằm ở Box chứ không phải ở div ngoài cùng để tránh trường hợp kéo vào vùng xanh.
@@ -116,7 +119,7 @@ const ColumnFC: React.FC<ColumnFCProps> = ({ column, deleteColumnDetails }) => {
        * - Với việc sử dụng Redux như vậy thì code sẽ Clean chuẩn chỉnh hơn rất nhiều.
        */
             deleteColumnDetails(column.id)
-        }).catch(() => {})
+        }).catch(() => { })
     }
 
     // Phải bọc div ở đây vì vấn đề chiều cao của column khi kéo thả sẽ có bug kiểu kiểu flickering (video 32)

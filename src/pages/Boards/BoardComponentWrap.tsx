@@ -9,13 +9,17 @@ import BoardComponent from '~/pages/Boards/_id'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 import Typography from '@mui/material/Typography'
+import { useGetBoardTemplateQuery } from '~/core/redux/api/board-template.api'
 
 
 const BoardComponentWrap = () => {
     const token = useSelector((state: any) => state.authReducer.token.accessToken)
     const dispatch = useDispatch()
     const boardId = useParams().boardId
-    const { isLoading } = useGetBoardByCodeQuery(boardId)
+    const { isLoading: isLoadingBoard } = useGetBoardByCodeQuery(boardId)
+    const { isLoading: isLoadingTemplate } = useGetBoardTemplateQuery(boardId)
+
+    const isLoading = isLoadingBoard || isLoadingTemplate
 
     const beforeStompConnect = useCallback(function () {
         this.connectHeaders = {

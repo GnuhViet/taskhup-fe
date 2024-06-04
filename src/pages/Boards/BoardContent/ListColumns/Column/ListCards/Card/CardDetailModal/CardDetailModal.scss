@@ -24,7 +24,7 @@
 }
 
 .button {
-    color: #3E4E6B !important;
+    color: #172b4d !important;
     background-color: #E2E4EA !important;
     box-shadow: none !important;
     height: 32px !important;
@@ -38,6 +38,11 @@
     font-size: 24px !important; 
     margin-right: 16px !important;
 }
+
+// .tox-tinymce {
+//     border: 1px solid #8590A2 !important;
+//     border-radius: 3px !important;
+// }
 
 .dialogTitle {
     display: flex;
@@ -67,6 +72,7 @@
 
     .body {
         width: 80%;
+        padding-right: 8px;
 
         .card-detail-title {
             margin-left: 40px;
@@ -135,6 +141,7 @@
     }
     
     .list-right-buttons {
+        padding-left: 8px;
         width: 20%;
         .button-title {
             font-size: 14px;

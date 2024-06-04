@@ -73,29 +73,29 @@ const RequireRole = () => {
 
         actions.forEach((action: string) => {
             switch (action) {
-            case Actions.EDIT_WORKSPACE:
-                permission['workspace'] = ['edit']
-                break
-            case Actions.MANAGE_USER:
-                permission['user'] = ['manage']
-                break
-            case Actions.EDIT_ROLE:
-                permission['role'] = ['edit']
-                break
-            case Actions.EDIT_BOARD:
-                permission['board'] = ['edit']
-                break
-            case Actions.DELETE_BOARD:
-                permission['board'] = ['delete']
-                break
-            case Actions.EDIT_CARD_TEMPLATE:
-                permission['cardTemplate'] = ['edit']
-                break
-            case Actions.EDIT_CARD:
-                permission['card'] = ['edit']
-                break
-            default:
-                break
+                case Actions.EDIT_WORKSPACE:
+                    permission['workspace'] = ['edit']
+                    break
+                case Actions.MANAGE_USER:
+                    permission['user'] = ['manage']
+                    break
+                case Actions.EDIT_ROLE:
+                    permission['role'] = ['edit']
+                    break
+                case Actions.EDIT_BOARD:
+                    permission['board'] = ['edit']
+                    break
+                case Actions.DELETE_BOARD:
+                    permission['board'] = ['delete']
+                    break
+                case Actions.EDIT_CARD_TEMPLATE:
+                    permission['cardTemplate'] = ['edit']
+                    break
+                case Actions.EDIT_CARD:
+                    permission['card'] = ['edit']
+                    break
+                default:
+                    break
             }
         })
         return getAbility(permission)

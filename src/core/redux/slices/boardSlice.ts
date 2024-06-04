@@ -14,17 +14,20 @@ import {
     BoardColumnMoveReq
 } from '~/core/services/board-services.model'
 import { mapObject } from '~/core/utils/mapper'
+import { boardTemplateApi } from '../api/board-template.api'
 
 export interface BoardState {
     board: Board
     boardId: string
     disableDrag: boolean
+    boardTemplate: any
 }
 
 const initialState: BoardState = {
     board: {} as Board,
     boardId: null,
-    disableDrag: false
+    disableDrag: false,
+    boardTemplate: null
 }
 
 export const boardSlice = createSlice({
@@ -131,6 +134,9 @@ export const boardSlice = createSlice({
             })
 
             state.board = board
+        }),
+        builder.addMatcher(boardTemplateApi.endpoints.getBoardTemplate.matchFulfilled, (state, action) => {
+            state.boardTemplate = action.payload?.data
         })
     }
 })
