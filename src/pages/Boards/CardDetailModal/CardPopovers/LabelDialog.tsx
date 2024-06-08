@@ -8,6 +8,8 @@ import TextBoxToolTip from '~/components/Common/TextBoxToolTip'
 import { getContrastTextColor } from '~/core/utils/common-used'
 import { useLazyGetLabelsQuery } from '~/core/redux/api/board-template.api'
 import { ApiResponse } from '~/core/services/api.model'
+import { useSelectLabelMutation } from '~/core/redux/api/board-card.api'
+import { SelectLabelRequest } from '~/core/services/board-card-services.model'
 
 const borderBottom = {
     borderBottom: '1px solid #DCDFE4'
@@ -29,16 +31,20 @@ export interface LabelDialogProps {
     open: boolean
     anchorEl: HTMLElement | null
     onClose: () => void
+    insideButton: boolean
+    reFetch: () => void
     templateId: string
     cardId: string
+    selectedLabels: any[]
 }
 
 export interface LabelItemProps {
     item: any
 }
 
-const LabelDialog: React.FC<LabelDialogProps> = ({ id, open, anchorEl, onClose, templateId, cardId }) => {
+const LabelDialog: React.FC<LabelDialogProps> = ({ id, open, anchorEl, onClose, insideButton, reFetch, templateId, cardId, selectedLabels }) => {
     const [triggerGetLabels, { isLoading: getLoading }] = useLazyGetLabelsQuery()
+    const [selectLabel, { isLoading: selectLoading }] = useSelectLabelMutation()
     const [data, setData] = React.useState<any>([])
     const [fillterName, setFillterName] = React.useState('')
 
@@ -53,7 +59,36 @@ const LabelDialog: React.FC<LabelDialogProps> = ({ id, open, anchorEl, onClose, 
         }
     }, [open])
 
-    if (getLoading) return <div>Loading...</div>
+    const [listSelectedIds, setListSelectedIds] = React.useState<string[]>([])
+
+    useEffect(() => {
+        if (selectedLabels) {
+            setListSelectedIds([...selectedLabels.map((item: any) => item.id)])
+        } else {
+            setListSelectedIds([])
+        }
+    }, [selectedLabels])
+
+    const handleClose = async () => {
+        if (
+            JSON.stringify(listSelectedIds.sort()) !== JSON.stringify(selectedLabels?.map((item: any) => item.id).sort())
+        ) {
+            try {
+                await selectLabel({
+                    boardCardLabelValue: listSelectedIds,
+                    boardCardId: cardId
+                } as SelectLabelRequest).unwrap()
+
+                await reFetch()
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        onClose()
+    }
+
+    if (getLoading || selectLoading) return <div>Loading...</div>
 
     const LabelItem: React.FC<LabelItemProps> = ({ item }) => {
         return (
@@ -61,6 +96,14 @@ const LabelDialog: React.FC<LabelDialogProps> = ({ id, open, anchorEl, onClose, 
                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                     <Checkbox
                         sx={checkBoxSx}
+                        checked={listSelectedIds?.includes(item.id)}
+                        onChange={(e) => {
+                            if (e.target.checked) {
+                                setListSelectedIds([...listSelectedIds, item.id])
+                            } else {
+                                setListSelectedIds(listSelectedIds?.filter((id) => id !== item.id))
+                            }
+                        }}
                     />
                     <Box sx={{
                         display: 'flex',
@@ -88,21 +131,23 @@ const LabelDialog: React.FC<LabelDialogProps> = ({ id, open, anchorEl, onClose, 
             id={id}
             open={open}
             anchorEl={anchorEl}
-            onClose={onClose}
+            onClose={handleClose}
             anchorOrigin={{
                 vertical: 'bottom',
                 horizontal: 'right'
             }}
-            transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right'
-            }}
+            transformOrigin={
+                insideButton
+                    ? { vertical: 'top', horizontal: 'center' }
+                    : { vertical: 'top', horizontal: 'right' }
+            }
             slotProps={{
                 paper: {
                     style: {
                         width: '320px',
                         borderRadius: '8px',
-                        boxShadow: '0'
+                        boxShadow: '0',
+                        marginTop: '6px'
                     }
                 }
             }}

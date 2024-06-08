@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import Box from '@mui/material/Box'
 import Input from '@mui/joy/Input'
@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton'
 import DateTimePickerPopOver from '~/components/Common/DateTimePickerPopOver'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import { isBlank } from '~/core/utils/data-utils'
 dayjs.extend(customParseFormat)
 
 const bgColorSx = {
@@ -97,7 +98,7 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({ id, defaultValue, handleV
                 open={open}
                 anchorEl={anchorEl}
                 onClose={() => setOpen(false)}
-                value={inputValue}
+                value={isBlank(inputValue) ? dayjs().format(DATE_TIME_FORMAT) : inputValue}
                 handleValueChange={(value) => {
                     setInputValue(value)
                     handleValueChange(value)

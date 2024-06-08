@@ -9,6 +9,8 @@ import { ApiResponse } from '~/core/services/api.model'
 import { useLazyGetWorkspaceMemberQuery } from '~/core/redux/api/workspace.api'
 import CircleAvatar from '~/components/Common/CircleAvatar'
 import { Tooltip } from '@mui/material'
+import { useUpdateMembersMutation } from '~/core/redux/api/board-card.api'
+import { UpdateMemberRequest } from '~/core/services/board-card-services.model'
 
 const borderBottom = {
     borderBottom: '1px solid #DCDFE4'
@@ -31,14 +33,18 @@ export interface MemberDialogProps {
     anchorEl: HTMLElement | null
     onClose: () => void
     cardId: string
+    members: any[]
+    reFetch: () => void
+    insideButton: boolean
 }
 
 export interface MemberItemProps {
     item: any
 }
 
-const MemberDialog: React.FC<MemberDialogProps> = ({ id, open, anchorEl, onClose, cardId }) => {
+const MemberDialog: React.FC<MemberDialogProps> = ({ id, open, anchorEl, onClose, cardId, members, reFetch, insideButton }) => {
     const [getWsMember, { isLoading: getLoading }] = useLazyGetWorkspaceMemberQuery()
+    const [updateMember, { isLoading: updateLoading }] = useUpdateMembersMutation()
     const [data, setData] = React.useState<any>([])
     const [fillterName, setFillterName] = React.useState('')
 
@@ -53,7 +59,36 @@ const MemberDialog: React.FC<MemberDialogProps> = ({ id, open, anchorEl, onClose
         }
     }, [open])
 
-    if (getLoading) return <div>Loading...</div>
+    const [listSelectedIds, setListSelectedIds] = React.useState<string[]>([])
+
+    useEffect(() => {
+        if (members) {
+            setListSelectedIds([...members.map((item: any) => item.id)])
+        } else {
+            setListSelectedIds([])
+        }
+    }, [members])
+
+    const handleClose = async () => {
+        if (
+            JSON.stringify(listSelectedIds.sort()) !== JSON.stringify(members?.map((item: any) => item.id).sort())
+        ) {
+            try {
+                await updateMember({
+                    members: listSelectedIds,
+                    boardCardId: cardId
+                } as UpdateMemberRequest).unwrap()
+
+                await reFetch()
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        onClose()
+    }
+
+    if (getLoading || updateLoading) return <div>Loading...</div>
 
     const MemberItem: React.FC<MemberItemProps> = ({ item }) => {
         return (
@@ -61,6 +96,14 @@ const MemberDialog: React.FC<MemberDialogProps> = ({ id, open, anchorEl, onClose
                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                     <Checkbox
                         sx={checkBoxSx}
+                        checked={listSelectedIds?.includes(item.userId)}
+                        onChange={(e) => {
+                            if (e.target.checked) {
+                                setListSelectedIds([...listSelectedIds, item.userId])
+                            } else {
+                                setListSelectedIds(listSelectedIds?.filter((id) => id !== item.userId))
+                            }
+                        }}
                     />
                     <Box sx={{
                         display: 'flex',
@@ -99,21 +142,23 @@ const MemberDialog: React.FC<MemberDialogProps> = ({ id, open, anchorEl, onClose
             id={id}
             open={open}
             anchorEl={anchorEl}
-            onClose={onClose}
+            onClose={handleClose}
             anchorOrigin={{
                 vertical: 'bottom',
                 horizontal: 'right'
             }}
-            transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right'
-            }}
+            transformOrigin={
+                insideButton
+                    ? { vertical: 'top', horizontal: 'center' }
+                    : { vertical: 'top', horizontal: 'right' }
+            }
             slotProps={{
                 paper: {
                     style: {
                         width: '320px',
                         borderRadius: '8px',
-                        boxShadow: '0'
+                        boxShadow: '0',
+                        marginTop: '6px'
                     }
                 }
             }}

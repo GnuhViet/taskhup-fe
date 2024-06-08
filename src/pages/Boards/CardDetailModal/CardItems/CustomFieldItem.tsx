@@ -48,7 +48,7 @@ export class CustomFieldItemModel {
     id: string
     title: string
     type: string // TEXT, DATE, DROPDOWN, CHECKBOX
-    option: OptionItem[]
+    options: OptionItem[]
     templateId: string
 }
 
@@ -56,10 +56,11 @@ interface ItemProps {
     item: CustomFieldItemModel;
     value: any;
     setValue: (value: any) => void;
-    handleValueChange: (value: any) => void;
+    handleValueChange: (value: any, isFromDate: boolean) => void;
+    setIsFocused: (value: boolean) => void;
 }
 
-const InputType: React.FC<ItemProps> = ({ item, value, setValue, handleValueChange }) => {
+const InputType: React.FC<ItemProps> = ({ item, value, setValue, handleValueChange, setIsFocused }) => {
     return (
         <Box>
             <Box sx={{ display: 'flex', justifyItems: 'center', mb: '4px' }}>
@@ -69,15 +70,16 @@ const InputType: React.FC<ItemProps> = ({ item, value, setValue, handleValueChan
             <Input
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
-                onBlur={() => handleValueChange(value)}
+                onBlur={() => handleValueChange(value, false)}
                 sx={{ ...bgColorSx }}
                 placeholder={`Add ${item.title}...`}
+                onFocus={() => setIsFocused(true)}
             />
         </Box>
     )
 }
 
-const CheckBoxType: React.FC<ItemProps> = ({ item, value, setValue, handleValueChange }) => {
+const CheckBoxType: React.FC<ItemProps> = ({ item, value, setValue, handleValueChange, setIsFocused }) => {
     return (
         <Box>
             <Box sx={{ display: 'flex', justifyItems: 'center', mb: '4px' }}>
@@ -89,17 +91,18 @@ const CheckBoxType: React.FC<ItemProps> = ({ item, value, setValue, handleValueC
                     checked={value === 'true'}
                     onChange={(e) => {
                         setValue(e.target.checked ? 'true' : 'false')
-                        handleValueChange(e.target.checked ? 'true' : 'false')
+                        handleValueChange(e.target.checked ? 'true' : 'false', false)
                     }}
                     label={`${item.title}`}
+                    onFocus={() => setIsFocused(true)}
                 />
             </Box>
         </Box>
     )
 }
 
-const DropDownType: React.FC<ItemProps> = ({ item, value, setValue, handleValueChange }) => {
-    const [selectedOption, setSelectedOption] = React.useState(item.option.find((option) => option.id === value))
+const DropDownType: React.FC<ItemProps> = ({ item, value, setValue, handleValueChange, setIsFocused }) => {
+    const [selectedOption, setSelectedOption] = React.useState(item.options?.find((option) => option.id === value))
     const action: SelectStaticProps['action'] = React.useRef(null)
     return (
         <Box>
@@ -124,9 +127,10 @@ const DropDownType: React.FC<ItemProps> = ({ item, value, setValue, handleValueC
                     value={value}
                     onChange={(e, newValue) => {
                         setValue(newValue)
-                        setSelectedOption(item.option.find((option) => option.id === newValue))
-                        handleValueChange(newValue)
+                        setSelectedOption(item.options.find((option) => option.id === newValue))
+                        handleValueChange(newValue, false)
                     }}
+                    onFocus={() => setIsFocused(true)}
                     {...(value && {
                         endDecorator: (
                             <IconButton
@@ -136,7 +140,7 @@ const DropDownType: React.FC<ItemProps> = ({ item, value, setValue, handleValueC
                                 }}
                                 onClick={() => {
                                     setValue(null)
-                                    handleValueChange(null)
+                                    handleValueChange(null, false)
                                     action.current?.focusVisible()
                                 }}
                                 sx={{
@@ -152,7 +156,7 @@ const DropDownType: React.FC<ItemProps> = ({ item, value, setValue, handleValueC
                         indicator: null
                     })}
                 >
-                    {item.option.map((option) => (
+                    {item.options?.map((option, index) => (
                         <Option
                             key={option.id}
                             value={option.id}
@@ -166,7 +170,7 @@ const DropDownType: React.FC<ItemProps> = ({ item, value, setValue, handleValueC
     )
 }
 
-const DateTimePickerType: React.FC<ItemProps> = ({ item, value, setValue, handleValueChange }) => {
+const DateTimePickerType: React.FC<ItemProps> = ({ item, value, setValue, handleValueChange, setIsFocused }) => {
     return (
         <Box>
             <Box sx={{ display: 'flex', justifyItems: 'center', mb: '4px' }}>
@@ -179,7 +183,8 @@ const DateTimePickerType: React.FC<ItemProps> = ({ item, value, setValue, handle
                     defaultValue={value}
                     handleValueChange={(value: string) => {
                         setValue(value)
-                        handleValueChange(value)
+                        setIsFocused(true)
+                        handleValueChange(value, true)
                     }}
                 />
             </Box>
@@ -190,22 +195,51 @@ const DateTimePickerType: React.FC<ItemProps> = ({ item, value, setValue, handle
 const CustomFieldItem: React.FC<CustomFieldItemProps> = ({ item, defaultValue, onValueChange }) => {
     const [value, setValue] = React.useState(defaultValue)
 
-    const handleValueChange = (value: any) => {
+    const handleValueChange = (value: any, isFromDate: boolean) => {
+        if (!isFromDate) {
+            if (!isFocused) return
+        }
         onValueChange(item.id, value)
     }
+
+    const [isFocused, setIsFocused] = React.useState(false)
 
     return (
         <Box>
             {(() => {
                 switch (item.type) {
                     case 'DROPDOWN':
-                        return <DropDownType item={item} value={value} setValue={setValue} handleValueChange={handleValueChange} />
+                        return <DropDownType
+                            item={item}
+                            value={value}
+                            setValue={setValue}
+                            handleValueChange={handleValueChange}
+                            setIsFocused={setIsFocused}
+                        />
                     case 'TEXT':
-                        return <InputType item={item} value={value} setValue={setValue} handleValueChange={handleValueChange} />
+                        return <InputType
+                            item={item}
+                            value={value}
+                            setValue={setValue}
+                            handleValueChange={handleValueChange}
+                            setIsFocused={setIsFocused}
+                        />
                     case 'DATE':
-                        return <DateTimePickerType item={item} value={value} setValue={setValue} handleValueChange={handleValueChange} />
+                        return <DateTimePickerType
+                            item={item}
+                            value={value}
+                            setValue={setValue}
+                            handleValueChange={handleValueChange}
+                            setIsFocused={setIsFocused}
+                        />
                     case 'CHECKBOX':
-                        return <CheckBoxType item={item} value={value} setValue={setValue} handleValueChange={handleValueChange} />
+                        return <CheckBoxType
+                            item={item}
+                            value={value}
+                            setValue={setValue}
+                            handleValueChange={handleValueChange}
+                            setIsFocused={setIsFocused}
+                        />
                     default:
                         return null
                 }

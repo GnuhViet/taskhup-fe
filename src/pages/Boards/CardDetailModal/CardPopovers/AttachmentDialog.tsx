@@ -55,7 +55,8 @@ const AttachmentDialog: React.FC<AttachmentDialogProps> = ({ id, open, anchorEl,
                     style: {
                         width: '320px',
                         borderRadius: '8px',
-                        boxShadow: '0'
+                        boxShadow: '0',
+                        marginTop: '6px'
                     }
                 }
             }}

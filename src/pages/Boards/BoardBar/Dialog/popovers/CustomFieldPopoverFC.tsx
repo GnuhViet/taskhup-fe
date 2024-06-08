@@ -403,7 +403,7 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
 
         const ColorPicker: React.FC<ColorPickerProps> = ({ id, open, anchorEl, onClose, onColorSelect, defaultSelectedColor }) => {
             const colors = [
-                '#F0F2F4',
+                '#E2E4EA',
                 '#4BCE97',
                 '#F5CD47',
                 '#FEA362',
@@ -486,7 +486,7 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
             const isOpen = Boolean(anchorElMember)
 
             const colors = [
-                '#F0F2F4',
+                '#E2E4EA',
                 '#4BCE97',
                 '#F5CD47',
                 '#FEA362',

@@ -32,7 +32,7 @@ const SingleLineTextBoxToolTip: React.FC<SingleLineTextBoxToolTipProps> = ({ sx,
         <>
             <Box sx={{ ...sx, ...overflowDotSx }} id={`single-line-tooltip-text-item-${id}`}>
                 {isEllipsis ? (
-                    <Tooltip title={text} enterDelay={800} slotProps={slotProps}>
+                    <Tooltip title={text} slotProps={slotProps}>
                         <span>{text}</span>
                     </Tooltip>
                 ) : (

@@ -11,6 +11,8 @@ import TextBoxToolTip from '~/components/Common/TextBoxToolTip'
 import Checkbox from '@mui/material/Checkbox'
 import { useLazyGetFieldsQuery } from '~/core/redux/api/board-template.api'
 import { ApiResponse } from '~/core/services/api.model'
+import { useSelectFieldMutation } from '~/core/redux/api/board-card.api'
+import { SelectFieldRequest } from '~/core/services/board-card-services.model'
 
 const borderBottom = {
     borderBottom: '1px solid #DCDFE4'
@@ -34,15 +36,17 @@ export interface CustomFieldDialogProps {
     onClose: () => void
     templateId: string
     cardId: string
+    selectedFieldsValue: any
+    reFetch: () => void
 }
 
 export interface FieldItemProps {
     item: any
 }
 
-const CustomFieldDialog: React.FC<CustomFieldDialogProps> = ({ id, open, anchorEl, onClose, templateId, cardId }) => {
+const CustomFieldDialog: React.FC<CustomFieldDialogProps> = ({ id, open, anchorEl, onClose, templateId, cardId, selectedFieldsValue, reFetch }) => {
     const [getField, { isLoading: getLoading }] = useLazyGetFieldsQuery()
-
+    const [selectField, { isLoading: selectLoading }] = useSelectFieldMutation()
     const [data, setData] = React.useState<any>([])
     const [fillterName, setFillterName] = React.useState('')
 
@@ -70,8 +74,42 @@ const CustomFieldDialog: React.FC<CustomFieldDialogProps> = ({ id, open, anchorE
         }
     }, [open])
 
-    if (getLoading) {
+    const [listSelectedIds, setListSelectedIds] = React.useState<string[]>([])
+
+    useEffect(() => {
+        if (selectedFieldsValue) {
+            setListSelectedIds([...selectedFieldsValue.map((item: any) => item.fieldId)])
+        } else {
+            setListSelectedIds([])
+        }
+    }, [selectedFieldsValue])
+
+    if (getLoading || selectLoading) {
         return <div>Loading...</div>
+    }
+
+    const handleClose = async () => {
+        if (
+            JSON.stringify(listSelectedIds.sort()) !== JSON.stringify(selectedFieldsValue?.map((item: any) => item.fieldId).sort())
+        ) {
+            try {
+                await selectField({
+                    customFieldValue: data.filter((item: any) => listSelectedIds.includes(item.id))
+                        .map((item: any) => {
+                            return {
+                                fieldId: item.id
+                            }
+                        }),
+                    boardCardId: cardId
+                } as SelectFieldRequest).unwrap()
+
+                await reFetch()
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        onClose()
     }
 
     const FieldItem: React.FC<FieldItemProps> = ({ item }) => {
@@ -80,6 +118,14 @@ const CustomFieldDialog: React.FC<CustomFieldDialogProps> = ({ id, open, anchorE
                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                     <Checkbox
                         sx={checkBoxSx}
+                        checked={listSelectedIds?.includes(item.id)}
+                        onChange={(e) => {
+                            if (e.target.checked) {
+                                setListSelectedIds([...listSelectedIds, item.id])
+                            } else {
+                                setListSelectedIds(listSelectedIds?.filter((id) => id !== item.id))
+                            }
+                        }}
                     />
                     <Box sx={{
                         display: 'flex',
@@ -120,7 +166,7 @@ const CustomFieldDialog: React.FC<CustomFieldDialogProps> = ({ id, open, anchorE
             id={id}
             open={open}
             anchorEl={anchorEl}
-            onClose={onClose}
+            onClose={handleClose}
             anchorOrigin={{
                 vertical: 'bottom',
                 horizontal: 'right'
@@ -134,7 +180,8 @@ const CustomFieldDialog: React.FC<CustomFieldDialogProps> = ({ id, open, anchorE
                     style: {
                         width: '320px',
                         borderRadius: '8px',
-                        boxShadow: '0'
+                        boxShadow: '0',
+                        marginTop: '6px'
                     }
                 }
             }}

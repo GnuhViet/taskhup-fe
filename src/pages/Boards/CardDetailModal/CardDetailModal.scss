@@ -83,6 +83,7 @@
 
         .card-details {
             display: flex;
+            flex-wrap: wrap;
 
             .field {
                 margin-right: 16px;
@@ -90,10 +91,12 @@
                 .field-title {
                     font-size: 14px;
                     margin-bottom: 4px;
+                    margin-top: 8px;
                 }
 
                 .field-content {
                     display: flex;
+                    flex-wrap: wrap;
                 }
             }
 

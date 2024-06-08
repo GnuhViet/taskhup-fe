@@ -12,7 +12,6 @@ import BookmarksOutlinedIcon from '@mui/icons-material/BookmarksOutlined'
 import TaskAltOutlinedIcon from '@mui/icons-material/TaskAltOutlined'
 import ScheduleOutlinedIcon from '@mui/icons-material/ScheduleOutlined'
 import AttachFileOutlinedIcon from '@mui/icons-material/AttachFileOutlined'
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined'
 import VideoLabelOutlinedIcon from '@mui/icons-material/VideoLabelOutlined'
 import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined'
 import SubjectOutlinedIcon from '@mui/icons-material/SubjectOutlined'
@@ -57,6 +56,12 @@ import CheckListDialog from './CardPopovers/CheckListDialog'
 import AttachmentDialog from './CardPopovers/AttachmentDialog'
 import TitleSection from './CardSections/TitleSection'
 import CoverSection from './CardSections/CoverSection'
+import { useLazyGetCardDetailsQuery } from '~/core/redux/api/board-card.api'
+import { ApiResponse } from '~/core/services/api.model'
+import LabelSection from './CardSections/LabelSection'
+import WatchSection from './CardSections/WatchSection'
+import CustomFieldSection from './CardSections/CustomFieldSection'
+import MemberSection from './CardSections/MemberSection'
 
 
 interface CardDialogProps {
@@ -124,8 +129,38 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
     const userInfo = useSelector((state: any) => state.homeReducer.userInfo) as UserInfoResponse
 
     const [members] = React.useState([
-        { name: 'JD', id: 1 }, { name: 'NV', id: 2 }, { name: 'AH', id: 3 }, { name: 'LK', id: 4 }
+        { name: 'JD', id: 1 },
+        { name: 'NV', id: 2 },
+        { name: 'AH', id: 3 },
+        { name: 'LK', id: 4 },
+        { name: 'LK', id: 5 },
+        { name: 'LK', id: 6 },
+        { name: 'LK', id: 7 },
+        { name: 'LK', id: 8 },
+        { name: 'LK', id: 9 },
+        { name: 'LK', id: 10 },
+        { name: 'LK', id: 11 },
+        { name: 'LK', id: 12 },
+        { name: 'LK', id: 13 },
+        { name: 'LK', id: 14 },
+        { name: 'LK', id: 15 },
+        { name: 'LK', id: 16 },
+        { name: 'LK', id: 17 },
     ])
+
+    const [getCardDetails, { isLoading: getLoading }] = useLazyGetCardDetailsQuery()
+    const [data, setData] = React.useState<any>([])
+
+    const fetchData = async () => {
+        const response = await getCardDetails(cardId).unwrap() as ApiResponse<any>
+        setData(response.data)
+    }
+
+    useEffect(() => {
+        if (open) {
+            fetchData()
+        }
+    }, [open])
 
     // const handleInputChange = (event: any) => {
     //     const { objectcard, value } = event.target
@@ -199,6 +234,9 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
     const [isOpenChecklistDialog, setIsOpenChecklistDialog] = React.useState(false)
     const [isOpenAttachmentDialog, setIsOpenAttachmentDialog] = React.useState(false)
 
+
+    const [isInsideButton, setIsInsideButton] = React.useState(false)
+
     const handleDialogClose = () => {
         setAnchorEl(null)
         setIsOpenTemplateDialog(false)
@@ -208,6 +246,19 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
         setIsOpenMemberDialog(false)
         setIsOpenChecklistDialog(false)
         setIsOpenAttachmentDialog(false)
+        setIsInsideButton(false)
+    }
+
+    const handleOpenMemberDialogInside = (event: any) => {
+        setIsInsideButton(true)
+        setAnchorEl(event.currentTarget)
+        setIsOpenMemberDialog(true)
+    }
+
+    const handleOpenLabelDialogInside = (event: any) => {
+        setIsInsideButton(true)
+        setAnchorEl(event.currentTarget)
+        setIsOpenLabelDialog(true)
     }
 
     return (
@@ -232,7 +283,6 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                     // }
                 }}
             >
-                {console.log('cardId', cardId)}
                 <Box className="closeIcon">
                     <CloseIcon sx={{ pr: '2px' }} onClick={handleClose} />
                 </Box>
@@ -257,7 +307,7 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                 >
                     <Box className="body" >
                         <Box className="card-details card-detail-title">
-                            <Box className="field member-field">
+                            {/* <Box className="field member-field">
                                 <Box className="field-title" sx={{ ...labelTextSx }}>Members</Box>
                                 <Box className="field-content">
                                     {members.map(member => (
@@ -268,21 +318,28 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                                             sx={{
                                                 width: '32px',
                                                 height: '32px',
-                                                mr: '6px'
+                                                m: '0 6px 6px 0'
                                             }}
                                         />
                                     ))}
                                     <Box className="add-icon">+</Box>
                                 </Box>
-                            </Box>
-                            <Box className="field noti-field">
+                            </Box> */}
+                            {data.members &&
+                                <MemberSection members={data.members} handleClickOpen={handleOpenMemberDialogInside} />
+                            }
+                            {data.selectedLabels &&
+                                <LabelSection selectedLabels={data.selectedLabels} handleClickOpen={handleOpenLabelDialogInside} />
+                            }
+                            <WatchSection isWatchCard={data.isWatchCard} reFetch={fetchData} cardId={cardId} />
+                            {/* <Box className="field noti-field">
                                 <Box className="field-title" sx={{ ...labelTextSx }}>Notifications</Box>
                                 <Box className="field-content">
                                     <Button className="button add-button" variant="contained" startIcon={<RemoveRedEyeOutlinedIcon />}>
                                         Watch
                                     </Button>
                                 </Box>
-                            </Box>
+                            </Box> */}
                         </Box>
 
                         {/* Desc field section */}
@@ -303,16 +360,13 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
 
                         {/* Checklist section */}
                         <ChecklistSection
-                            cardId={'123'}
-                            checkListItem={[
-                                { id: '1', title: 'Checklist item 1', checked: true },
-                                { id: '2', title: 'Checklist item 2', checked: false },
-                                { id: '3', title: 'Checklist item 3', checked: false }
-                            ]}
+                            cardId={cardId}
+                            checkListItem={data.checkLists}
+                            reFetch={fetchData}
                         />
 
                         {/* Custom field section */}
-                        <Box>
+                        {/* <Box>
                             <Box className="section-details card-detail-desc">
                                 <DriveFileRenameOutlineOutlinedIcon className="left-icon" sx={{ ...titleTextSx }} />
                                 <Box className="section-title" sx={{ ...titleTextSx }}>Custom Fields</Box>
@@ -372,7 +426,13 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                                     onValueChange={(id, value) => console.log(id, value)}
                                 />
                             </Box>
-                        </Box>
+                        </Box> */}
+                        <CustomFieldSection
+                            customFields={data.customFields}
+                            selectedFieldsValue={data.selectedFieldsValue}
+                            cardId={cardId}
+                            reFetch={fetchData}
+                        />
 
                         {/* Acttachment section */}
                         <Box>
@@ -597,37 +657,49 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                         open={isOpenTemplateDialog}
                         anchorEl={anchorEl}
                         onClose={handleDialogClose}
-                        cardId='123'
+                        cardId={cardId}
+                        defaultTemplateId={data.templateId}
+                        reFetch={fetchData}
                     />
                     <CustomFieldDialog
                         id='custom-field-dialog'
                         open={isOpenCustomFieldDialog}
                         anchorEl={anchorEl}
                         onClose={handleDialogClose}
-                        templateId='8808b2ea-a1b5-4667-8478-1e58d1873c53'
-                        cardId='123'
+                        templateId={data.templateId}
+                        cardId={cardId}
+                        selectedFieldsValue={data.selectedFieldsValue}
+                        reFetch={fetchData}
                     />
                     <LabelDialog
                         id='label-dialog'
                         open={isOpenLabelDialog}
                         anchorEl={anchorEl}
                         onClose={handleDialogClose}
-                        templateId='8808b2ea-a1b5-4667-8478-1e58d1873c53'
-                        cardId='123'
+                        templateId={data.templateId}
+                        cardId={cardId}
+                        selectedLabels={data.selectedLabels}
+                        reFetch={fetchData}
+                        insideButton={isInsideButton}
                     />
                     <MemberDialog
                         id='member-dialog'
                         open={isOpenMemberDialog}
                         anchorEl={anchorEl}
                         onClose={handleDialogClose}
-                        cardId='123'
+                        cardId={cardId}
+                        members={data.members}
+                        reFetch={fetchData}
+                        insideButton={isInsideButton}
                     />
                     <CheckListDialog
                         id='checklist-dialog'
                         open={isOpenChecklistDialog}
                         anchorEl={anchorEl}
                         onClose={handleDialogClose}
-                        cardId='123'
+                        cardId={cardId}
+                        checkListValue={data.checkLists}
+                        reFetch={fetchData}
                     />
                     <DateRangeDialog
                         id='dates-dialog'

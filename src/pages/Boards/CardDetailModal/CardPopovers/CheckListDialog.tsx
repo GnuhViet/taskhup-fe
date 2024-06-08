@@ -15,6 +15,8 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { Tooltip } from '@mui/material'
 import { isBlank } from '~/core/utils/data-utils'
 import { toast } from 'react-toastify'
+import { useUpdateCheckListMutation } from '~/core/redux/api/board-card.api'
+import { UpdateCheckListRequest } from '~/core/services/board-card-services.model'
 
 const borderBottom = {
     borderBottom: '1px solid #DCDFE4'
@@ -37,14 +39,17 @@ export interface CheckListDialogProps {
     anchorEl: HTMLElement | null
     onClose: () => void
     cardId: string
+    checkListValue: any[]
+    reFetch: () => void
 }
 
 export interface ItemProps {
     item: any
 }
 
-const CheckListDialog: React.FC<CheckListDialogProps> = ({ id, open, anchorEl, onClose, cardId }) => {
+const CheckListDialog: React.FC<CheckListDialogProps> = ({ id, open, anchorEl, onClose, cardId, checkListValue, reFetch }) => {
     // const [getWsMember, { isLoading: getLoading }] = useLazyGetWorkspaceMemberQuery()
+    const [updateCheckList, { isLoading: updateLoading }] = useUpdateCheckListMutation()
     const [data, setData] = React.useState<any>([])
     const [itemName, setItemName] = React.useState('')
     const [clickedAddOptions, setClickedAddOptions] = React.useState(false)
@@ -56,17 +61,30 @@ const CheckListDialog: React.FC<CheckListDialogProps> = ({ id, open, anchorEl, o
     // }
 
     useEffect(() => {
-        // if (open) {
-        //     fetchData()
-        // }
-        setData([
-            { id: '1', title: 'checklist item 1', checked: false },
-            { id: '2', title: 'checklist item 2', checked: true },
-            { id: '3', title: 'checklist item 3', checked: false }
-        ])
+        if (checkListValue) {
+            setData(checkListValue)
+        } else {
+            setData([])
+        }
     }, [open])
 
-    // if (getLoading) return <div>Loading...</div>
+    const handleClose = async () => {
+        if (
+            JSON.stringify(data.map((item: any) => item.id).sort()) !== JSON.stringify(checkListValue?.map((item: any) => item.id).sort())
+        ) {
+            try {
+                await updateCheckList({
+                    boardCardId: cardId,
+                    checkListValue: data
+                } as UpdateCheckListRequest).unwrap()
+
+                await reFetch()
+            } catch (err) {
+                console.log(err)
+            }
+        }
+        onClose()
+    }
 
     const ChecklistItem: React.FC<ItemProps> = ({ item }) => {
         return (
@@ -95,32 +113,9 @@ const CheckListDialog: React.FC<CheckListDialogProps> = ({ id, open, anchorEl, o
                         }}
                         icon={<DeleteIcon />}
                         checkedIcon={<DeleteIcon />}
-                        onClick={() => {}
-                            // templateItem.usedIn === 0
-                            //     ? (async () => {
-                            //         switch (actionsShow) {
-                            //             case 'edit':
-                            //                 setCurrentMenu('edit')
-                            //                 break
-                            //             case 'delete':
-                            //                 try {
-                            //                     await deleteField(
-                            //                         { id: item.id, templateId: templateItem?.id }
-                            //                     ).unwrap()
-                            //                     await fetchData()
-                            //                 } catch (error) {
-                            //                     toast.error('Delete label failed', {
-                            //                         position: 'bottom-right'
-                            //                     })
-                            //                 }
-                            //                 break
-                            //             default:
-                            //                 break
-                            //         }
-                            //         setSelectedField(item)
-                            //     })()
-                            //     : null
-                        }
+                        onClick={() => {
+                            setData(data.filter((i: any) => i.id !== item.id))
+                        }}
                     />
                 </Box>
             </Box>
@@ -132,7 +127,7 @@ const CheckListDialog: React.FC<CheckListDialogProps> = ({ id, open, anchorEl, o
             id={id}
             open={open}
             anchorEl={anchorEl}
-            onClose={onClose}
+            onClose={handleClose}
             anchorOrigin={{
                 vertical: 'bottom',
                 horizontal: 'right'
@@ -146,7 +141,8 @@ const CheckListDialog: React.FC<CheckListDialogProps> = ({ id, open, anchorEl, o
                     style: {
                         width: '320px',
                         borderRadius: '8px',
-                        boxShadow: '0'
+                        boxShadow: '0',
+                        marginTop: '6px'
                     }
                 }
             }}
@@ -218,6 +214,7 @@ const CheckListDialog: React.FC<CheckListDialogProps> = ({ id, open, anchorEl, o
                                 setItemName(value)
                             }
                         }}
+                        value={itemName}
                         error={clickedAddOptions && !itemName}
                     />
                     <Button
@@ -231,7 +228,9 @@ const CheckListDialog: React.FC<CheckListDialogProps> = ({ id, open, anchorEl, o
                         onClick={() => {
                             setClickedAddOptions(true)
                             if (isBlank(itemName)) return
-                            setData([...data, { id: '4', title: itemName, checked: false }])
+                            setData([...data, { id: `${data.length + 1}`, title: itemName, checked: false }])
+                            setItemName('')
+                            setClickedAddOptions(false)
                         }}
                     >Add</Button>
                 </Box>

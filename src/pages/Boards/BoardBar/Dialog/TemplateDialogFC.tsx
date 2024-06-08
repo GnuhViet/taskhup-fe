@@ -232,7 +232,7 @@ const TemplateDialogFC: React.FC<CardDialogProps> = ({ open, handleClose }) => {
 
     return (
         <Dialog
-            // fullWidth={true}
+            fullWidth={true}
             maxWidth='md'
             style={{ zIndex: 99 }}
             open={open}

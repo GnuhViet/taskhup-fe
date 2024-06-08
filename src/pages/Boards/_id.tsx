@@ -8,8 +8,8 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { handleSocketEvent } from '~/core/services/board-services'
 import { useSubscription } from 'react-stomp-hooks'
-import CardDialogFC from './BoardContent/ListColumns/Column/ListCards/Card/CardDetailModal/CardDialogFC'
 import { setDisableDrag, setOpenCardDialog } from '~/core/redux/slices/boardSlice'
+import CardDialogFC from './CardDetailModal/CardDialogFC'
 
 const BoardComponent: React.FC = () => {
 

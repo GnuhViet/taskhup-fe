@@ -9,6 +9,8 @@ import FormControl from '@mui/material/FormControl'
 import RadioGroup from '@mui/material/RadioGroup'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Radio from '@mui/material/Radio'
+import { useSelectTemplateMutation } from '~/core/redux/api/board-card.api'
+import { toast } from 'react-toastify'
 
 
 export interface TemplateDialogProps {
@@ -17,6 +19,8 @@ export interface TemplateDialogProps {
     anchorEl: HTMLElement | null
     onClose: () => void
     cardId: string
+    defaultTemplateId: string
+    reFetch: () => void
 }
 
 const borderBottom = {
@@ -28,11 +32,12 @@ const titleSx = {
     fontWeight: '500',
     maxWidth: '150px'
 }
+
 export interface MemberItemmProps {
     item: any
 }
 
-const TemplateDialog: React.FC<TemplateDialogProps> = ({ id, open, anchorEl, onClose, cardId }) => {
+const TemplateDialog: React.FC<TemplateDialogProps> = ({ id, open, anchorEl, onClose, cardId, defaultTemplateId, reFetch }) => {
     const templateList = useSelector((state: any) => state.boardReducer.boardTemplate)
     const [fillterName, setFillterName] = React.useState('')
 
@@ -71,12 +76,39 @@ const TemplateDialog: React.FC<TemplateDialogProps> = ({ id, open, anchorEl, onC
         )
     }
 
+    const [selectedTemplate, setSelectedTemplate] = React.useState(defaultTemplateId)
+
+    React.useEffect(() => {
+        setSelectedTemplate(defaultTemplateId)
+    }, [defaultTemplateId])
+
+    const [selectTemplate, { isLoading }] = useSelectTemplateMutation()
+
+    const handleClose = async () => {
+        if (selectedTemplate && selectedTemplate !== defaultTemplateId) {
+            try {
+                await selectTemplate({
+                    templateId: selectedTemplate,
+                    boardCardId: cardId
+                })
+                await reFetch()
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        onClose()
+    }
+
+    if (isLoading) {
+        return <div>Loading...</div>
+    }
+
     return (
         <Popover
             id={id}
             open={open}
             anchorEl={anchorEl}
-            onClose={onClose}
+            onClose={handleClose}
             anchorOrigin={{
                 vertical: 'bottom',
                 horizontal: 'right'
@@ -90,7 +122,8 @@ const TemplateDialog: React.FC<TemplateDialogProps> = ({ id, open, anchorEl, onC
                     style: {
                         width: '320px',
                         borderRadius: '8px',
-                        boxShadow: '0'
+                        boxShadow: '0',
+                        marginTop: '6px'
                     }
                 }
             }}
@@ -137,8 +170,10 @@ const TemplateDialog: React.FC<TemplateDialogProps> = ({ id, open, anchorEl, onC
                         <RadioGroup
                             aria-labelledby="demo-controlled-radio-buttons-group"
                             name="controlled-radio-buttons-group"
-                        // value={value}
-                        // onChange={handleChange}
+                            value={selectedTemplate}
+                            onChange={(e) => {
+                                setSelectedTemplate(e.target.value)
+                            }}
                         >
                             {templateList.map((item: any) => {
                                 return (
