@@ -11,7 +11,8 @@ import {
     BoardCardCreateResp,
     BoardCardMoveReq,
     BoardColumnCreateResp,
-    BoardColumnMoveReq
+    BoardColumnMoveReq,
+    OpenCardDetailRequest
 } from '~/core/services/board-services.model'
 import { mapObject } from '~/core/utils/mapper'
 import { boardTemplateApi } from '../api/board-template.api'
@@ -20,6 +21,8 @@ export interface BoardState {
     board: Board
     boardId: string
     disableDrag: boolean
+    openCardDetail: boolean
+    openCardDetailId: string
     boardTemplate: any
 }
 
@@ -27,6 +30,8 @@ const initialState: BoardState = {
     board: {} as Board,
     boardId: null,
     disableDrag: false,
+    openCardDetail: false,
+    openCardDetailId: null,
     boardTemplate: null
 }
 
@@ -111,6 +116,10 @@ export const boardSlice = createSlice({
         setDisableDrag: (state, action: PayloadAction<boolean>) => {
             state.disableDrag = action.payload
         },
+        setOpenCardDialog: (state, action: PayloadAction<OpenCardDetailRequest>) => {
+            state.openCardDetail = action.payload.open
+            state.openCardDetailId = action.payload.cardId
+        }
     },
     extraReducers: (builder) => {
         builder.addMatcher(boardApi.endpoints.getBoardByCode.matchFulfilled, (state, action) => {
@@ -153,7 +162,8 @@ export const {
     updateCardOrderResponse,
     messageReceived,
     setDisableDrag,
-    websocketReady
+    websocketReady,
+    setOpenCardDialog
 } = boardSlice.actions
 
 export default boardSlice.reducer

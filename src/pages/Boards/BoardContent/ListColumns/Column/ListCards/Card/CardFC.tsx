@@ -9,22 +9,22 @@ import CommentIcon from '@mui/icons-material/Comment'
 import AttachmentIcon from '@mui/icons-material/Attachment'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import SimpleModal from './CardDetailModal/CardDialogFC'
+// import SimpleModal from './CardDetailModal/CardDialogFC'
 
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Card } from '~/core/model/card.model'
 import { useDispatch } from 'react-redux'
-import { setDisableDrag } from '~/core/redux/slices/boardSlice'
+import { setDisableDrag, setOpenCardDialog } from '~/core/redux/slices/boardSlice'
+import Box from '@mui/material/Box'
+import CardDialogFC from './CardDetailModal/CardDialogFC'
 
 interface CardFCProps {
     card: Card
-    modalRender: any
 }
 
-const CardFC: React.FC<CardFCProps> = ({ card, modalRender }) => {
+const CardFC: React.FC<CardFCProps> = ({ card }) => {
     //<editor-fold desc="Hook & State">
-    const [open, setOpen] = React.useState(false)
     const dispatch = useDispatch()
 
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -43,24 +43,20 @@ const CardFC: React.FC<CardFCProps> = ({ card, modalRender }) => {
     }
     //</editor-fold>
 
-    const handleClose = () => {
-        setOpen(false)
-        dispatch(setDisableDrag(false))
+    const handleClickOpen = async () => {
+        await dispatch(setOpenCardDialog({
+            open: true,
+            cardId: card.id
+        }))
+        await dispatch(setDisableDrag(true))
     }
-
-    const handleClickOpen = () => {
-        setOpen(true)
-        dispatch(setDisableDrag(true))
-        return <SimpleModal open={open} handleClose={handleClose} card={card} />
-    }
-
 
     const shouldShowCardActions = () => {
         return !!card?.memberIds?.length || !!card?.comments?.length || !!card?.attachments?.length
     }
 
     return (
-        <>
+        <Box>
             <MuiCard
                 ref={setNodeRef} style={dndKitCardStyles} {...attributes} {...listeners}
                 sx={{
@@ -80,21 +76,20 @@ const CardFC: React.FC<CardFCProps> = ({ card, modalRender }) => {
                     <Typography>{card?.title}</Typography>
                 </CardContent>
                 {shouldShowCardActions() &&
-        <CardActions sx={{ p: '0 4px 8px 4px' }}>
-            {!!card?.memberIds?.length &&
-            <Button size="small" startIcon={<GroupIcon />}>{card?.memberIds?.length}</Button>
-            }
-            {!!card?.comments?.length &&
-            <Button size="small" startIcon={<CommentIcon />}>{card?.comments?.length}</Button>
-            }
-            {!!card?.attachments?.length &&
-            <Button size="small" startIcon={<AttachmentIcon />}>{card?.attachments?.length}</Button>
-            }
-        </CardActions>
+                    <CardActions sx={{ p: '0 4px 8px 4px' }}>
+                        {!!card?.memberIds?.length &&
+                            <Button size="small" startIcon={<GroupIcon />}>{card?.memberIds?.length}</Button>
+                        }
+                        {!!card?.comments?.length &&
+                            <Button size="small" startIcon={<CommentIcon />}>{card?.comments?.length}</Button>
+                        }
+                        {!!card?.attachments?.length &&
+                            <Button size="small" startIcon={<AttachmentIcon />}>{card?.attachments?.length}</Button>
+                        }
+                    </CardActions>
                 }
             </MuiCard>
-            {modalRender?.({ open, handleClose, card })}
-        </>
+        </Box>
     )
 }
 

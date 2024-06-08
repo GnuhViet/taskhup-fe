@@ -6,6 +6,7 @@ const TinyMce = () => {
         <Editor
             apiKey='dbg7svsu8ovrt7sgcc1su1vw1rdya8ygm0ll3im2av4185gi'
             init={{
+                auto_focus: true,
                 height: '260px',
                 menubar: false,
                 plugins: 'lists advlist table link',

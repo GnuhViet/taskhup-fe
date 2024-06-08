@@ -2,6 +2,8 @@ import Box from '@mui/material/Box'
 import Color, { Palette } from 'color-thief-react'
 import React from 'react'
 import ApiLoadingOverlay from './ApiLoadingOverlay'
+import Modal from '@mui/material/Modal'
+import Button from '@mui/material/Button'
 
 export interface ObjectFitAvatarProps {
     src: string
@@ -54,6 +56,10 @@ function lightenHexColor(hex: string, lightenFactor) {
 }
 
 const ObjectFitAvatar: React.FC<ObjectFitAvatarProps> = ({ src, alt, sx }) => {
+    const [open, setOpen] = React.useState(false)
+    const handleOpen = () => setOpen(true)
+    const handleClose = () => setOpen(false)
+
     if (src === null) {
         const firstChar = alt.charAt(0)
         return (
@@ -64,16 +70,55 @@ const ObjectFitAvatar: React.FC<ObjectFitAvatarProps> = ({ src, alt, sx }) => {
     }
 
     return (
-        <Palette src={src} crossOrigin="anonymous" format="hex" colorCount={10}>
-            {({ data, loading }) => {
-                if (loading) return <ApiLoadingOverlay />
-                return (
-                    <Box sx={{ ...sx, boxSx, backgroundColor: lightenHexColor(data[data.length - 1], 0.5) }}>
-                        <img src={src} alt={alt} style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '4px' }} />
+        <Box>
+            <Box onClick={handleOpen} sx={{ cursor: 'pointer' }}>
+                <Palette src={src} crossOrigin="anonymous" format="hex" colorCount={10}>
+                    {({ data, loading }) => {
+                        if (loading) return <ApiLoadingOverlay />
+                        return (
+                            <Box sx={{ ...sx, boxSx, backgroundColor: lightenHexColor(data[data.length - 1], 0.5) }}>
+                                <img
+                                    src={src}
+                                    alt={alt}
+                                    style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '4px' }}
+                                />
+                            </Box>
+                        )
+                    }}
+                </Palette >
+            </Box>
+            <Box>
+                <Modal
+                    open={open}
+                    onClose={handleClose}
+                    sx={{
+                        zIndex: '999',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: 'fit-content',
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}
+                        onClick={handleClose}
+                    >
+                        <img
+                            src={src}
+                            alt={alt}
+                            style={{ maxWidth: '90%', maxHeight: '90%', objectFit: 'contain' }}
+                            onClick={null}
+                        />
                     </Box>
-                )
-            }}
-        </Palette >
+                </Modal>
+            </Box>
+        </Box>
+
     )
 }
 

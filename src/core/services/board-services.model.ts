@@ -101,3 +101,8 @@ export class CardTemplateCreateFieldReq {
     option: OptionItem[]
     templateId: string
 }
+
+export class OpenCardDetailRequest {
+    open: boolean
+    cardId: string
+}

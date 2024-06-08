@@ -2,7 +2,6 @@ import React from 'react'
 import Box from '@mui/material/Box'
 import CardFC from './Card/CardFC'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import CardDialog from './Card/CardDetailModal/CardDialogFC'
 import { Card } from '~/core/model/card.model'
 
 interface ListCardsFCProps {
@@ -29,7 +28,12 @@ const ListCardsFC: React.FC<ListCardsFCProps> = ({ cards }) => {
                 '&::-webkit-scrollbar-thumb': { backgroundColor: '#ced0da' },
                 '&::-webkit-scrollbar-thumb:hover': { backgroundColor: '#bfc2cf' }
             }}>
-                {cards?.map(card => <CardFC key={card.id} card={card} modalRender={(props: any) => {return <CardDialog {...props}/> }}/>)}
+                {cards?.map(card =>
+                    <CardFC
+                        key={card.id}
+                        card={card}
+                    />)
+                }
             </Box>
         </SortableContext>
     )

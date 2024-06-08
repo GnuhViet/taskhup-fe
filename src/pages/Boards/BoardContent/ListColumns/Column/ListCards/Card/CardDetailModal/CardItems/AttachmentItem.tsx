@@ -3,7 +3,6 @@ import Box from '@mui/material/Box'
 import Tooltip from '@mui/material/Tooltip'
 import CallMadeOutlinedIcon from '@mui/icons-material/CallMadeOutlined'
 import ObjectFitAvatar from '~/components/Common/ObjectFitAvatar'
-import TextBoxToolTip from '~/components/Common/TextBoxToolTip'
 import SingleLineTextBoxToolTip from '~/components/Common/SingleLineTextBoxToolTip'
 
 const mediumTextSx = {
@@ -28,11 +27,7 @@ const textButtonSx = {
     textDecoration: 'underline'
 }
 
-function getRandomString(length) {
-    return Math.random().toString(36).substring(2, 2 + length);
-}
-
-const AttachmentItem = () => {
+const AttachmentItem: React.FC = () => {
     return (
         <Box sx={{
             display: 'flex',
@@ -64,6 +59,7 @@ const AttachmentItem = () => {
                         <Tooltip title="Open in new tab" arrow>
                             <CallMadeOutlinedIcon
                                 sx={{ fontSize: '15px', color: '#162B4D', cursor: 'pointer' }}
+                                onClick={() => window.open('https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D')}
                             />
                         </Tooltip>
                     </Box>

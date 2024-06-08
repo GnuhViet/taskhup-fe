@@ -90,6 +90,7 @@ export const {
     useCreateWorkspaceMutation,
     useGetUserWorkSpaceQuery,
     useGetWorkspaceMemberQuery,
+    useLazyGetWorkspaceMemberQuery,
     useGetWorkspaceJoinRequestQuery,
     useAcceptWorkspaceMemberMutation,
     useDenyWorkspaceMemberMutation,

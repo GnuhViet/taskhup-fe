@@ -18,7 +18,6 @@ import EditOffOutlinedIcon from '@mui/icons-material/EditOffOutlined'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useCreateLabelMutation, useDeleteLabelMutation, useGetLabelsQuery, useLazyGetLabelsQuery, useUpdateLabelMutation } from '~/core/redux/api/board-template.api'
 import { ApiResponse } from '~/core/services/api.model'
-import { set } from 'lodash'
 import { toast } from 'react-toastify'
 import ApiLoadingOverlay from '~/components/Common/ApiLoadingOverlay'
 
