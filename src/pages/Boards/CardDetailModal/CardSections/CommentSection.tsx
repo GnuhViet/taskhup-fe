@@ -9,6 +9,7 @@ import TinyMceWrap from '~/components/Common/TinyMceWrap'
 import CommentItem from '../CardItems/CommentItem'
 import { useCreateCommentMutation } from '~/core/redux/api/board-card.api'
 import { create } from 'lodash'
+import { CreateCommentReq } from '~/core/services/board-card-services.model'
 
 const titleTextSx = {
     color: '#172b4d',
@@ -32,6 +33,33 @@ export interface SectionProps {
     reFetch: () => void
 }
 
+function generateCommentString(comments: any[]) {
+    if (!comments) return null
+    // Tạo một map để lưu trữ các id duy nhất
+    const uniqueComments = new Map()
+
+    comments.forEach(comment => {
+        // Nếu id chưa có trong map thì thêm vào
+        if (!uniqueComments.has(comment.createBy)) {
+            uniqueComments.set(comment.createBy, comment.fullName)
+        }
+    })
+
+    // Lấy danh sách các fullName duy nhất
+    const uniqueNames = Array.from(uniqueComments.values())
+
+    // Xử lý các trường hợp đặc biệt
+    if (uniqueNames.length === 0) return ''
+    if (uniqueNames.length === 1) return uniqueNames[0]
+    if (uniqueNames.length === 2) return `${uniqueNames[0]}, ${uniqueNames[1]}`
+
+    const n = uniqueNames.length
+    const moreText = n > 2 ? `...(+${n - 2} more)` : ''
+    const result = `${uniqueNames.slice(0, 2).join(', ')}${moreText}`
+
+    return result
+}
+
 const CommentSection: React.FC<SectionProps> = (
     {
         isShowComment,
@@ -52,7 +80,7 @@ const CommentSection: React.FC<SectionProps> = (
             await createComment({
                 boardCardId: cardId,
                 content: value
-            }).unwrap()
+            } as CreateCommentReq).unwrap()
 
             await reFetch()
         } catch (error) {
@@ -65,6 +93,17 @@ const CommentSection: React.FC<SectionProps> = (
     useEffect(() => {
         setValue('')
     }, [isShowComment])
+
+    const [commentData, setCommentData] = React.useState<any[]>(comments)
+
+    const handleItemRefect = async () => {
+        setCommentData(null)
+        await reFetch()
+    }
+
+    useEffect(() => {
+        setCommentData(comments)
+    }, [comments])
 
     return (
         <Box>
@@ -92,14 +131,17 @@ const CommentSection: React.FC<SectionProps> = (
                             }
                         </IconButton>
                     </Box>
-                    <Box sx={{
-                        ml: '40px',
-                        mt: '4px',
-                        display: isShowComment ? 'none' : 'block',
-                        ...labelTextSx
-                    }}>
-                        4 comment from Việt Hưng Nguyễn, Tran Van A,... (2+ more)
-                    </Box>
+                    {commentData &&
+                        <Box sx={{
+                            ml: '40px',
+                            mt: '4px',
+                            display: isShowComment ? 'none' : 'block',
+                            ...labelTextSx
+                        }}>
+                            {commentData?.length} comment from {generateCommentString(commentData)}
+                        </Box>
+                    }
+
                 </Box>
             </Box>
             <Box sx={{ display: 'flex', mb: '16px' }}>
@@ -130,13 +172,13 @@ const CommentSection: React.FC<SectionProps> = (
             <Box sx={{
                 display: isShowComment ? 'block' : 'none'
             }}>
-                {comments &&
-                    comments.map((comment, index) => (
+                {commentData &&
+                    commentData.map((comment, index) => (
                         <CommentItem
                             key={index}
                             commentItem={comment}
                             cardId={cardId}
-                            reFetch={reFetch}
+                            reFetch={handleItemRefect}
                         />
                     ))
                 }

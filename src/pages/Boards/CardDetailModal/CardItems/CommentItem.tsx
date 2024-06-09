@@ -10,8 +10,8 @@ import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import { Tooltip } from '@mui/material'
 import TinyMceWrap from '~/components/Common/TinyMceWrap'
 import CommentAttachment from './CommentAttachment'
-import { UploadAttachmentReq } from '~/core/services/board-card-services.model'
-import { useUploadAttachmentMutation } from '~/core/redux/api/board-card.api'
+import { EditCommentContentReq, UploadAttachmentReq } from '~/core/services/board-card-services.model'
+import { useDeleteCardCommentMutation, useEditCommentContentMutation, useUploadAttachmentMutation } from '~/core/redux/api/board-card.api'
 import { toast } from 'react-toastify'
 
 const mediumTextSx = {
@@ -49,12 +49,35 @@ export interface CommentItemProps {
 }
 
 const CommentItem: React.FC<CommentItemProps> = ({ commentItem, cardId, reFetch }) => {
-    const [uploadAttachment, { isLoading }] = useUploadAttachmentMutation()
+    const [uploadAttachment, { isLoading: isLoadingUploadAttach }] = useUploadAttachmentMutation()
+    const [editCommentContent, { isLoading: isLoadEditContent }] = useEditCommentContentMutation()
+    const [deleteComment, { isLoading: isLoadDeleteComment }] = useDeleteCardCommentMutation()
 
     const [isEditing, setIsEditing] = React.useState(false)
+    const [isEditAttachMent, setIsEditAttachMent] = React.useState(false)
+    const [isLoadingDeleteAttach, setIsLoadingDeleteAttach] = React.useState(false)
 
-    const handleEdit = (value: string) => {
-        console.log('Edit comment', value)
+    const handleEdit = async (value: string) => {
+        if (!value || value === commentItem.content) return
+
+        try {
+            await editCommentContent({
+                content: value,
+                id: commentItem.id
+            } as EditCommentContentReq)
+            await reFetch()
+        } catch (error) {
+            console.error('Error editing comment:', error)
+        }
+    }
+
+    const handleDeleteComment = async () => {
+        try {
+            await deleteComment({ id: commentItem.id })
+            await reFetch()
+        } catch (error) {
+            console.error('Error deleting comment:', error)
+        }
     }
 
     const fileInputRef = React.useRef(null)
@@ -62,7 +85,6 @@ const CommentItem: React.FC<CommentItemProps> = ({ commentItem, cardId, reFetch 
     const handleButtonClick = () => {
         fileInputRef.current.click()
     }
-
     const handleFileChange = async (event: any) => {
         const file = event.target.files[0]
         try {
@@ -101,6 +123,13 @@ const CommentItem: React.FC<CommentItemProps> = ({ commentItem, cardId, reFetch 
         return () => clearInterval(timer)
     }, [])
 
+    const [editorValue, setEditorValue] = useState(commentItem.content)
+
+    // useEffect(() => {
+    //     setEditorValue(commentItem.content)
+    // }, [isEditing])
+
+    const isApiLoading = isLoadingUploadAttach || isLoadEditContent || isLoadDeleteComment || isLoadingDeleteAttach
 
     return (
         <Box sx={{ display: 'flex', mb: '16px' }}>
@@ -129,7 +158,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ commentItem, cardId, reFetch 
                     setIsFocus={setIsEditing}
                     placeholder="Add a more detailed description..."
                     placeHolderSx={{ minHeight: '24px' }}
-                    value={commentItem.content}
+                    value={editorValue}
                     handleSave={handleEdit}
                     preventClick={true}
                 />
@@ -137,7 +166,6 @@ const CommentItem: React.FC<CommentItemProps> = ({ commentItem, cardId, reFetch 
                     ref={fileInputRef}
                     type="file"
                     style={{ display: 'none' }}
-                    accept="image/*"
                     onChange={handleFileChange}
                 />
                 {commentItem.editable &&
@@ -146,17 +174,17 @@ const CommentItem: React.FC<CommentItemProps> = ({ commentItem, cardId, reFetch 
                         <Box
                             sx={{
                                 ...smallTextSx,
-                                cursor: isLoading ? 'normal' : 'pointer',
-                                textDecoration: isLoading ? 'none' :'underline'
+                                cursor: isApiLoading ? 'normal' : 'pointer',
+                                textDecoration: isApiLoading ? 'none' : 'underline'
                             }}
                             onClick={handleButtonClick}
                         >
-                            {isLoading
-                                ? `Uploading${'.'.repeat(dots)}`
+                            {isApiLoading
+                                ? `Processing${'.'.repeat(dots)}`
                                 : <AttachmentOutlinedIcon sx={{ fontSize: '16px' }} />
                             }
                         </Box>
-                        <Box sx={{ display: isLoading ? 'none' : 'flex' }}>
+                        <Box sx={{ display: isApiLoading ? 'none' : 'flex' }}>
                             <Box sx={{ ...dotSx }}>&nbsp;•&nbsp;</Box>
                             <Box
                                 sx={{ ...smallTextSx, ...textButtonSx }}
@@ -165,22 +193,33 @@ const CommentItem: React.FC<CommentItemProps> = ({ commentItem, cardId, reFetch 
                                 Edit
                             </Box>
                             <Box sx={{ ...dotSx }}>&nbsp;•&nbsp;</Box>
-                            <Box sx={{ ...smallTextSx, ...textButtonSx }}>
-                                Delete
+                            <Box
+                                sx={{ ...smallTextSx, ...textButtonSx }}
+                                onClick={handleDeleteComment}
+                            >
+                                Delete comment
+                            </Box>
+                            <Box sx={{ ...dotSx }}>&nbsp;•&nbsp;</Box>
+                            <Box
+                                sx={{ ...smallTextSx, ...textButtonSx }}
+                                onClick={() => setIsEditAttachMent(!isEditAttachMent)}
+                            >
+                                {isEditAttachMent ? 'Cancel delete attachment' : 'Delete attachment'}
                             </Box>
                         </Box>
                     </Box>
                 }
                 <Box sx={{
                     display: 'flex',
-                    mt: isEditing ? '16px' : '0'
+                    mt: '6px'
                 }}>
                     {commentItem.attachments &&
                         commentItem.attachments.map((attachment: any, index: number) => (
                             <CommentAttachment
                                 key={index}
-                                isEditing={isEditing}
+                                isEditing={isEditAttachMent}
                                 attachment={attachment}
+                                setIsLoadingDeleteAttach={setIsLoadingDeleteAttach}
                                 reFetch={reFetch}
                             />
                         ))

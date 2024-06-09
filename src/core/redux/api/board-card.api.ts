@@ -1,5 +1,5 @@
 import { apiSlice } from '~/core/redux/api/base.api'
-import { DeleteAttachmentReq, SelectFieldRequest, SelectLabelRequest, SelectTemplateRequest, UpdateCardCoverReq, UpdateCardDateReq, UpdateCardTitleRequest, UpdateCheckListRequest, UpdateCheckListValueReq, UpdateDescriptionReq, UpdateFieldValueRequest, UpdateWatchCardReq, UpdateWorkingStatusReq, UploadAttachmentReq } from '~/core/services/board-card-services.model'
+import { CreateCommentReq, DeleteAttachmentReq, DeleteCommentReq, EditCommentContentReq, SelectFieldRequest, SelectLabelRequest, SelectTemplateRequest, UpdateCardCoverReq, UpdateCardDateReq, UpdateCardTitleRequest, UpdateCheckListRequest, UpdateCheckListValueReq, UpdateDescriptionReq, UpdateFieldValueRequest, UpdateWatchCardReq, UpdateWorkingStatusReq, UploadAttachmentReq } from '~/core/services/board-card-services.model'
 
 const API_URL = '/api/v1/board-card'
 
@@ -134,8 +134,22 @@ export const boardCardApi = apiSlice.injectEndpoints({
             })
         }),
         createComment: builder.mutation({
-            query: (data: UpdateDescriptionReq) => ({
+            query: (data: CreateCommentReq) => ({
                 url: `${API_URL}/create-comment`,
+                method: 'POST',
+                body: data
+            })
+        }),
+        editCommentContent: builder.mutation({
+            query: (data: EditCommentContentReq) => ({
+                url: `${API_URL}/edit-comment-content`,
+                method: 'POST',
+                body: data
+            })
+        }),
+        deleteCardComment: builder.mutation({
+            query: (data: DeleteCommentReq) => ({
+                url: `${API_URL}/delete-comment`,
                 method: 'POST',
                 body: data
             })
@@ -160,5 +174,7 @@ export const {
     useUpdateCardTitleMutation,
     useUploadAttachmentMutation,
     useDeleteAttachmentMutation,
-    useCreateCommentMutation
+    useCreateCommentMutation,
+    useEditCommentContentMutation,
+    useDeleteCardCommentMutation
 } = boardCardApi

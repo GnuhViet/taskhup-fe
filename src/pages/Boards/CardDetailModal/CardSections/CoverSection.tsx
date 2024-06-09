@@ -21,6 +21,7 @@ const CoverSection: React.FC<SectionProps> = ({ coverUrl }) => {
                     height: '200px',
                     borderRadius: '3px'
                 }}
+                disableHoverShadown={true}
             />
         </Box>
     )

@@ -3,15 +3,20 @@ import Box from '@mui/material/Box'
 import PlayCircleFilledWhiteOutlinedIcon from '@mui/icons-material/PlayCircleFilledWhiteOutlined';
 import Modal from '@mui/material/Modal'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
+import { set } from 'lodash';
 
 export interface VideoThumnailProps {
     src: string
+    disableHover?: boolean
 }
 
-const VideoThumnail: React.FC<VideoThumnailProps> = ({ src }) => {
+const VideoThumnail: React.FC<VideoThumnailProps> = ({ src, disableHover }) => {
     const videoRef = useRef(null)
     const [open, setOpen] = React.useState(false)
-    const handleOpen = () => setOpen(true)
+    const handleOpen = () => {
+        if (disableHover) return
+        setOpen(true)
+    }
     const handleClose = () => setOpen(false)
 
     return (
@@ -26,18 +31,22 @@ const VideoThumnail: React.FC<VideoThumnailProps> = ({ src }) => {
                     boxShadow: 'inset 0 0 0 1000px rgba(0, 0, 0, 0.2)',
                     cursor: 'pointer',
                     fontSize: '34px',
-                    '&:hover': {
-                        boxShadow: 'inset 0 0 0 1000px rgba(0, 0, 0, 0.6)',
-                        fontSize: '54px',
-                        '& svg': { // Target the SVG inside the Box (the PlayCircleFilledWhiteOutlinedIcon)
-                            transform: 'translate(-50%, -50%) scale(1.5)'
+                    '&:hover': disableHover
+                        ? {}
+                        :
+                        {
+                            boxShadow: 'inset 0 0 0 1000px rgba(0, 0, 0, 0.6)',
+                            fontSize: '54px',
+                            '& svg': { // Target the SVG inside the Box (the PlayCircleFilledWhiteOutlinedIcon)
+                                transform: 'translate(-50%, -50%) scale(1.5)'
+                            }
                         }
-                    }
                 }}
                 onClick={handleOpen}
             >
                 <PlayCircleFilledWhiteOutlinedIcon
                     sx={{
+                        display: disableHover ? 'none' : 'block',
                         fontSize: '38px',
                         position: 'absolute',
                         top: '50%',
@@ -91,7 +100,7 @@ const VideoThumnail: React.FC<VideoThumnailProps> = ({ src }) => {
                                 ref={videoRef}
                                 src={src}
                                 controls
-                                style={{ minHeight: '700px', minWidth: 'auto' }}
+                                style={{ width: '70vw', height: 'auto'}}
                             ></video>
                         </Box>
                     </Box>

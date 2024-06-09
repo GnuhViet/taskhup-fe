@@ -3,13 +3,13 @@ import Color, { Palette } from 'color-thief-react'
 import React from 'react'
 import ApiLoadingOverlay from './ApiLoadingOverlay'
 import Modal from '@mui/material/Modal'
-import Button from '@mui/material/Button'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 
 export interface ObjectFitAvatarProps {
     src: string
     alt: string
     sx?: any
+    disableHoverShadown?: boolean
 }
 
 const boxSx = {
@@ -56,7 +56,7 @@ function lightenHexColor(hex: string, lightenFactor) {
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`
 }
 
-const ObjectFitAvatar: React.FC<ObjectFitAvatarProps> = ({ src, alt, sx }) => {
+const ObjectFitAvatar: React.FC<ObjectFitAvatarProps> = ({ src, alt, sx, disableHoverShadown }) => {
     const [open, setOpen] = React.useState(false)
     const handleOpen = () => setOpen(true)
     const handleClose = () => setOpen(false)
@@ -80,7 +80,7 @@ const ObjectFitAvatar: React.FC<ObjectFitAvatarProps> = ({ src, alt, sx }) => {
                     justifyItems: 'center',
                     textAlign: 'center',
                     // backgroundColor: '#E2E4EA',
-                    boxShadow: 'inset 0 0 0 1000px rgba(0, 0, 0, 0.1)',
+                    // boxShadow: 'inset 0 0 0 1000px rgba(0, 0, 0, 0.9)',
                     ...sx
                 }}
             >
@@ -96,7 +96,21 @@ const ObjectFitAvatar: React.FC<ObjectFitAvatarProps> = ({ src, alt, sx }) => {
                     {({ data, loading }) => {
                         if (loading) return <LoadingOverlay />
                         return (
-                            <Box sx={{ ...sx, boxSx, backgroundColor: lightenHexColor(data[data.length - 1], 0.5) }}>
+                            <Box sx={{
+                                ...sx,
+                                boxSx,
+                                backgroundColor: lightenHexColor(data[data.length - 1], 0.5),
+                                position: 'relative',
+                            }}>
+                                <Box sx={{
+                                    '&:hover': {
+                                        boxShadow: disableHoverShadown ? 'none' : 'inset 0 0 0 1000px rgba(0, 0, 0, 0.3)'
+                                    },
+                                    position: 'absolute',
+                                    width: '100%',
+                                    height: '100%'
+                                }}
+                                ></Box>
                                 <img
                                     src={src}
                                     alt={alt}

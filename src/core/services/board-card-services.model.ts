@@ -81,3 +81,12 @@ export class CreateCommentReq {
     content: string
     boardCardId: string
 }
+
+export class EditCommentContentReq {
+    id: string
+    content: string
+}
+
+export class DeleteCommentReq {
+    id: string
+}
