@@ -1,7 +1,13 @@
 import React from 'react'
 import { Editor } from '@tinymce/tinymce-react'
 
-const TinyMce = () => {
+export interface TinyMceProps {
+    value: string
+    setValue: (value: string) => void
+}
+
+const TinyMce: React.FC<TinyMceProps> = ({ value, setValue }) => {
+
     return (
         <Editor
             apiKey='dbg7svsu8ovrt7sgcc1su1vw1rdya8ygm0ll3im2av4185gi'
@@ -26,6 +32,8 @@ const TinyMce = () => {
                     })
                 }
             }}
+            value={value}
+            onEditorChange={(content) => setValue(content)}
         />
     )
 }

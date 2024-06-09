@@ -1,5 +1,5 @@
 import { apiSlice } from '~/core/redux/api/base.api'
-import { SelectFieldRequest, SelectLabelRequest, SelectTemplateRequest, UpdateCheckListRequest, UpdateCheckListValueReq, UpdateFieldValueRequest, UpdateWatchCardReq } from '~/core/services/board-card-services.model'
+import { DeleteAttachmentReq, SelectFieldRequest, SelectLabelRequest, SelectTemplateRequest, UpdateCardCoverReq, UpdateCardDateReq, UpdateCardTitleRequest, UpdateCheckListRequest, UpdateCheckListValueReq, UpdateDescriptionReq, UpdateFieldValueRequest, UpdateWatchCardReq, UpdateWorkingStatusReq, UploadAttachmentReq } from '~/core/services/board-card-services.model'
 
 const API_URL = '/api/v1/board-card'
 
@@ -69,6 +69,76 @@ export const boardCardApi = apiSlice.injectEndpoints({
                 method: 'POST',
                 body: data
             })
+        }),
+        updateCardCover: builder.mutation({
+            query: (data: UpdateCardCoverReq) => {
+                const formData = new FormData()
+                formData.append('file', data.file)
+                formData.append('boardCardId', data.boardCardId)
+
+                return {
+                    url: `${API_URL}/update-cover`,
+                    method: 'POST',
+                    body: formData
+                }
+            }
+        }),
+        updateCardDate: builder.mutation({
+            query: (data: UpdateCardDateReq) => ({
+                url: `${API_URL}/update-card-date`,
+                method: 'POST',
+                body: data
+            })
+        }),
+        updateWorkingStatus: builder.mutation({
+            query: (data: UpdateWorkingStatusReq) => ({
+                url: `${API_URL}/update-working-status`,
+                method: 'POST',
+                body: data
+            })
+        }),
+        updateDescription: builder.mutation({
+            query: (data: UpdateDescriptionReq) => ({
+                url: `${API_URL}/update-description`,
+                method: 'POST',
+                body: data
+            })
+        }),
+        updateCardTitle: builder.mutation({
+            query: (data: UpdateCardTitleRequest) => ({
+                url: `${API_URL}/update-title`,
+                method: 'POST',
+                body: data
+            })
+        }),
+        uploadAttachment: builder.mutation({
+            query: (data: UploadAttachmentReq) => {
+                const formData = new FormData()
+                formData.append('file', data.file)
+                formData.append('displayName', data.displayName)
+                formData.append('type', data.type)
+                formData.append('refId', data.refId)
+
+                return {
+                    url: `${API_URL}/upload-attachment`,
+                    method: 'POST',
+                    body: formData
+                }
+            }
+        }),
+        deleteAttachment: builder.mutation({
+            query: (data: DeleteAttachmentReq) => ({
+                url: `${API_URL}/delete-upload-attachment`,
+                method: 'POST',
+                body: data
+            })
+        }),
+        createComment: builder.mutation({
+            query: (data: UpdateDescriptionReq) => ({
+                url: `${API_URL}/create-comment`,
+                method: 'POST',
+                body: data
+            })
         })
     })
 })
@@ -82,5 +152,13 @@ export const {
     useUpdateMembersMutation,
     useUpdateWatchCardMutation,
     useUpdateCheckListMutation,
-    useUpdateCheckListValueMutation
+    useUpdateCheckListValueMutation,
+    useUpdateCardCoverMutation,
+    useUpdateCardDateMutation,
+    useUpdateWorkingStatusMutation,
+    useUpdateDescriptionMutation,
+    useUpdateCardTitleMutation,
+    useUploadAttachmentMutation,
+    useDeleteAttachmentMutation,
+    useCreateCommentMutation
 } = boardCardApi

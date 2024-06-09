@@ -4,6 +4,7 @@ import React from 'react'
 import ApiLoadingOverlay from './ApiLoadingOverlay'
 import Modal from '@mui/material/Modal'
 import Button from '@mui/material/Button'
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 
 export interface ObjectFitAvatarProps {
     src: string
@@ -69,12 +70,31 @@ const ObjectFitAvatar: React.FC<ObjectFitAvatarProps> = ({ src, alt, sx }) => {
         )
     }
 
+    const LoadingOverlay = () => {
+        return (
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    justifyItems: 'center',
+                    textAlign: 'center',
+                    // backgroundColor: '#E2E4EA',
+                    boxShadow: 'inset 0 0 0 1000px rgba(0, 0, 0, 0.1)',
+                    ...sx
+                }}
+            >
+                <ApiLoadingOverlay />
+            </Box>
+        )
+    }
+
     return (
         <Box>
             <Box onClick={handleOpen} sx={{ cursor: 'pointer' }}>
                 <Palette src={src} crossOrigin="anonymous" format="hex" colorCount={10}>
                     {({ data, loading }) => {
-                        if (loading) return <ApiLoadingOverlay />
+                        if (loading) return <LoadingOverlay />
                         return (
                             <Box sx={{ ...sx, boxSx, backgroundColor: lightenHexColor(data[data.length - 1], 0.5) }}>
                                 <img
@@ -98,22 +118,41 @@ const ObjectFitAvatar: React.FC<ObjectFitAvatarProps> = ({ src, alt, sx }) => {
                         justifyContent: 'center'
                     }}
                 >
-                    <Box
-                        sx={{
-                            width: 'fit-content',
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}
-                        onClick={handleClose}
-                    >
-                        <img
-                            src={src}
-                            alt={alt}
-                            style={{ maxWidth: '90%', maxHeight: '90%', objectFit: 'contain' }}
-                            onClick={null}
+                    <Box>
+                        <CloseOutlinedIcon
+                            sx={{
+                                fontSize: '30px',
+                                position: 'absolute',
+                                top: '10px',
+                                right: '40px',
+                                cursor: 'pointer',
+                                color: '#c7cbd6',
+                                transition: 'transform 0.3s ease-in-out',
+                                transformOrigin: 'center center', // Add this line
+                                '&:hover': {
+                                    transform: 'scale(1.6)',
+                                    color: '#fff'
+                                }
+                            }}
+                            onClick={handleClose}
                         />
+                        <Box
+                            sx={{
+                                width: 'fit-content',
+                                height: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                            onClick={handleClose}
+                        >
+                            <img
+                                src={src}
+                                alt={alt}
+                                style={{ maxWidth: '90%', maxHeight: '90%', objectFit: 'contain' }}
+                                onClick={null}
+                            />
+                        </Box>
                     </Box>
                 </Modal>
             </Box>

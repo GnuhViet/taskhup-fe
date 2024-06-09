@@ -10,6 +10,8 @@ import { handleSocketEvent } from '~/core/services/board-services'
 import { useSubscription } from 'react-stomp-hooks'
 import { setDisableDrag, setOpenCardDialog } from '~/core/redux/slices/boardSlice'
 import CardDialogFC from './CardDetailModal/CardDialogFC'
+import TinyMce from '~/components/Common/TinyMce'
+import Box from '@mui/material/Box'
 
 const BoardComponent: React.FC = () => {
 

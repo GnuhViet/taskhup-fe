@@ -1,10 +1,18 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import Box from '@mui/material/Box'
 import CircleAvatar from '~/components/Common/CircleAvatar'
 import { useSelector } from 'react-redux'
 import AttachmentOutlinedIcon from '@mui/icons-material/AttachmentOutlined'
 import ObjectFitAvatar from '~/components/Common/ObjectFitAvatar'
+import dayjs from 'dayjs'
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
+import { Tooltip } from '@mui/material'
+import TinyMceWrap from '~/components/Common/TinyMceWrap'
+import CommentAttachment from './CommentAttachment'
+import { UploadAttachmentReq } from '~/core/services/board-card-services.model'
+import { useUploadAttachmentMutation } from '~/core/redux/api/board-card.api'
+import { toast } from 'react-toastify'
 
 const mediumTextSx = {
     fontSize: '15px',
@@ -34,8 +42,66 @@ const textButtonSx = {
     textDecoration: 'underline'
 }
 
-const CommentItem: React.FC = () => {
-    const userInfo = useSelector((state: any) => state.homeReducer.userInfo)
+export interface CommentItemProps {
+    commentItem: any
+    cardId: string
+    reFetch: () => void
+}
+
+const CommentItem: React.FC<CommentItemProps> = ({ commentItem, cardId, reFetch }) => {
+    const [uploadAttachment, { isLoading }] = useUploadAttachmentMutation()
+
+    const [isEditing, setIsEditing] = React.useState(false)
+
+    const handleEdit = (value: string) => {
+        console.log('Edit comment', value)
+    }
+
+    const fileInputRef = React.useRef(null)
+
+    const handleButtonClick = () => {
+        fileInputRef.current.click()
+    }
+
+    const handleFileChange = async (event: any) => {
+        const file = event.target.files[0]
+        try {
+            if (!file) return
+
+            const request = {
+                file: file,
+                displayName: null,
+                type: 'COMMENT_ATTACH',
+                refId: commentItem.id
+            } as UploadAttachmentReq
+
+            await uploadAttachment(request).unwrap()
+            await reFetch()
+            toast.success('File uploaded successfully.', {
+                position: 'bottom-right'
+            })
+        } catch (error) {
+            toast.error(
+                'An error occurred while uploading the file. Please try again.',
+                {
+                    position: 'bottom-right'
+                }
+            )
+        }
+        event.target.value = ''
+    }
+
+    const [dots, setDots] = useState(1)
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setDots((prevDots) => (prevDots % 5) + 1)
+        }, 200)
+
+        return () => clearInterval(timer)
+    }, [])
+
+
     return (
         <Box sx={{ display: 'flex', mb: '16px' }}>
             <Box sx={{
@@ -43,8 +109,8 @@ const CommentItem: React.FC = () => {
                 mt: '4px'
             }}>
                 <CircleAvatar
-                    src={userInfo?.avatar}
-                    alt={userInfo?.fullName}
+                    src={commentItem?.avatarUrl}
+                    alt={commentItem?.fullName}
                     sx={{
                         width: '32px',
                         height: '32px'
@@ -53,76 +119,72 @@ const CommentItem: React.FC = () => {
             </Box>
             <Box sx={{ width: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: '4px' }}>
-                    <Box sx={{ ...mediumTextSx }}>Việt Hưng Nguyễn</Box>
-                    <Box sx={{ ...smallTextSx, ml: '8px', mt: '2px' }}>Added on 22/11/2023 at 15:20</Box>
-                </Box>
-                <Box
-                    sx={{
-                        backgroundColor: '#E2E4EA',
-                        borderRadius: '3px',
-                        border: '1px solid #dfe1e6',
-                        mb: '4px'
-                        // '&:hover': {
-                        //     backgroundColor: '#CFD3DB'
-                        // }
-                    }}
-                >
-                    <Box sx={{
-                        p: '8px 12px',
-                        ...labelTextSx,
-                        fontSize: '16px',
-                        fontWeight: '400'
-                    }}>
-                        {'content of comments'}
+                    <Box sx={{ ...mediumTextSx }}>{commentItem.fullName}</Box>
+                    <Box sx={{ ...smallTextSx, ml: '8px', mt: '2px' }}>
+                        Added on {dayjs(commentItem.createAt).format('DD/MM/YYYY [at] HH:mm')}
                     </Box>
                 </Box>
-                <Box sx={{ display: 'flex' }}>
-                    <Box sx={{ ...smallTextSx, ...textButtonSx }}>
-                        <AttachmentOutlinedIcon sx={{ fontSize: '16px' }} />
-                    </Box>
-                    <Box sx={{ ...dotSx }}>&nbsp;•&nbsp;</Box>
-                    <Box sx={{ ...smallTextSx, ...textButtonSx }}>
-                        Edit
-                    </Box>
-                    <Box sx={{ ...dotSx }}>&nbsp;•&nbsp;</Box>
-                    <Box sx={{ ...smallTextSx, ...textButtonSx }}>
-                        Delete
-                    </Box>
-                </Box>
-                <Box sx={{ display: 'flex' }}>
-                    <Box sx={{ mr: '12px' }}>
-                        <ObjectFitAvatar
-                            src={'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D'}
-                            alt={null}
+                <TinyMceWrap
+                    focus={isEditing}
+                    setIsFocus={setIsEditing}
+                    placeholder="Add a more detailed description..."
+                    placeHolderSx={{ minHeight: '24px' }}
+                    value={commentItem.content}
+                    handleSave={handleEdit}
+                    preventClick={true}
+                />
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    style={{ display: 'none' }}
+                    accept="image/*"
+                    onChange={handleFileChange}
+                />
+                {commentItem.editable &&
+                    isEditing === false &&
+                    <Box sx={{ display: 'flex', mt: '4px' }}>
+                        <Box
                             sx={{
-                                width: '112px',
-                                height: '80px',
-                                borderRadius: '3px'
+                                ...smallTextSx,
+                                cursor: isLoading ? 'normal' : 'pointer',
+                                textDecoration: isLoading ? 'none' :'underline'
                             }}
-                        />
+                            onClick={handleButtonClick}
+                        >
+                            {isLoading
+                                ? `Uploading${'.'.repeat(dots)}`
+                                : <AttachmentOutlinedIcon sx={{ fontSize: '16px' }} />
+                            }
+                        </Box>
+                        <Box sx={{ display: isLoading ? 'none' : 'flex' }}>
+                            <Box sx={{ ...dotSx }}>&nbsp;•&nbsp;</Box>
+                            <Box
+                                sx={{ ...smallTextSx, ...textButtonSx }}
+                                onClick={() => setIsEditing(true)}
+                            >
+                                Edit
+                            </Box>
+                            <Box sx={{ ...dotSx }}>&nbsp;•&nbsp;</Box>
+                            <Box sx={{ ...smallTextSx, ...textButtonSx }}>
+                                Delete
+                            </Box>
+                        </Box>
                     </Box>
-                    <Box sx={{ mr: '12px' }}>
-                        <ObjectFitAvatar
-                            src={'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D'}
-                            alt={null}
-                            sx={{
-                                width: '112px',
-                                height: '80px',
-                                borderRadius: '3px'
-                            }}
-                        />
-                    </Box>
-                    <Box sx={{ mr: '12px' }}>
-                        <ObjectFitAvatar
-                            src={'https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D'}
-                            alt={null}
-                            sx={{
-                                width: '112px',
-                                height: '80px',
-                                borderRadius: '3px'
-                            }}
-                        />
-                    </Box>
+                }
+                <Box sx={{
+                    display: 'flex',
+                    mt: isEditing ? '16px' : '0'
+                }}>
+                    {commentItem.attachments &&
+                        commentItem.attachments.map((attachment: any, index: number) => (
+                            <CommentAttachment
+                                key={index}
+                                isEditing={isEditing}
+                                attachment={attachment}
+                                reFetch={reFetch}
+                            />
+                        ))
+                    }
                 </Box>
             </Box>
         </Box>

@@ -14,6 +14,8 @@ import RequireRole from './pages/Auth/RequireRole'
 import WorkspaceSettingFC from './pages/workspace-settings/WorkspaceSettingFC'
 import JoinInviteFC from './pages/Auth/JoinInviteFC'
 import ProfileFC from './pages/User/ProfileFC'
+import Box from '@mui/material/Box'
+import TinyMce from './components/Common/TinyMce'
 
 const router = createBrowserRouter([
     {
@@ -35,7 +37,7 @@ const router = createBrowserRouter([
                         element: <RequireRole />,
                         path: '/w/:workspaceId',
                         children: [
-                            { path: 'settings', element: <WorkspaceSettingFC/> },
+                            { path: 'settings', element: <WorkspaceSettingFC /> },
                             { path: 'member', element: <MemberFC /> },
                             { path: 'b/:boardId', element: <BoardComponentWrap /> }
                             // { path: '/boards', element: <BoardComponentWrap /> }
@@ -55,6 +57,10 @@ const App: React.FC = () => {
 
             <RouterProvider router={router} />
 
+            {/* PRE LOAD TINY MCE */}
+            <Box sx={{ display: 'none' }}>
+                <TinyMce value={null} setValue={null} />
+            </Box>
             {/* <RouterProvider router={router} /> */}
             {/* <Box sx={{ display: 'none' }}>
                 <BoardComponent />

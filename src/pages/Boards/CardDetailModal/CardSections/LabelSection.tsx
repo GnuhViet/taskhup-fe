@@ -51,7 +51,7 @@ const LabelSection: React.FC<LabelSectionProps> = ({ selectedLabels, handleClick
                 <Box
                     className="add-icon"
                     sx={{
-                        borderRadius: '3px !important',
+                        borderRadius: '3px !important'
                     }}
                     onClick={(event) => handleClickOpen(event)}
                 >+</Box>

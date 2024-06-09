@@ -3,15 +3,18 @@ import Box from '@mui/material/Box'
 import ObjectFitAvatar from '~/components/Common/ObjectFitAvatar'
 
 export interface SectionProps {
-    cardItem: any
-    refetch: () => void
+    coverUrl: string
 }
 
-const CoverSection = () => {
+const CoverSection: React.FC<SectionProps> = ({ coverUrl }) => {
     return (
-        <Box>
+        <Box
+            sx={{
+                minHeight: '200px'
+            }}
+        >
             <ObjectFitAvatar
-                src={'https://cdn.pixabay.com/photo/2024/02/28/07/42/european-shorthair-8601492_640.jpg'}
+                src={coverUrl}
                 alt={null}
                 sx={{
                     width: '100%',

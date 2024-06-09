@@ -38,3 +38,46 @@ export class UpdateCheckListValueReq {
     checked: boolean
     boardCardId: string
 }
+
+export class UpdateCardCoverReq {
+    file: any
+    boardCardId: string
+}
+
+export class UpdateCardDateReq {
+    fromDate: string
+    deadlineDate: string
+    boardCardId: string
+    reminder: number
+}
+
+export class UpdateWorkingStatusReq {
+    workingStatus: boolean
+    boardCardId: string
+}
+
+export class UpdateDescriptionReq {
+    description: string
+    boardCardId: string
+}
+
+export class UpdateCardTitleRequest {
+    title: string
+    boardCardId: string
+}
+
+export class UploadAttachmentReq {
+    file: any
+    displayName: string
+    type: string
+    refId: string
+}
+
+export class DeleteAttachmentReq {
+    attachmentId: string
+}
+
+export class CreateCommentReq {
+    content: string
+    boardCardId: string
+}

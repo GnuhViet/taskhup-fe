@@ -62,6 +62,12 @@ import LabelSection from './CardSections/LabelSection'
 import WatchSection from './CardSections/WatchSection'
 import CustomFieldSection from './CardSections/CustomFieldSection'
 import MemberSection from './CardSections/MemberSection'
+import UploadCoverSection from './CardSections/UploadCoverSection'
+import CardDateSection from './CardSections/CardDateSection'
+import TinyMceWrap from '~/components/Common/TinyMceWrap'
+import DescriptionSection from './CardSections/DescriptionSection'
+import AttachmentSection from './CardSections/AttachmentSection'
+import CommentSection from './CardSections/CommentSection'
 
 
 interface CardDialogProps {
@@ -128,25 +134,25 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
     // const [open, setOpen] = React.useState(true)
     const userInfo = useSelector((state: any) => state.homeReducer.userInfo) as UserInfoResponse
 
-    const [members] = React.useState([
-        { name: 'JD', id: 1 },
-        { name: 'NV', id: 2 },
-        { name: 'AH', id: 3 },
-        { name: 'LK', id: 4 },
-        { name: 'LK', id: 5 },
-        { name: 'LK', id: 6 },
-        { name: 'LK', id: 7 },
-        { name: 'LK', id: 8 },
-        { name: 'LK', id: 9 },
-        { name: 'LK', id: 10 },
-        { name: 'LK', id: 11 },
-        { name: 'LK', id: 12 },
-        { name: 'LK', id: 13 },
-        { name: 'LK', id: 14 },
-        { name: 'LK', id: 15 },
-        { name: 'LK', id: 16 },
-        { name: 'LK', id: 17 },
-    ])
+    // const [members] = React.useState([
+    //     { name: 'JD', id: 1 },
+    //     { name: 'NV', id: 2 },
+    //     { name: 'AH', id: 3 },
+    //     { name: 'LK', id: 4 },
+    //     { name: 'LK', id: 5 },
+    //     { name: 'LK', id: 6 },
+    //     { name: 'LK', id: 7 },
+    //     { name: 'LK', id: 8 },
+    //     { name: 'LK', id: 9 },
+    //     { name: 'LK', id: 10 },
+    //     { name: 'LK', id: 11 },
+    //     { name: 'LK', id: 12 },
+    //     { name: 'LK', id: 13 },
+    //     { name: 'LK', id: 14 },
+    //     { name: 'LK', id: 15 },
+    //     { name: 'LK', id: 16 },
+    //     { name: 'LK', id: 17 },
+    // ])
 
     const [getCardDetails, { isLoading: getLoading }] = useLazyGetCardDetailsQuery()
     const [data, setData] = React.useState<any>([])
@@ -159,6 +165,9 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
     useEffect(() => {
         if (open) {
             fetchData()
+        }
+        if (!open) {
+            setData(null)
         }
     }, [open])
 
@@ -173,57 +182,6 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
     const [isFocusComment, setIsFocusComment] = React.useState(false)
     const [isShowComment, setIsShowComment] = React.useState(false)
     const [isShowHistory, setIsShowHistory] = React.useState(false)
-
-    const TinyMceWrap: React.FC<TinyMceProps> = ({ focus, setIsFocus, placeholder, placeHolderSx }) => {
-        return (
-            <>
-                {focus ? (
-                    <Box sx={{ position: 'relative' }}>
-                        <TinyMce />
-                        <Box sx={{ mt: '8px', ml: '2px' }}>
-                            <Button
-                                variant="contained"
-                                sx={{
-                                    height: '32px',
-                                    width: '54px',
-                                    borderRadius: '3px',
-                                    mr: '6px'
-                                }}
-                            >Save</Button>
-                            <Button
-                                variant="text"
-                                onClick={() => setIsFocus(false)}
-                            >Cancel</Button>
-                        </Box>
-                    </Box>
-                ) : (
-                    <Box
-                        onClick={(e) => setIsFocus(true)}
-                        sx={{
-                            ...placeHolderSx,
-                            cursor: 'pointer',
-                            backgroundColor: '#E2E4EA',
-                            borderRadius: '3px',
-                            // height: '90px',
-                            border: '1px solid #dfe1e6',
-                            '&:hover': {
-                                backgroundColor: '#CFD3DB'
-                            }
-                        }}
-                    >
-                        <Box sx={{
-                            p: '8px 12px',
-                            ...labelTextSx,
-                            fontSize: '16px',
-                            fontWeight: '400'
-                        }}>
-                            {placeholder}
-                        </Box>
-                    </Box>
-                )}
-            </>
-        )
-    }
 
     const [anchorEl, setAnchorEl] = React.useState(null)
     const [isOpenTemplateDialog, setIsOpenTemplateDialog] = React.useState(false)
@@ -261,6 +219,18 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
         setIsOpenLabelDialog(true)
     }
 
+    const handleOpenDateDialogInside = (event: any) => {
+        setIsInsideButton(true)
+        setAnchorEl(event.currentTarget)
+        setIsOpenDateDialog(true)
+    }
+
+    if (getLoading || data == null) {
+        return (
+            <></>
+        )
+    }
+
     return (
         <React.Fragment>
             <Dialog
@@ -272,15 +242,7 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                 onClose={handleClose}
                 scroll='body'
                 PaperProps={{
-                    sx: { borderRadius: '15px', backgroundColor: '#F0F1F4', minWidth: '900px' },
-                    // onSubmit: (event: any) => {
-                    //     event.preventDefault()
-                    //     const formData = new FormData(event.currentTarget)
-                    //     const formJson = Object.fromEntries((formData).entries())
-                    //     const email = formJson.email
-                    //     console.log(email)
-                    //     handleClose()
-                    // }
+                    sx: { borderRadius: '15px', backgroundColor: '#F0F1F4', minWidth: '900px' }
                 }}
             >
                 <Box className="closeIcon">
@@ -294,8 +256,15 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                         p: 0,
                     }}
                 >
-                    <CoverSection />
-                    <TitleSection />
+                    {data.coverUrl &&
+                        <CoverSection coverUrl={data.coverUrl} />
+                    }
+                    <TitleSection
+                        title={data.title}
+                        columnName={data.columnName}
+                        cardId={cardId}
+                        reFetch={fetchData}
+                    />
                 </DialogTitle>
 
                 <DialogContent
@@ -307,24 +276,6 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                 >
                     <Box className="body" >
                         <Box className="card-details card-detail-title">
-                            {/* <Box className="field member-field">
-                                <Box className="field-title" sx={{ ...labelTextSx }}>Members</Box>
-                                <Box className="field-content">
-                                    {members.map(member => (
-                                        <CircleAvatar
-                                            key={member.id}
-                                            src={'https://www.w3schools.com/howto/img_avatar.png'}
-                                            alt='T'
-                                            sx={{
-                                                width: '32px',
-                                                height: '32px',
-                                                m: '0 6px 6px 0'
-                                            }}
-                                        />
-                                    ))}
-                                    <Box className="add-icon">+</Box>
-                                </Box>
-                            </Box> */}
                             {data.members &&
                                 <MemberSection members={data.members} handleClickOpen={handleOpenMemberDialogInside} />
                             }
@@ -332,187 +283,64 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                                 <LabelSection selectedLabels={data.selectedLabels} handleClickOpen={handleOpenLabelDialogInside} />
                             }
                             <WatchSection isWatchCard={data.isWatchCard} reFetch={fetchData} cardId={cardId} />
-                            {/* <Box className="field noti-field">
-                                <Box className="field-title" sx={{ ...labelTextSx }}>Notifications</Box>
-                                <Box className="field-content">
-                                    <Button className="button add-button" variant="contained" startIcon={<RemoveRedEyeOutlinedIcon />}>
-                                        Watch
-                                    </Button>
-                                </Box>
-                            </Box> */}
+
+                            {data.fromDate && data.deadlineDate &&
+                                <CardDateSection
+                                    cardId={cardId}
+                                    reFetch={fetchData}
+                                    fromDate={data.fromDate}
+                                    deadlineDate={data.deadlineDate}
+                                    workingStatus={data.workingStatus}
+                                    handleClickOpen={handleOpenDateDialogInside}
+                                />
+                            }
                         </Box>
 
                         {/* Desc field section */}
-                        <Box>
-                            <Box className="section-details card-detail-desc">
-                                <SubjectOutlinedIcon className="left-icon" sx={{ ...titleTextSx }} />
-                                <Box className="section-title" sx={{ ...titleTextSx }}>Description</Box>
-                            </Box>
-                            <Box sx={{ ml: '40px' }}>
-                                <TinyMceWrap
-                                    focus={isFocusDetail}
-                                    setIsFocus={setIsFocusDetail}
-                                    placeholder="Add a more detailed description..."
-                                    placeHolderSx={{ height: '90px' }}
-                                />
-                            </Box>
-                        </Box>
+                        <DescriptionSection
+                            isFocusDetail={isFocusDetail}
+                            setIsFocusDetail={setIsFocusDetail}
+                            description={data.description}
+                            cardId={cardId}
+                            reFetch={fetchData}
+                        />
 
                         {/* Checklist section */}
-                        <ChecklistSection
-                            cardId={cardId}
-                            checkListItem={data.checkLists}
-                            reFetch={fetchData}
-                        />
+                        {data.checkLists &&
+                            <ChecklistSection
+                                cardId={cardId}
+                                checkListItem={data.checkLists}
+                                reFetch={fetchData}
+                            />
+                        }
 
                         {/* Custom field section */}
-                        {/* <Box>
-                            <Box className="section-details card-detail-desc">
-                                <DriveFileRenameOutlineOutlinedIcon className="left-icon" sx={{ ...titleTextSx }} />
-                                <Box className="section-title" sx={{ ...titleTextSx }}>Custom Fields</Box>
-                            </Box>
-                            <Box sx={{
-                                ml: '40px',
-                                gridTemplateColumns: 'repeat(3, 199px)',
-                                gridGap: '16px',
-                                display: 'grid'
-                            }}>
-                                <CustomFieldItem
-                                    item={{
-                                        id: '1',
-                                        title: 'Xin chao',
-                                        type: 'TEXT',
-                                        option: [],
-                                        templateId: '1'
-                                    }}
-                                    defaultValue='Hello world'
-                                    onValueChange={(id, value) => console.log(id, value)}
-                                />
-                                <CustomFieldItem
-                                    item={{
-                                        id: '2',
-                                        title: 'Xin chao',
-                                        type: 'CHECKBOX',
-                                        option: [],
-                                        templateId: '1'
-                                    }}
-                                    defaultValue='true'
-                                    onValueChange={(id, value) => console.log(id, value)}
-                                />
-                                <CustomFieldItem
-                                    item={{
-                                        id: '3',
-                                        title: 'Xin chao',
-                                        type: 'DROPDOWN',
-                                        option: [
-                                            { id: 1, title: 'Option 1', color: '#FEA362' },
-                                            { id: 2, title: 'Option 2', color: '#9F8FEF' },
-                                            { id: 3, title: 'Option 3', color: '#F87168' }
-                                        ],
-                                        templateId: '1'
-                                    }}
-                                    defaultValue={1}
-                                    onValueChange={(id, value) => console.log(id, value)}
-                                />
-                                <CustomFieldItem
-                                    item={{
-                                        id: '4',
-                                        title: 'Xin chao',
-                                        type: 'DATE',
-                                        option: null,
-                                        templateId: '1'
-                                    }}
-                                    defaultValue={'22/12/2024 12:21'}
-                                    onValueChange={(id, value) => console.log(id, value)}
-                                />
-                            </Box>
-                        </Box> */}
-                        <CustomFieldSection
-                            customFields={data.customFields}
-                            selectedFieldsValue={data.selectedFieldsValue}
-                            cardId={cardId}
-                            reFetch={fetchData}
-                        />
+                        {data.customFields &&
+                            <CustomFieldSection
+                                customFields={data.customFields}
+                                selectedFieldsValue={data.selectedFieldsValue}
+                                cardId={cardId}
+                                reFetch={fetchData}
+                            />
+                        }
 
                         {/* Acttachment section */}
-                        <Box>
-                            <Box className="section-details card-detail-desc">
-                                <AttachFileOutlinedIcon className="left-icon" sx={{ ...titleTextSx }} />
-                                <Box className="section-title" sx={{ ...titleTextSx }}>Attachments</Box>
-                            </Box>
-                            <Box sx={{ ml: '40px' }}>
-                                <AttachmentItem />
-                                {/* <AttachmentItem /> */}
-                                {/* <AttachmentItem /> */}
-                            </Box>
-                        </Box>
+                        {data.attachments &&
+                            <AttachmentSection attachments={data.attachments} cardId={cardId} reFetch={fetchData} />
+                        }
 
                         {/* Comment section */}
                         <Box ref={commentSectionRef}>
-                            <Box className="section-details card-detail-desc">
-                                <SubdirectoryArrowRightOutlinedIcon className="left-icon" sx={{ ...titleTextSx }} />
-                                <Box className="section-title" sx={{ ...titleTextSx }}>Comments</Box>
-                                <Box sx={{ position: 'relative' }}>
-                                    <Box sx={{ position: 'absolute', top: '-2px' }}>
-                                        <IconButton
-                                            aria-label="delete"
-                                            size="small"
-                                            onClick={() => setIsShowComment(!isShowComment)}
-                                        >
-                                            {isShowComment
-                                                ? <VisibilityOutlinedIcon
-                                                    fontSize="small"
-                                                    sx={{ color: '#172b4d' }} />
-                                                :
-                                                <Box>
-                                                    <VisibilityOffOutlinedIcon
-                                                        fontSize="small"
-                                                        sx={{ color: '#172b4d' }} />
-
-                                                </Box>
-                                            }
-                                        </IconButton>
-                                    </Box>
-                                    <Box sx={{
-                                        ml: '40px',
-                                        mt: '4px',
-                                        display: isShowComment ? 'none' : 'block',
-                                        ...labelTextSx
-                                    }}>
-                                        4 comment from Việt Hưng Nguyễn, Tran Van A,... (2+ more)
-                                    </Box>
-                                </Box>
-                            </Box>
-                            <Box sx={{ display: 'flex', mb: '16px' }}>
-                                <Box sx={{
-                                    mr: '10px',
-                                    mt: '4px'
-                                }}>
-                                    <CircleAvatar
-                                        src={userInfo?.avatar}
-                                        alt={userInfo?.fullName}
-                                        sx={{
-                                            width: '32px',
-                                            height: '32px'
-                                        }}
-                                    />
-                                </Box>
-                                <Box sx={{ width: '100%' }}>
-                                    <TinyMceWrap
-                                        focus={isFocusComment}
-                                        setIsFocus={setIsFocusComment}
-                                        placeholder="Write a comment..."
-                                        placeHolderSx={{ height: '40px' }}
-                                    />
-                                </Box>
-                            </Box>
-                            <Box sx={{
-                                display: isShowComment ? 'block' : 'none'
-                            }}>
-                                <CommentItem />
-                                <CommentItem />
-                                <CommentItem />
-                            </Box>
+                            <CommentSection
+                                isFocusComment={isFocusComment}
+                                setIsFocusComment={setIsFocusComment}
+                                isShowComment={isShowComment}
+                                setIsShowComment={setIsShowComment}
+                                userInfo={userInfo}
+                                cardId={cardId}
+                                reFetch={fetchData}
+                                comments={data.comments}
+                            />
                         </Box>
 
                         {/* History section */}
@@ -638,11 +466,15 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                                 commentSectionRef.current?.scrollIntoView({ behavior: 'smooth' })
                             }}
                         >Comment</Button>
-                        <Button
+                        {/* <Button
                             className="button right-button"
                             variant="contained"
                             startIcon={<VideoLabelOutlinedIcon />}
-                        >Cover</Button>
+                        >Cover</Button> */}
+                        <UploadCoverSection
+                            cardId={cardId}
+                            reFetch={fetchData}
+                        />
                     </Box>
 
                 </DialogContent>
@@ -706,14 +538,19 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                         open={isOpenDateDialog}
                         anchorEl={anchorEl}
                         onClose={handleDialogClose}
-                        cardId='123'
+                        cardId={cardId}
+                        insideButton={isInsideButton}
+                        fromDate={data.fromDate}
+                        deadlineDate={data.deadlineDate}
+                        reFetch={fetchData}
                     />
                     <AttachmentDialog
                         id='attachment-dialog'
                         open={isOpenAttachmentDialog}
                         anchorEl={anchorEl}
                         onClose={handleDialogClose}
-                        cardId='123'
+                        cardId={cardId}
+                        reFetch={fetchData}
                     />
                 </Box>
             </Dialog>

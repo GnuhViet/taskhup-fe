@@ -1,9 +1,9 @@
 // Boards list
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { StompSessionProvider } from 'react-stomp-hooks'
-import { useGetBoardByCodeQuery } from '~/core/redux/api/board.api'
+import { useGetBoardByCodeQuery, useLazyGetBoardByCodeQuery } from '~/core/redux/api/board.api'
 import { setBoard } from '~/core/redux/slices/boardSlice'
 import BoardComponent from '~/pages/Boards/_id'
 import Box from '@mui/material/Box'
@@ -14,12 +14,25 @@ import { useGetBoardTemplateQuery } from '~/core/redux/api/board-template.api'
 
 const BoardComponentWrap = () => {
     const token = useSelector((state: any) => state.authReducer.token.accessToken)
+    const openCardDetail = useSelector((state: any) => state.boardReducer.openCardDetail)
+
     const dispatch = useDispatch()
     const boardId = useParams().boardId
     const { isLoading: isLoadingBoard } = useGetBoardByCodeQuery(boardId)
+    const [triggerGetBoard, { isLoading: isRefetchingBoard }] = useLazyGetBoardByCodeQuery()
     const { isLoading: isLoadingTemplate } = useGetBoardTemplateQuery(boardId)
 
-    const isLoading = isLoadingBoard || isLoadingTemplate
+    const isLoading = isLoadingBoard || isLoadingTemplate || isRefetchingBoard
+
+    const refetchBoard = useCallback(async () => {
+        await triggerGetBoard(boardId)
+    }, [boardId])
+
+    useEffect(() => {
+        if (!openCardDetail) {
+            refetchBoard()
+        }
+    }, [openCardDetail])
 
     const beforeStompConnect = useCallback(function () {
         this.connectHeaders = {
