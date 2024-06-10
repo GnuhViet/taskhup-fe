@@ -39,11 +39,11 @@ const BoardComponent: React.FC = () => {
 
     return (
         <Container disableGutters maxWidth={false} sx={{ height: 'auto' }}>
-            <>
+            <Box sx={{ position: 'relative' }}>
                 <BoardBarFC board={board} />
                 <BoardContentFC />
                 <CardDialogFC open={open} handleClose={handleClose} cardId={cardId} />
-            </>
+            </Box>
         </Container>
     )
 }

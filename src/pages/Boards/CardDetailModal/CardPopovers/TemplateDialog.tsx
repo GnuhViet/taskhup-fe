@@ -11,7 +11,13 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Radio from '@mui/material/Radio'
 import { useSelectTemplateMutation } from '~/core/redux/api/board-card.api'
 import { toast } from 'react-toastify'
-
+import { useMediaQuery } from '@mui/material'
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
 
 export interface TemplateDialogProps {
     id: string
@@ -82,9 +88,28 @@ const TemplateDialog: React.FC<TemplateDialogProps> = ({ id, open, anchorEl, onC
         setSelectedTemplate(defaultTemplateId)
     }, [defaultTemplateId])
 
+    React.useEffect(() => {
+        setSelectedTemplate(defaultTemplateId)
+    }, [open])
+
     const [selectTemplate, { isLoading }] = useSelectTemplateMutation()
 
     const handleClose = async () => {
+        if (selectedTemplate && selectedTemplate !== defaultTemplateId) {
+            setOpenConfirm(true)
+            return
+        }
+        onClose()
+    }
+
+    const [openConfirm, setOpenConfirm] = React.useState(false)
+
+    const handleDisagree = () => {
+        setOpenConfirm(false)
+        onClose()
+    }
+
+    const handleAgree = async () => {
         if (selectedTemplate && selectedTemplate !== defaultTemplateId) {
             try {
                 await selectTemplate({
@@ -96,6 +121,7 @@ const TemplateDialog: React.FC<TemplateDialogProps> = ({ id, open, anchorEl, onC
                 console.log(error)
             }
         }
+        setOpenConfirm(false)
         onClose()
     }
 
@@ -190,7 +216,37 @@ const TemplateDialog: React.FC<TemplateDialogProps> = ({ id, open, anchorEl, onC
                         </RadioGroup>
                     </FormControl>
                 </Box>
+                <Box sx={{
+                    mt: '8px',
+                    display: 'flex',
+                    justifyContent: 'space-between'
+                }}>
+                    <FormHelperText>
+                        When you change the template, data from the old template such as labels and custom fields will be deleted and cannot be recovered.
+                    </FormHelperText>
+                </Box>
             </Box>
+            <Dialog
+                open={openConfirm}
+                onClose={handleDisagree}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {'Template have been changed, do you want to save it?'}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        When you change the template, data from the old template such as labels and custom fields will be deleted and cannot be recovered.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDisagree}>Disagree</Button>
+                    <Button onClick={handleAgree} autoFocus>
+                        Agree
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Popover >
     )
 }

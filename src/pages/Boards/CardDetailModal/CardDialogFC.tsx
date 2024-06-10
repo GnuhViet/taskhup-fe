@@ -68,6 +68,7 @@ import TinyMceWrap from '~/components/Common/TinyMceWrap'
 import DescriptionSection from './CardSections/DescriptionSection'
 import AttachmentSection from './CardSections/AttachmentSection'
 import CommentSection from './CardSections/CommentSection'
+import CardHistorySection from './CardSections/CardHistorySection'
 
 
 interface CardDialogProps {
@@ -257,7 +258,11 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                     }}
                 >
                     {data.coverUrl &&
-                        <CoverSection coverUrl={data.coverUrl} />
+                        <CoverSection
+                            coverUrl={data.coverUrl}
+                            cardId={cardId}
+                            refetch={fetchData}
+                        />
                     }
                     <TitleSection
                         title={data.title}
@@ -306,7 +311,7 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                         />
 
                         {/* Checklist section */}
-                        {data.checkLists &&
+                        {data.checkLists && data.checkLists.length > 0 &&
                             <ChecklistSection
                                 cardId={cardId}
                                 checkListItem={data.checkLists}
@@ -344,7 +349,7 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                         </Box>
 
                         {/* History section */}
-                        <Box>
+                        {/* <Box>
                             <Box className="section-details card-detail-desc">
                                 <RestoreOutlinedIcon className="left-icon" sx={{ ...titleTextSx }} />
                                 <Box className="section-title" sx={{ ...titleTextSx }}>Activity</Box>
@@ -386,7 +391,15 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                                 <ActivityHistoryItem />
                                 <ActivityHistoryItem />
                             </Box>
-                        </Box>
+                        </Box> */}
+                        <CardHistorySection
+                            isShowHistory={isShowHistory}
+                            setIsShowHistory={setIsShowHistory}
+                            activityHistory={data.activityHistory}
+                            cardId={cardId}
+                        />
+
+
                     </Box>
 
                     <Box className="list-right-buttons">
@@ -520,7 +533,7 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                         anchorEl={anchorEl}
                         onClose={handleDialogClose}
                         cardId={cardId}
-                        members={data.members}
+                        members={data.members === null ? [] : data.members}
                         reFetch={fetchData}
                         insideButton={isInsideButton}
                     />

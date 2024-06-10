@@ -44,6 +44,10 @@ export class UpdateCardCoverReq {
     boardCardId: string
 }
 
+export class RemoveCardCoverReq {
+    boardCardId: string
+}
+
 export class UpdateCardDateReq {
     fromDate: string
     deadlineDate: string

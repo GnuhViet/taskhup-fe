@@ -70,6 +70,10 @@ const LabelDialog: React.FC<LabelDialogProps> = ({ id, open, anchorEl, onClose, 
     }, [selectedLabels])
 
     const handleClose = async () => {
+        if (data.length === 0) {
+            onClose()
+            return
+        }
         if (
             JSON.stringify(listSelectedIds.sort()) !== JSON.stringify(selectedLabels?.map((item: any) => item.id).sort())
         ) {

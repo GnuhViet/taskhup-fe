@@ -27,16 +27,19 @@ const DATE_TIME_FORMAT = 'DD/MM/YYYY HH:mm'
 
 const formatDate = (dateString: string) => {
     const hasTime = dateString.includes(':')
+    const isMidnight = dateString.endsWith('00:00')
     const format = hasTime ? DATE_TIME_FORMAT : 'DD/MM/YYYY'
     const date = moment(dateString, format)
     const now = moment()
 
     if (date.year() === now.year()) {
         // If the date is in the current year, format it as 'MMM D at HH:mm' if it has time, or 'MMM D' if it doesn't
-        return date.format(hasTime ? 'MMM D [at] HH:mm' : 'MMM D')
+        // If the time is '00:00', remove it
+        return date.format(hasTime && !isMidnight ? 'MMM D [at] HH:mm' : 'MMM D')
     } else {
         // Otherwise, use the original format
-        return date.format(format)
+        // If the time is '00:00', remove it
+        return date.format(hasTime && !isMidnight ? format : 'DD/MM/YYYY')
     }
 }
 

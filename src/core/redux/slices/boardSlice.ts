@@ -24,6 +24,7 @@ export interface BoardState {
     openCardDetail: boolean
     openCardDetailId: string
     boardTemplate: any
+    boardBackground: string
 }
 
 const initialState: BoardState = {
@@ -32,7 +33,8 @@ const initialState: BoardState = {
     disableDrag: false,
     openCardDetail: false,
     openCardDetailId: null,
-    boardTemplate: null
+    boardTemplate: null,
+    boardBackground: null
 }
 
 export const boardSlice = createSlice({
@@ -143,9 +145,13 @@ export const boardSlice = createSlice({
             })
 
             state.board = board
+            state.boardBackground = board.color
         }),
         builder.addMatcher(boardTemplateApi.endpoints.getBoardTemplate.matchFulfilled, (state, action) => {
             state.boardTemplate = action.payload?.data
+        }),
+        builder.addMatcher(boardApi.endpoints.getBoardInfomation.matchFulfilled, (state, action) => {
+            state.boardBackground = action.payload?.data?.color
         })
     }
 })

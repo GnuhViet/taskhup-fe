@@ -17,7 +17,6 @@ import SaveAsOutlinedIcon from '@mui/icons-material/SaveAsOutlined'
 
 import React, { useEffect } from 'react'
 import SquareAvatar from '~/components/Common/SquareAvatar'
-import LabelPopoverFC from './popovers/LabelPopoverFC'
 import TextField from '@mui/material/TextField'
 import { useParams } from 'react-router-dom'
 import { useCreateBoardTemplateMutation, useDeleteBoardTemplateMutation, useLazyGetBoardTemplateQuery } from '~/core/redux/api/board-template.api'
@@ -26,6 +25,9 @@ import ApiLoadingOverlay from '~/components/Common/ApiLoadingOverlay'
 import { BoardTemplateCreateRequest } from '~/core/services/board-template-services.model'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
+
+import BoltIcon from '@mui/icons-material/Bolt'
+import LabelPopoverFC from './popovers/LabelPopoverFC'
 import CustomFieldPopoverFC from './popovers/CustomFieldPopoverFC'
 
 interface CardDialogProps {
@@ -246,10 +248,14 @@ const TemplateDialogFC: React.FC<CardDialogProps> = ({ open, handleClose }) => {
             </Box>
 
             <DialogTitle sx={{ mb: '14px' }} className="dialogTitle">
-                <ViewComfyOutlinedIcon className="left-icon subtitlesIcon" />
-                <Box>
-                    <Box className="textarea-title">
-                        Card Template
+                <Box sx={{ display: 'flex' }}>
+                    <Box sx={{ mt: '3px' }}>
+                        <BoltIcon className="left-icon subtitlesIcon" />
+                    </Box>
+                    <Box>
+                        <Box className="textarea-title">
+                            Card Template
+                        </Box>
                     </Box>
                 </Box>
             </DialogTitle>

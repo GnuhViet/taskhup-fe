@@ -59,7 +59,7 @@ const UploadCoverSection: React.FC<UploadCoverSectionProps> = ({ cardId, reFetch
                             size='28px'
                         />
                     </Box>
-                    : 'Cover'
+                    : 'Upload Cover'
                 }
             </Button>
         </Box>

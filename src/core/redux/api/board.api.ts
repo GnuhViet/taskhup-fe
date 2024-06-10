@@ -5,7 +5,7 @@ import { apiSlice } from '~/core/redux/api/base.api'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Board } from '../../model/board.model'
 import { create } from 'lodash'
-import { BoardCreateReq } from '~/core/services/board-services.model'
+import { BoardBgUpdateReq, BoardCreateReq, BoardInfoUpdateReq } from '~/core/services/board-services.model'
 
 export type Channel = 'redux' | 'general'
 
@@ -56,6 +56,26 @@ export const boardApi = apiSlice.injectEndpoints({
                 method: 'POST',
                 body: data
             })
+        }),
+        getBoardInfomation: builder.query({
+            query: (boardId: string) => ({
+                url: `${API_URL}/info/${boardId}`,
+                method: 'GET'
+            })
+        }),
+        updateBoardInfomation: builder.mutation({
+            query: (data: BoardInfoUpdateReq) => ({
+                url: `${API_URL}/update-board-info`,
+                method: 'POST',
+                body: data
+            })
+        }),
+        updateBoardBackground: builder.mutation({
+            query: (data: BoardBgUpdateReq) => ({
+                url: `${API_URL}/update-board-background`,
+                method: 'POST',
+                body: data
+            })
         })
     })
 })
@@ -68,5 +88,8 @@ export const {
     useGetBoardByCodeQuery,
     useLazyGetBoardByCodeQuery,
     useGetAllBoardQuery,
-    useCreateBoardMutation
+    useCreateBoardMutation,
+    useLazyGetBoardInfomationQuery,
+    useUpdateBoardInfomationMutation,
+    useUpdateBoardBackgroundMutation,
 } = boardApi

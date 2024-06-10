@@ -3,6 +3,7 @@ import Box from '@mui/material/Box'
 import SubjectOutlinedIcon from '@mui/icons-material/SubjectOutlined'
 import TinyMceWrap from '~/components/Common/TinyMceWrap'
 import { useUpdateDescriptionMutation } from '~/core/redux/api/board-card.api'
+import { isBlank } from '~/core/utils/data-utils'
 
 const titleTextSx = {
     color: '#172b4d',
@@ -30,6 +31,14 @@ const DescriptionSection: React.FC<SectionProps> = ({ isFocusDetail, setIsFocusD
             console.log('Error:', error)
         }
     }
+
+    React.useEffect(() => {
+        if (isBlank(description)) {
+            setIsFocusDetail(true)
+        } else {
+            setIsFocusDetail(false)
+        }
+    }, [description])
 
     return (
         <Box>

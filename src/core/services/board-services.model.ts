@@ -106,3 +106,15 @@ export class OpenCardDetailRequest {
     open: boolean
     cardId: string
 }
+
+export class BoardInfoUpdateReq {
+    id: string
+    title: string
+    shortDescription: string
+    description: string
+}
+
+export class BoardBgUpdateReq {
+    id: string
+    color: string
+}

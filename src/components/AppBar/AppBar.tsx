@@ -72,10 +72,10 @@ const AppBar: React.FC = () => {
                     </Box>
 
                     <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-                        <Workspaces />
+                        {/* <Workspaces /> */}
                         <Recent />
                         <Starred />
-                        <Templates />
+                        {/* <Templates />    */}
                         <CreateMenu />
                     </Box>
                 </Box>
@@ -111,7 +111,7 @@ const AppBar: React.FC = () => {
                             )
                         }}
                         sx={{
-                            width: isFocusSreach ? '700px' :'220px',
+                            width: isFocusSreach ? '500px' :'220px',
                             '& label': { color: 'black' },
                             '& input': { color: 'black' },
                             '& label.Mui-focused': { color: 'black' },

@@ -1,5 +1,5 @@
 import { apiSlice } from '~/core/redux/api/base.api'
-import { CreateCommentReq, DeleteAttachmentReq, DeleteCommentReq, EditCommentContentReq, SelectFieldRequest, SelectLabelRequest, SelectTemplateRequest, UpdateCardCoverReq, UpdateCardDateReq, UpdateCardTitleRequest, UpdateCheckListRequest, UpdateCheckListValueReq, UpdateDescriptionReq, UpdateFieldValueRequest, UpdateWatchCardReq, UpdateWorkingStatusReq, UploadAttachmentReq } from '~/core/services/board-card-services.model'
+import { CreateCommentReq, DeleteAttachmentReq, DeleteCommentReq, EditCommentContentReq, RemoveCardCoverReq, SelectFieldRequest, SelectLabelRequest, SelectTemplateRequest, UpdateCardCoverReq, UpdateCardDateReq, UpdateCardTitleRequest, UpdateCheckListRequest, UpdateCheckListValueReq, UpdateDescriptionReq, UpdateFieldValueRequest, UpdateWatchCardReq, UpdateWorkingStatusReq, UploadAttachmentReq } from '~/core/services/board-card-services.model'
 
 const API_URL = '/api/v1/board-card'
 
@@ -8,6 +8,15 @@ export const boardCardApi = apiSlice.injectEndpoints({
         getCardDetails: builder.query({
             query: (cardId: string) => ({
                 url: `${API_URL}/card-details`,
+                method: 'POST',
+                body: {
+                    boardCardId: cardId
+                }
+            })
+        }),
+        getCardAllHistory: builder.query({
+            query: (cardId: string) => ({
+                url: `${API_URL}/card-history`,
                 method: 'POST',
                 body: {
                     boardCardId: cardId
@@ -80,6 +89,15 @@ export const boardCardApi = apiSlice.injectEndpoints({
                     url: `${API_URL}/update-cover`,
                     method: 'POST',
                     body: formData
+                }
+            }
+        }),
+        removeCardCover: builder.mutation({
+            query: (data: RemoveCardCoverReq) => {
+                return {
+                    url: `${API_URL}/remove-cover`,
+                    method: 'POST',
+                    body: data
                 }
             }
         }),
@@ -159,6 +177,7 @@ export const boardCardApi = apiSlice.injectEndpoints({
 
 export const {
     useLazyGetCardDetailsQuery,
+    useLazyGetCardAllHistoryQuery,
     useSelectTemplateMutation,
     useSelectLabelMutation,
     useSelectFieldMutation,
@@ -168,6 +187,7 @@ export const {
     useUpdateCheckListMutation,
     useUpdateCheckListValueMutation,
     useUpdateCardCoverMutation,
+    useRemoveCardCoverMutation,
     useUpdateCardDateMutation,
     useUpdateWorkingStatusMutation,
     useUpdateDescriptionMutation,

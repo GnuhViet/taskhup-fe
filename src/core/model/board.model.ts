@@ -5,6 +5,8 @@ export class Board {
     name: string
     title: string
     description: string
+    shortDescription: string
+    color: string
     type: string
     ownerIds: string[]
     memberIds: string[]

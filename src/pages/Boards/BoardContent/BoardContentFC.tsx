@@ -66,6 +66,7 @@ interface BoadContentFCProps {
 }
 
 const BoardContentFC: React.FC<BoadContentFCProps> = () => {
+    const boardBackground = useSelector((state: any) => state.boardReducer.boardBackground)
     const disableDrag = useSelector((state: any) => state.boardReducer.disableDrag)
 
     //<editor-fold desc="Sensor custom">
@@ -526,10 +527,13 @@ const BoardContentFC: React.FC<BoadContentFCProps> = () => {
             onDragEnd={handleDragEnd}
         >
             <Box sx={{
-                bgcolor: (theme: any) => (theme.palette.mode === 'dark' ? '#34495e' : '#1976d2'),
+                // background: 'linear-gradient(to right, #FF5733, #FFC300)',
+                // background: 'linear-gradient(to right, #FF5733, #FFC300)',
+                background: boardBackground,
                 width: '100%',
                 height: (theme: any) => theme.trello.boardContentHeight,
-                p: '10px 0'
+                p: '10px 0',
+                pt: '74px'
             }}>
                 <>
                     <ListColumnsFC

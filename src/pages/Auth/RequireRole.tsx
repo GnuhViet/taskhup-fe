@@ -83,10 +83,10 @@ const RequireRole = () => {
                     permission['role'] = ['edit']
                     break
                 case Actions.EDIT_BOARD:
-                    permission['board'] = ['edit']
+                    permission['board'] = [...(permission['board'] || []), 'edit']
                     break
                 case Actions.DELETE_BOARD:
-                    permission['board'] = ['delete']
+                    permission['board'] = [...(permission['board'] || []), 'delete']
                     break
                 case Actions.EDIT_CARD_TEMPLATE:
                     permission['cardTemplate'] = ['edit']

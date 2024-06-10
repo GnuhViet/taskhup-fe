@@ -13,9 +13,13 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import { capitalizeFirstLetter } from '~/core/utils/formatters'
 import { useDispatch } from 'react-redux'
 import { setDisableDrag } from '~/core/redux/slices/boardSlice'
-import React from 'react'
-import { set } from 'lodash'
-import TemplateDialogFC from './Dialog/TemplateDialogFC'
+import React, { useEffect, useState } from 'react'
+import { useGetWorkspaceMemberQuery, useLazyGetWorkspaceMemberQuery } from '~/core/redux/api/workspace.api'
+import { ApiResponse } from '~/core/services/api.model'
+import ApiLoadingOverlay from '~/components/Common/ApiLoadingOverlay'
+import { useNavigate, useParams } from 'react-router-dom'
+import TemplateDialogFC from './Dialog/Template/TemplateDialogFC'
+import BoardInfoDialog from './Dialog/BoardInfo/BoardInfoDialogFC'
 
 const MENU_STYLES = {
     color: 'white',
@@ -32,8 +36,13 @@ const MENU_STYLES = {
 }
 
 function BoardBarFC({ board }) {
+    const [wsMember, setWsMember] = React.useState<any[]>([])
+    const [getMember, { isLoading }] = useLazyGetWorkspaceMemberQuery()
+    const workspaceId = useParams().workspaceId
+    const navigate = useNavigate()
     const dispatch = useDispatch()
 
+    const [openBoardInfo, setOpenBoardInfo] = React.useState(false)
     const [openTempate, setOpenTemplate] = React.useState(false)
     const [openFilter, setOpenFilter] = React.useState(false)
 
@@ -47,9 +56,22 @@ function BoardBarFC({ board }) {
         dispatch(setDisableDrag(true))
     }
 
+    const fetchWsMember = async () => {
+        try {
+            const response = await getMember({}).unwrap() as ApiResponse<any>
+            setWsMember(response.data)
+        } catch (error) {
+            console.log('error', error)
+        }
+    }
+
+    useEffect(() => {
+        fetchWsMember()
+    }, [board])
+
     return (
         <>
-            <Box>
+            <Box sx={{ position: 'absolute', width: '100%' }}>
                 <Box sx={{
                     width: '100%',
                     height: (theme) => theme.trello.boardBarHeight,
@@ -60,8 +82,8 @@ function BoardBarFC({ board }) {
                     paddingX: 2,
                     overflowX: 'auto',
                     position: 'relative',
-                    bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#34495e' : '#1976d2'),
-                    boxShadow: 'inset 0 0 0 1000px rgba(0, 0, 0, 0.2)'
+                    // bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#34495e' : '#1976d2'),
+                    boxShadow: 'inset 0 0 0 1000px rgba(0, 0, 0, 0.4)'
                 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <Tooltip title={board?.description}>
@@ -69,21 +91,10 @@ function BoardBarFC({ board }) {
                                 sx={MENU_STYLES}
                                 icon={<DashboardIcon />}
                                 label={board?.title}
+                                onClick={() => handleClickOpen(setOpenBoardInfo)}
                                 clickable
                             />
                         </Tooltip>
-                        {/* <Chip
-                    sx={MENU_STYLES}
-                    icon={<VpnLockIcon />}
-                    label={capitalizeFirstLetter(board?.type)}
-                    clickable
-                /> */}
-                        {/* <Chip
-                    sx={MENU_STYLES}
-                    icon={<AddToDriveIcon />}
-                    label="Add To Google Drive"
-                    clickable
-                /> */}
                         <Chip
                             sx={MENU_STYLES}
                             icon={<BoltIcon />}
@@ -109,12 +120,15 @@ function BoardBarFC({ board }) {
                                 borderColor: 'white',
                                 '&:hover': { borderColor: 'white' }
                             }}
+                            onClick={() => navigate(`/w/${workspaceId}/member`)}
                         >
                             Invite
                         </Button>
-
+                        {isLoading &&
+                            <ApiLoadingOverlay />
+                        }
                         <AvatarGroup
-                            max={7}
+                            max={4}
                             sx={{
                                 gap: '10px',
                                 '& .MuiAvatar-root': {
@@ -128,71 +142,21 @@ function BoardBarFC({ board }) {
                                 }
                             }}
                         >
-                            {/* <Tooltip title="trungquandev">
-                        <Avatar alt="trungquandev"
-                            src="https://trungquandev.com/wp-content/uploads/2023/05/main-avatar-circle-min-trungquandev-codetq.jpeg"
-                        />
-                    </Tooltip>
-                    <Tooltip title="trungquandev">
-                        <Avatar alt="trungquandev"
-                            src="https://trungquandev.com/wp-content/uploads/2021/01/trungquandev-avatar-2021.jpg"
-                        />
-                    </Tooltip>
-                    <Tooltip title="trungquandev">
-                        <Avatar alt="trungquandev"
-                            src="https://trungquandev.com/wp-content/uploads/2018/04/trungquandev-avatar.jpeg"
-                        />
-                    </Tooltip>
-                    <Tooltip title="trungquandev">
-                        <Avatar alt="trungquandev"
-                            src="https://trungquandev.com/wp-content/uploads/2019/03/trungquandev-avatar-01-scaled.jpg"
-                        />
-                    </Tooltip>
-                    <Tooltip title="trungquandev">
-                        <Avatar alt="trungquandev"
-                            src="https://trungquandev.com/wp-content/uploads/2017/03/aboutme.jpg"
-                        />
-                    </Tooltip>
-                    <Tooltip title="trungquandev">
-                        <Avatar alt="trungquandev"
-                            src="https://trungquandev.com/wp-content/uploads/2019/06/trungquandev-cat-avatar.png"
-                        />
-                    </Tooltip>
-
-                    <Tooltip title="trungquandev">
-                        <Avatar alt="trungquandev"
-                            src="https://trungquandev.com/wp-content/uploads/2023/05/main-avatar-circle-min-trungquandev-codetq.jpeg"
-                        />
-                    </Tooltip>
-                    <Tooltip title="trungquandev">
-                        <Avatar alt="trungquandev"
-                            src="https://trungquandev.com/wp-content/uploads/2021/01/trungquandev-avatar-2021.jpg"
-                        />
-                    </Tooltip>
-                    <Tooltip title="trungquandev">
-                        <Avatar alt="trungquandev"
-                            src="https://trungquandev.com/wp-content/uploads/2018/04/trungquandev-avatar.jpeg"
-                        />
-                    </Tooltip>
-                    <Tooltip title="trungquandev">
-                        <Avatar alt="trungquandev"
-                            src="https://trungquandev.com/wp-content/uploads/2019/03/trungquandev-avatar-01-scaled.jpg"
-                        />
-                    </Tooltip>
-                    <Tooltip title="trungquandev">
-                        <Avatar alt="trungquandev"
-                            src="https://trungquandev.com/wp-content/uploads/2017/03/aboutme.jpg"
-                        />
-                    </Tooltip>
-                    <Tooltip title="trungquandev">
-                        <Avatar alt="trungquandev"
-                            src="https://trungquandev.com/wp-content/uploads/2019/06/trungquandev-cat-avatar.png"
-                        />
-                    </Tooltip> */}
+                            {wsMember &&
+                                wsMember.map((member) => (
+                                    <Tooltip key={member.userId} title={member.fullName}>
+                                        <Avatar
+                                            alt={member.fullName}
+                                            src={member.avatarUrl}
+                                        />
+                                    </Tooltip>
+                                ))
+                            }
                         </AvatarGroup>
                     </Box>
 
                 </Box>
+                <BoardInfoDialog open={openBoardInfo} handleClose={() => handleClose(setOpenBoardInfo)} />
                 <TemplateDialogFC open={openTempate} handleClose={() => handleClose(setOpenTemplate)} />
             </Box>
         </>

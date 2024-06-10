@@ -89,6 +89,10 @@ const CustomFieldDialog: React.FC<CustomFieldDialogProps> = ({ id, open, anchorE
     }
 
     const handleClose = async () => {
+        if (data.length === 0) {
+            onClose()
+            return
+        }
         if (
             JSON.stringify(listSelectedIds.sort()) !== JSON.stringify(selectedFieldsValue?.map((item: any) => item.fieldId).sort())
         ) {
