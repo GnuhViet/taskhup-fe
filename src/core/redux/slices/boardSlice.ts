@@ -81,29 +81,37 @@ export const boardSlice = createSlice({
         },
         updateCardOrderResponse: (state, action: PayloadAction<BoardCardMoveReq>) => {
             const response = action.payload
-            if (response.fromColumnId == response.toColumnId) {
-                const column = state.board.columns.find(column => column.id === response.fromColumnId)
-                column.cardOrderIds = response.cardOrderIds
-                column.cards = mapOrder(column.cards, response.cardOrderIds, 'id')
-            }
-            else if (response.fromColumnId !== response.toColumnId) {
-                const fromColumn = state.board.columns.find(column => column.id === response.fromColumnId)
-                const toColumn = state.board.columns.find(column => column.id === response.toColumnId)
-
-                fromColumn.cardOrderIds = [...fromColumn.cardOrderIds].filter(cardId => cardId !== response.cardId)
-                toColumn.cardOrderIds = [...response.cardOrderIds]
-
-                fromColumn.cards = fromColumn.cards.filter(card => card.id !== response.cardId)
-                toColumn.cards = [...toColumn.cards.filter(card => card.id !== response.cardId), response.card]
-
-                fromColumn.cards = mapOrder(fromColumn.cards, fromColumn.cardOrderIds, 'id')
-                toColumn.cards = mapOrder(toColumn.cards, toColumn.cardOrderIds, 'id')
-
-                if (isEmpty(fromColumn.cards)) {
-                    fromColumn.cards = [generatePlaceholderCard(fromColumn)]
-                    fromColumn.cardOrderIds = [generatePlaceholderCard(fromColumn).id]
+            try {
+                if (response.fromColumnId == response.toColumnId) {
+                    const column = state.board.columns.find(column => column.id === response.fromColumnId)
+                    column.cardOrderIds = response.cardOrderIds
+                    column.cards = mapOrder(column.cards, response.cardOrderIds, 'id')
                 }
+                else if (response.fromColumnId !== response.toColumnId) {
+                    const fromColumn = state.board.columns.find(column => column.id === response.fromColumnId)
+                    const toColumn = state.board.columns.find(column => column.id === response.toColumnId)
+
+                    fromColumn.cardOrderIds = [...fromColumn.cardOrderIds].filter(cardId => cardId !== response.cardId)
+                    toColumn.cardOrderIds = [...response.cardOrderIds]
+
+                    const oldCard = fromColumn.cards.find(card => card.id === response.cardId)
+                    oldCard.columnId = response.toColumnId
+
+                    fromColumn.cards = fromColumn.cards.filter(card => card.id !== response.cardId)
+                    toColumn.cards = [...toColumn.cards.filter(card => card.id !== response.cardId), oldCard]
+
+                    fromColumn.cards = mapOrder(fromColumn.cards, fromColumn.cardOrderIds, 'id')
+                    toColumn.cards = mapOrder(toColumn.cards, toColumn.cardOrderIds, 'id')
+
+                    if (isEmpty(fromColumn.cards)) {
+                        fromColumn.cards = [generatePlaceholderCard(fromColumn)]
+                        fromColumn.cardOrderIds = [generatePlaceholderCard(fromColumn).id]
+                    }
+                }
+            } catch (error) {
+                console.log('error!! --- ', error)
             }
+
         },
         updateColumnOrder: (state, action: PayloadAction<Column[]>) => {
             state.board.columnOrderIds = action.payload.map(column => column.id)
@@ -147,12 +155,12 @@ export const boardSlice = createSlice({
             state.board = board
             state.boardBackground = board.color
         }),
-        builder.addMatcher(boardTemplateApi.endpoints.getBoardTemplate.matchFulfilled, (state, action) => {
-            state.boardTemplate = action.payload?.data
-        }),
-        builder.addMatcher(boardApi.endpoints.getBoardInfomation.matchFulfilled, (state, action) => {
-            state.boardBackground = action.payload?.data?.color
-        })
+            builder.addMatcher(boardTemplateApi.endpoints.getBoardTemplate.matchFulfilled, (state, action) => {
+                state.boardTemplate = action.payload?.data
+            }),
+            builder.addMatcher(boardApi.endpoints.getBoardInfomation.matchFulfilled, (state, action) => {
+                state.boardBackground = action.payload?.data?.color
+            })
     }
 })
 

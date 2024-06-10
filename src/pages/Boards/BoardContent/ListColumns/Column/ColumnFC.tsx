@@ -31,6 +31,8 @@ import { BoardCardCreateReq } from '~/core/services/board-services.model'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
+import SingleLineTextBoxToolTip from '~/components/Common/SingleLineTextBoxToolTip'
+import { max } from 'lodash'
 
 interface ColumnFCProps {
     column: Column
@@ -161,7 +163,13 @@ const ColumnFC: React.FC<ColumnFCProps> = ({ column, deleteColumnDetails }) => {
                         fontWeight: 'bold',
                         cursor: 'pointer'
                     }}>
-                        {column?.title}
+                        <SingleLineTextBoxToolTip
+                            id={`collum-title-of-${column?.id}`}
+                            text={column?.title}
+                            sx={{
+                                width: '238px'
+                            }}
+                        />
                     </Typography>
                     <Box>
                         <Tooltip title="More options">

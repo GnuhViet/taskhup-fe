@@ -12,8 +12,11 @@ import { setDisableDrag, setOpenCardDialog } from '~/core/redux/slices/boardSlic
 import CardDialogFC from './CardDetailModal/CardDialogFC'
 import TinyMce from '~/components/Common/TinyMce'
 import Box from '@mui/material/Box'
+import { useLazyGetBoardInfomationQuery } from '~/core/redux/api/board.api'
+import ApiLoadingOverlay from '~/components/Common/ApiLoadingOverlay'
 
 const BoardComponent: React.FC = () => {
+    const [getBoardInfo, { isLoading }] = useLazyGetBoardInfomationQuery()
 
     const dispatch = useDispatch()
     // const board = useSelector((state: any) => state.boardReducer.board)

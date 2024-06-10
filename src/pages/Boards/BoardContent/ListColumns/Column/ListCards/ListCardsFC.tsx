@@ -12,7 +12,7 @@ const ListCardsFC: React.FC<ListCardsFCProps> = ({ cards }) => {
     return (
         <SortableContext items={cards?.map(c => c.id)} strategy={verticalListSortingStrategy}>
             <Box sx={{
-                p: '0 5px 5px 5px',
+                p: '5px 5px 5px 5px',
                 m: '0 5px',
                 display: 'flex',
                 flexDirection: 'column',

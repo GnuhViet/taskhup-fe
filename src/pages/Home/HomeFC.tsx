@@ -40,10 +40,10 @@ const HomeFC = () => {
     return (
         <>
             <Box className="home-container">
-                <Box className="home-sticky-container">
+                <Box className="home-sticky-container" sx={{ height: 'calc(100vh - 48px)' }}>
                     <Box className="home-left-sidebar-container">
                         <List className="top-button">
-                            <SideBarButton id={'workspace-button'} text={'Word Spaces'} icon={<TrelloIcon style={iconSx} />} defaultSelected/>
+                            <SideBarButton id={'workspace-button'} text={'Word Spaces'} icon={<TrelloIcon style={iconSx} />} defaultSelected />
                             <SideBarButton id={'activity-button'} text={'My Activity'} icon={<InsightsOutlinedIcon sx={iconSx} />} />
                             <SideBarButton id={'home-button'} text={'Home'} icon={<HomeOutlinedIcon sx={iconSx} />} />
                         </List>

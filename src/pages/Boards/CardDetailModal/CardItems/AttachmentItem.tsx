@@ -61,6 +61,17 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({ attachment, cardId, reF
         return () => clearInterval(timer)
     }, [])
 
+    const handleDownload = (downloadUrl, fileName) => {
+        const link = document.createElement('a')
+        link.href = downloadUrl
+        link.download = fileName
+
+        document.body.appendChild(link)
+        link.click()
+
+        document.body.removeChild(link)
+    }
+
     return (
         <Box sx={{
             display: 'flex',
@@ -71,8 +82,13 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({ attachment, cardId, reF
         }}>
             <Box>
                 {(() => {
-                    switch (attachment.resourceType) {
-                        case 'image':
+                    switch (attachment.format) {
+                        case 'jpg':
+                        case 'jpeg':
+                        case 'png':
+                        case 'gif':
+                        case 'bmp':
+                        case 'webp':
                             return <ObjectFitAvatar
                                 src={attachment.downloadUrl}
                                 alt={null}
@@ -82,7 +98,14 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({ attachment, cardId, reF
                                     borderRadius: '3px'
                                 }}
                             />
-                        case 'video':
+                        case 'mp4':
+                        case 'avi':
+                        case 'mov':
+                        case 'wmv':
+                        case 'flv':
+                        case 'mkv':
+                        case 'webm':
+                        case 'm4v':
                             return <VideoThumnail src={attachment.downloadUrl} />
                         default:
                             return (
@@ -146,7 +169,7 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({ attachment, cardId, reF
                             Added on {attachment.upadteAt}
                         </Box>
                         <Box sx={{ ...dotSx }}>&nbsp;•&nbsp;</Box>
-                        <Box sx={{ ...smallTextSx, ...textButtonSx }} onClick={() => window.open(attachment.downloadUrl, '_blank')}>
+                        <Box sx={{ ...smallTextSx, ...textButtonSx }} onClick={() => handleDownload(attachment.downloadUrl, attachment.originFileName)}>
                             Download
                         </Box>
                         <Box sx={{ ...dotSx }}>&nbsp;•&nbsp;</Box>

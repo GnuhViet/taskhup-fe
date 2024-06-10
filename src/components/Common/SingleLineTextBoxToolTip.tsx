@@ -16,23 +16,23 @@ const overflowDotSx = {
     textOverflow: 'ellipsis'
 }
 
-const slotProps = { popper: { modifiers: [{ name: 'offset', options: { offset: [-30, -30] } }] } }
+const slotProps = { popper: { modifiers: [{ name: 'offset', options: { offset: [-10, 0] } }] } }
 
 const SingleLineTextBoxToolTip: React.FC<SingleLineTextBoxToolTipProps> = ({ sx, text, id }) => {
     const [isEllipsis, setIsEllipsis] = React.useState(false)
+    const elementRef = React.useRef(null)
 
     React.useEffect(() => {
-        const element = document.getElementById(`single-line-tooltip-text-item-${id}`)
-        if (element) {
-            setIsEllipsis(element.scrollWidth > element.clientWidth)
+        if (elementRef.current) {
+            setIsEllipsis(elementRef.current.scrollWidth > elementRef.current.clientWidth)
         }
     }, [id])
 
     return (
         <>
-            <Box sx={{ ...sx, ...overflowDotSx }} id={`single-line-tooltip-text-item-${id}`}>
+            <Box ref={elementRef} sx={{ ...sx, ...overflowDotSx }} >
                 {isEllipsis ? (
-                    <Tooltip title={text} slotProps={slotProps}>
+                    <Tooltip title={text} slotProps={slotProps} placement="bottom-start">
                         <span>{text}</span>
                     </Tooltip>
                 ) : (
