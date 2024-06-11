@@ -132,7 +132,7 @@ const CustomFieldPopoverFC: React.FC<CustomFieldPopoverProps> = ({ id, templateI
         setOptionsItemList([])
         setSelectedType('TEXT')
         reset()
-    }, [open])
+    }, [open, currentMenu])
 
     const [selectedField, setSelectedField] = React.useState(null)
 

@@ -117,17 +117,22 @@ const CardHistorySection: React.FC<SectionProps> = ({ isShowHistory, setIsShowHi
                                 ))}
                                 {activityHistory.length > 0
                                     ?
-                                    <Button
-                                        className="button right-button"
-                                        variant="contained"
-                                        onClick={() => setIsShowAll(true)}
-                                    >
-                                        {isLoadingHistory
-                                            ?
-                                            <ApiLoadingOverlay size='28px' />
-                                            : <>Show all history...</>
+                                    <>
+                                        {
+                                            activityHistory.length >= 9 &&
+                                            <Button
+                                                className="button right-button"
+                                                variant="contained"
+                                                onClick={() => setIsShowAll(true)}
+                                            >
+                                                {isLoadingHistory
+                                                    ?
+                                                    <ApiLoadingOverlay size='28px' />
+                                                    : <>Show all history...</>
+                                                }
+                                            </Button>
                                         }
-                                    </Button>
+                                    </>
                                     :
                                     <Box>
                                         <Box sx={{ ...labelTextSx, ml: '40px' }}>No activity yet</Box>
@@ -135,8 +140,6 @@ const CardHistorySection: React.FC<SectionProps> = ({ isShowHistory, setIsShowHi
                                 }
                             </Box>
                         }
-
-
                     </>
                 }
 

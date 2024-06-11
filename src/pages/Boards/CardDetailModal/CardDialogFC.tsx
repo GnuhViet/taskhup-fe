@@ -328,7 +328,7 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                         }
 
                         {/* Custom field section */}
-                        {data.customFields &&
+                        {data.selectedFieldsValue && data.selectedFieldsValue.length > 0 &&
                             <CustomFieldSection
                                 customFields={data.customFields}
                                 selectedFieldsValue={data.selectedFieldsValue}

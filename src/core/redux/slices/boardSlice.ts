@@ -66,7 +66,25 @@ export const boardSlice = createSlice({
                         column.cardOrderIds = []
                     }
                     const card = mapObject<Card>(action.payload, new Card())
-                    column.cards = [...column.cards, { ...card } as Card]
+                    const cardDetail = { } as Card
+
+                    cardDetail.id = card.id
+                    cardDetail.title = card.title
+                    cardDetail.cover = null
+                    cardDetail.fromDate = null
+                    cardDetail.deadlineDate = null
+                    cardDetail.workingStatus = null
+                    cardDetail.isWatchCard = 0
+                    cardDetail.commentCount = 0
+                    cardDetail.attachmentCount = 0
+                    cardDetail.checkListsItems = '[]'
+                    cardDetail.selectedLabels = []
+                    cardDetail.members = []
+                    cardDetail.boardId = card.boardId
+                    cardDetail.columnId = card.columnId
+
+
+                    column.cards = [...column.cards, { ...cardDetail }]
                     column.cardOrderIds = [...column.cardOrderIds, card.id]
                 }
             })
@@ -155,12 +173,12 @@ export const boardSlice = createSlice({
             state.board = board
             state.boardBackground = board.color
         }),
-        builder.addMatcher(boardTemplateApi.endpoints.getBoardTemplate.matchFulfilled, (state, action) => {
-            state.boardTemplate = action.payload?.data
-        }),
-        builder.addMatcher(boardApi.endpoints.getBoardInfomation.matchFulfilled, (state, action) => {
-            state.boardBackground = action.payload?.data?.color
-        })
+            builder.addMatcher(boardTemplateApi.endpoints.getBoardTemplate.matchFulfilled, (state, action) => {
+                state.boardTemplate = action.payload?.data
+            }),
+            builder.addMatcher(boardApi.endpoints.getBoardInfomation.matchFulfilled, (state, action) => {
+                state.boardBackground = action.payload?.data?.color
+            })
     }
 })
 

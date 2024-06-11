@@ -47,13 +47,13 @@ const compareDate = (inputDate: string) => {
     const now = moment()
     const date = moment(inputDate, DATE_TIME_FORMAT)
 
-    const diff = now.diff(date, 'days')
+    const diff = now.diff(date, 'hours')
 
     if (diff < 0) {
         // The current date is less than the input date
         return -1
-    } else if (diff <= 1) {
-        // The current date is within 1 day of the input date
+    } else if (diff <= 24) {
+        // The current date is within 24 hours of the input date
         return 1
     } else {
         // The current date is more than the input date
