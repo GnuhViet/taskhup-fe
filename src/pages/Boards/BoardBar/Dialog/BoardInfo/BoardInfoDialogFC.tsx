@@ -58,7 +58,6 @@ const BoardInfoDialog: React.FC<DialogProps> = ({ open, handleClose }) => {
         try {
             const res = await loadBoadInfo(boardId).unwrap() as ApiResponse<any>
             setBoardInfo(res?.data)
-            console.log(res)
         } catch (error) {
             console.log(error)
         }
@@ -71,7 +70,6 @@ const BoardInfoDialog: React.FC<DialogProps> = ({ open, handleClose }) => {
             setBoardInfo(null)
             reset()
         }
-        console.log('ability', ability)
     }, [open])
 
     const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<BoardInfoUpdateReq>({

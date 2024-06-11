@@ -12,4 +12,5 @@ export class Board {
     memberIds: string[]
     columnOrderIds: string[]
     columns: Column[]
+    isStarred: boolean
 }

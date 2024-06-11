@@ -118,3 +118,13 @@ export class BoardBgUpdateReq {
     id: string
     color: string
 }
+
+export class BoardStarReq {
+    boardId: string
+    isStarred: boolean
+}
+
+export class RecentBoardReq {
+    boardId: string
+    workspaceId: string
+}

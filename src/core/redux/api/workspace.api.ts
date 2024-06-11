@@ -89,6 +89,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
 export const {
     useCreateWorkspaceMutation,
     useGetUserWorkSpaceQuery,
+    useLazyGetUserWorkSpaceQuery,
     useGetWorkspaceMemberQuery,
     useLazyGetWorkspaceMemberQuery,
     useGetWorkspaceJoinRequestQuery,

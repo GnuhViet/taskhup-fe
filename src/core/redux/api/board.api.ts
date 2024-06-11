@@ -5,7 +5,7 @@ import { apiSlice } from '~/core/redux/api/base.api'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Board } from '../../model/board.model'
 import { create } from 'lodash'
-import { BoardBgUpdateReq, BoardCreateReq, BoardInfoUpdateReq } from '~/core/services/board-services.model'
+import { BoardBgUpdateReq, BoardCreateReq, BoardInfoUpdateReq, BoardStarReq } from '~/core/services/board-services.model'
 
 export type Channel = 'redux' | 'general'
 
@@ -76,6 +76,13 @@ export const boardApi = apiSlice.injectEndpoints({
                 method: 'POST',
                 body: data
             })
+        }),
+        updateStarBoard: builder.mutation({
+            query: (data: BoardStarReq) => ({
+                url: `${API_URL}/board-star`,
+                method: 'POST',
+                body: data
+            })
         })
     })
 })
@@ -92,4 +99,5 @@ export const {
     useLazyGetBoardInfomationQuery,
     useUpdateBoardInfomationMutation,
     useUpdateBoardBackgroundMutation,
+    useUpdateStarBoardMutation,
 } = boardApi

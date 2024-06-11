@@ -22,15 +22,20 @@ import { ConfirmProvider } from 'material-ui-confirm'
 import { Provider } from 'react-redux'
 import { store } from '~/core/redux/store'
 import { setCredentials } from './core/redux/slices/authSlice'
+import { loadRecentBoard } from './core/redux/slices/homeSlice'
 
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 
+// star pre init redux
 const storedToken = localStorage.getItem('auth-token')
 if (storedToken) {
     const token = JSON.parse(storedToken)
-    store.dispatch(setCredentials(token))
+    store.dispatch(setCredentials(token))//
 }
+
+store.dispatch(loadRecentBoard())
+// end pre init redux
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     // <React.StrictMode>

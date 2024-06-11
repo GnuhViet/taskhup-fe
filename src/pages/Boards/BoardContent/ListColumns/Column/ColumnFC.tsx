@@ -147,7 +147,8 @@ const ColumnFC: React.FC<ColumnFCProps> = ({ column, deleteColumnDetails }) => {
                     '*::-webkit-scrollbar-thumb:hover': {
                         backgroundColor: '#acafb9'
                     },
-                    maxHeight: (theme: any) => `calc(${theme.trello.boardContentHeight} - ${theme.spacing(5)})`
+                    // maxHeight: (theme: any) => `calc(${theme.trello.boardContentHeight} - ${theme.spacing(5)})`
+                    maxHeight: '98%',
                 }}
             >
                 {/* Box ColumnFC Header */}

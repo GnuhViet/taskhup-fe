@@ -3,29 +3,12 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
-import Divider from '@mui/material/Divider'
-import ListItemText from '@mui/material/ListItemText'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import Check from '@mui/icons-material/Check'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import BookmarksOutlinedIcon from '@mui/icons-material/BookmarksOutlined'
-import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined'
-import Paper from '@mui/material/Paper'
-import Grid from '@mui/material/Grid'
-import Typography from '@mui/material/Typography'
-import ButtonBase from '@mui/material/ButtonBase'
-import SquareAvatar from '~/components/Common/SquareAvatar'
-import StarBorderRoundedIcon from '@mui/icons-material/StarBorderRounded'
-import StarRateRoundedIcon from '@mui/icons-material/StarRateRounded'
+import AppBarDropDownItem from '~/components/Common/AppBarDropDownItem'
+import { useSelector } from 'react-redux'
+import { Board } from '~/core/model/board.model'
 
-export interface TemplateItemProps {
-    item: {
-        id: string
-        title: string
-        avatar: string
-        usedIn: number
-    }
-}
+import { ReactComponent as NoDataIcon } from '~/assets/no-data.svg'
 
 const Recent: React.FC = () => {
     const [anchorEl, setAnchorEl] = React.useState(null)
@@ -36,53 +19,19 @@ const Recent: React.FC = () => {
     const handleClose = () => {
         setAnchorEl(null)
     }
-
-    const TemplateItem: React.FC<TemplateItemProps> = ({ item }) => {
-        const [anchorElMember, setAnchorElMember] = React.useState(null)
-        const openMember = Boolean(anchorElMember)
-        const handleClose = () => {
-            setAnchorElMember(null)
-        }
-
-        return (
-            <Box sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                width: '280px',
-                height: '40px'
-            }}>
-                <Box sx={{ display: 'flex' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <SquareAvatar
-                            alt={item.title.charAt(0).toUpperCase()}
-                            src={item.avatar}
-                            sx={{
-                                width: 40,
-                                height: 32
-                            }}
-                        />
-                    </Box>
-                    <Box sx={{ ml: '12px' }}>
-                        <Box sx={{ fontSize: '14px' }}>
-                            {item.title}
-                        </Box>
-                        <Box sx={{ fontSize: '12px', color: 'rgba(0, 0, 0, 0.6)' }}>
-                            Used in {item.usedIn} cards
-                        </Box>
-                    </Box>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <StarBorderRoundedIcon />
-                    {/* <StarRateRoundedIcon /> */}
-                </Box>
-            </Box>
-        )
-    }
+    const recentBoard = useSelector((state: any) => state.homeReducer.recentBoard) as Board[]
 
     return (
         <Box>
             <Button
-                sx={{ color: 'black' }}
+                sx={{
+                    color: 'black',
+                    height: '32px',
+                    mt: '3px',
+                    '&:hover': {
+                        boxShadow: 'inset 0 0 0 1000px rgba(0, 0, 0, 0.2)'
+                    }
+                }}
                 id="basic-button-recent"
                 aria-controls={open ? 'basic-menu-recent' : undefined}
                 aria-haspopup="true"
@@ -101,37 +50,47 @@ const Recent: React.FC = () => {
                     'aria-labelledby': 'basic-button-recent'
                 }}
             >
-                <MenuItem>
-                    <TemplateItem item={{
-                        id: 't1',
-                        title: 'Template 1',
-                        avatar: 'https://cdn.britannica.com/70/234870-050-D4D024BB/Orange-colored-cat-yawns-displaying-teeth.jpg',
-                        usedIn: 0
-                    }} />
-                </MenuItem>
-                {/* <MenuItem>
-                    <ListItemText inset>1.15</ListItemText>
-                </MenuItem>
-                <MenuItem>
-                    <ListItemText inset>Double</ListItemText>
-                </MenuItem>
-                <MenuItem>
-                    <ListItemIcon>
-                        <Check />
-                    </ListItemIcon>
-                    Custom: 1.2
-                </MenuItem>
-                <Divider />
-                <MenuItem>
-                    <ListItemText>Add space before paragraph</ListItemText>
-                </MenuItem>
-                <MenuItem>
-                    <ListItemText>Add space after paragraph</ListItemText>
-                </MenuItem>
-                <Divider />
-                <MenuItem>
-                    <ListItemText>Custom spacing...</ListItemText>
-                </MenuItem> */}
+                {(recentBoard && recentBoard.length > 0)
+                    ? recentBoard.map((item: any, index: number) => (
+                        <MenuItem key={`starred-menu-item-${index}`}>
+                            <AppBarDropDownItem item={{
+                                id: item.id,
+                                title: item.title,
+                                description: item.shortDescription,
+                                type: 'board',
+                                starred: item.isStarred,
+                                workspaceId: item.workspaceId,
+                                backgroundUrl: 'https://res.cloudinary.com/dhqx90jaa/image/upload/v1718077281/ywbz7jsardpfpygmim4r.jpg',
+                                backgroundColor: item.color
+                            }} />
+                        </MenuItem>
+                    ))
+                    : <Box
+                        sx={{
+                            width: '200px',
+                            height: '100px',
+                            padding: '0 10px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <NoDataIcon />
+
+                        <Box sx={{
+                            textAlign: 'center',
+                            color: '#44546f',
+                            fontSize: '14px',
+                            fontWeight: '400',
+                            lineHeight: '20px',
+                            mt: '8px'
+                        }}>
+                            {'You don\'t have any recent activity yet.'}
+                        </Box>
+                    </Box>
+                }
+
             </Menu>
         </Box>
     )

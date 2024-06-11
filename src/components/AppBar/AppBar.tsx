@@ -18,6 +18,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import CreateMenu from './Menus/Create'
 import { useNavigate } from 'react-router-dom'
 import { useGetUserInfoQuery } from '~/core/redux/api/user.api'
+import ButtonBase from '@mui/material/ButtonBase'
 
 const AppBar: React.FC = () => {
     const [isFocusSreach, setIsFocusSearch] = useState(false)
@@ -42,34 +43,70 @@ const AppBar: React.FC = () => {
                 backgroundColor: 'white'
             }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <AppsIcon />
-                    <Box
+                    <ButtonBase
+                        sx={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '3px',
+                            cursor: 'pointer',
+                            '&:hover': {
+                                boxShadow: 'inset 0 0 0 1000px rgba(0, 0, 0, 0.2)',
+                            }
+                        }}
+                    >
+                        <Tooltip title="more from us" arrow>
+                            <AppsIcon />
+                        </Tooltip>
+                    </ButtonBase>
+                    <ButtonBase
                         sx={{
                             cursor: 'pointer',
                             minWidth: '100px',
                             minHeight: '32px',
                             borderRadius: '3px',
                             backgroundRepeat: 'no-repeat',
-                            backgroundPosition: 'center center',
-                            backgroundSize: '85px',
-                            backgroundImage: 'url(https://trello.com/assets/d947df93bc055849898e.gif)',
+                            backgroundPosition: 'left center',
+                            backgroundSize: '24px',
+                            // backgroundImage: 'url(https://res.cloudinary.com/dhqx90jaa/image/upload/v1718088753/static-icon.gif)',
                             filter: 'brightness(0) saturate(100%) invert(30%) sepia(53%) saturate(323%) hue-rotate(179deg) brightness(91%) contrast(88%)',
                             '&:hover': {
                                 maxHeight: '100%',
                                 boxShadow: 'inset 0 0 0 1000px rgba(0, 0, 0, 0.2)',
-                                backgroundImage: 'url(https://trello.com/assets/87e1af770a49ce8e84e3.gif)'
+                                // backgroundImage: 'url(https://res.cloudinary.com/dhqx90jaa/image/upload/v1718089078/animated-icon.gif)'
                             }
                         }}
-                        onClick={() => navigate('/home')}
                     >
-                        <Box sx={{}}>
-                            {/*<SvgIcon component={TrelloIcon} fontSize="small" inheritViewBox />*/}
-                            {/*<Typography variant="span" sx={{*/}
-                            {/*    fontSize: '1.2rem',*/}
-                            {/*    fontWeight: 'bold'*/}
-                            {/*}}>Trello</Typography>*/}
+                        <Box
+                            sx={{
+                                zIndex: 20,
+                                m: '4px 4px',
+                                width: '100px',
+                                height: '24px',
+                                backgroundRepeat: 'no-repeat',
+                                backgroundPosition: 'left center',
+                                backgroundSize: '22px',
+                                backgroundImage: 'url(https://res.cloudinary.com/dhqx90jaa/image/upload/v1718088753/static-icon.gif)',
+                                filter: 'brightness(0) saturate(100%) invert(30%) sepia(53%) saturate(323%) hue-rotate(179deg) brightness(91%) contrast(88%)',
+                                '&:hover': {
+                                    backgroundImage: 'url(https://res.cloudinary.com/dhqx90jaa/image/upload/v1718089078/animated-icon.gif)'
+                                }
+                            }}
+                            onClick={() => navigate('/home')}
+                        >
+                            <Box sx={{
+                                position: 'absolute',
+                                top: '-3px',
+                                left: '32px',
+                                fontSize: '21px',
+                                fontStyle: 'normal',
+                                fontWeight: '1000',
+                                zIndex: 10,
+                                userSelect: 'none'
+                            }}>
+                                Home
+                            </Box>
                         </Box>
-                    </Box>
+                    </ButtonBase>
 
                     <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
                         {/* <Workspaces /> */}
@@ -111,7 +148,7 @@ const AppBar: React.FC = () => {
                             )
                         }}
                         sx={{
-                            width: isFocusSreach ? '500px' :'220px',
+                            width: isFocusSreach ? '500px' : '220px',
                             '& label': { color: 'black' },
                             '& input': { color: 'black' },
                             '& label.Mui-focused': { color: 'black' },

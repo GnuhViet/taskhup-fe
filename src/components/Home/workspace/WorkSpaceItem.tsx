@@ -79,7 +79,7 @@ const WorkSpaceItem: React.FC<WorkSpaceItemProps> = ({ workspace }) => {
 
     return (
         <Box>
-            <Box className='section-header' sx={{ display: 'flex', justifyContent: 'space-between', pr: '10px' }}>
+            <Box className='section-header' sx={{ display: 'flex', justifyContent: 'space-between', pr: '10px', minWidth: '920px' }}>
                 <Box className='section-header-title' sx={{ display: 'flex', alignItems: 'center' }}>
                     <SquareAvatar
                         sx={avatarSx}
@@ -106,8 +106,9 @@ const WorkSpaceItem: React.FC<WorkSpaceItemProps> = ({ workspace }) => {
                             title={board.title}
                             workspaceId={workspace.id}
                             desc={board.shortDescription}
-                            starred={false}
-                            backgroundUrl='https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x336/24baa6609b89fb8eb0cc0aceb70eaf36/photo-1557682250-33bd709cbe85.jpg'
+                            starred={board.isStarred}
+                            backgroundColor={board.color}
+                            backgroundUrl='https://res.cloudinary.com/dhqx90jaa/image/upload/v1718077281/ywbz7jsardpfpygmim4r.jpg'
                         />
                     </Box>
                 )}

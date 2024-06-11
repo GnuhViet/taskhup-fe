@@ -2,7 +2,7 @@ import React from 'react'
 
 import HomeFC from '~/pages/Home/HomeFC'
 
-import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+import { RouterProvider, createBrowserRouter, useLocation } from 'react-router-dom'
 import ErrorPage from './pages/Error/ErrorPage'
 
 import RequireAuth from '~/pages/Auth/RequireAuth'
@@ -16,12 +16,14 @@ import JoinInviteFC from './pages/Auth/JoinInviteFC'
 import ProfileFC from './pages/User/ProfileFC'
 import Box from '@mui/material/Box'
 import TinyMce from './components/Common/TinyMce'
+import RouterWrapper from './RouterWrapper'
 
 const router = createBrowserRouter([
     {
         path: '/',
         errorElement: <ErrorPage />,
         // element: <Layout />,
+        element: <RouterWrapper />,
         children: [
             // { path: '', element: <Public/> },
             { path: '/login', element: <LoginFC /> },
