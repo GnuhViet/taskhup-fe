@@ -81,7 +81,12 @@ const ListColumnsFC: React.FC<ListColumnsFCProps> = ({ deleteColumnDetails }) =>
                         mx: 2,
                         borderRadius: '6px',
                         height: 'fit-content',
-                        bgcolor: '#ffffff3d'
+                        // bgcolor: 'black'
+                        bgcolor: '#ffffff3d',
+                        '&:hover': {
+                            bgcolor: '#ffffff4d',
+                            boxShadow: 'inset 0 0 0 1000px rgba(0, 0, 0, 0.4)'
+                        }
                     }}>
                         <Button
                             startIcon={<NoteAddIcon/>}

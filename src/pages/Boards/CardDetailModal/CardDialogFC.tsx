@@ -69,6 +69,8 @@ import DescriptionSection from './CardSections/DescriptionSection'
 import AttachmentSection from './CardSections/AttachmentSection'
 import CommentSection from './CardSections/CommentSection'
 import CardHistorySection from './CardSections/CardHistorySection'
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
+import DeleteCardDialog from './CardPopovers/DeleteCardDialog'
 
 
 interface CardDialogProps {
@@ -192,6 +194,7 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
     const [isOpenMemberDialog, setIsOpenMemberDialog] = React.useState(false)
     const [isOpenChecklistDialog, setIsOpenChecklistDialog] = React.useState(false)
     const [isOpenAttachmentDialog, setIsOpenAttachmentDialog] = React.useState(false)
+    const [isOpenDeleteCardDialog, setIsOpenDeleteCardDialog] = React.useState(false)
 
 
     const [isInsideButton, setIsInsideButton] = React.useState(false)
@@ -206,6 +209,11 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
         setIsOpenChecklistDialog(false)
         setIsOpenAttachmentDialog(false)
         setIsInsideButton(false)
+    }
+
+    const handleCardDelete = () => {
+        setIsOpenDeleteCardDialog(false)
+        handleClose()
     }
 
     const handleOpenMemberDialogInside = (event: any) => {
@@ -488,6 +496,16 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                             cardId={cardId}
                             reFetch={fetchData}
                         />
+
+                        <Box className="button-title" sx={{ ...labelTextSx, mt: '40px' }}>Actions</Box>
+                        <Button
+                            className="button right-button"
+                            variant="contained"
+                            startIcon={<DeleteForeverOutlinedIcon />}
+                            onClick={() => {
+                                setIsOpenDeleteCardDialog(true)
+                            }}
+                        >Delete card</Button>
                     </Box>
 
                 </DialogContent>
@@ -564,6 +582,12 @@ const CardDialogFC: React.FC<CardDialogProps> = ({ open, handleClose, cardId }) 
                         onClose={handleDialogClose}
                         cardId={cardId}
                         reFetch={fetchData}
+                    />
+                    <DeleteCardDialog
+                        id={'delete-card-dialog'}
+                        open={isOpenDeleteCardDialog}
+                        onClose={handleCardDelete}
+                        cardId={cardId}
                     />
                 </Box>
             </Dialog>

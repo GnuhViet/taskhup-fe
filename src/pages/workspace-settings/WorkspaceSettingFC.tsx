@@ -119,12 +119,12 @@ const WorkspaceSettingFC = () => {
 
                         {(() => {
                             switch (selectedButtonId) {
-                            case 'workspace-setting-info-button':
-                                return <WorkSpaceInfoFC />
-                            case 'workspace-setting-role-button':
-                                return <RoleSettingFC />
-                            default:
-                                return null
+                                case 'workspace-setting-info-button':
+                                    return <WorkSpaceInfoFC />
+                                case 'workspace-setting-role-button':
+                                    return <RoleSettingFC />
+                                default:
+                                    return null
                             }
                         })()}
                     </Box>

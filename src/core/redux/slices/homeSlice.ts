@@ -12,6 +12,7 @@ import { set } from 'lodash'
 import { userApi } from '../api/user.api'
 import { UserInfoResponse } from '~/core/services/user-services.model'
 import { enableMapSet } from 'immer'
+import { isBlank } from '~/core/utils/data-utils'
 
 enableMapSet()
 
@@ -21,8 +22,8 @@ export interface BoardState {
     currentActiveWorkspaceId: string
     userInfo: UserInfoResponse
     starredBoard: any[]
-
     recentBoard: Board[]
+    isPrefetchWorkspace: boolean
 }
 
 const initialState: BoardState = {
@@ -31,7 +32,8 @@ const initialState: BoardState = {
     currentActiveWorkspaceId: '',
     userInfo: null,
     starredBoard: [],
-    recentBoard: null
+    recentBoard: null,
+    isPrefetchWorkspace: false
 }
 
 export const homeSlice = createSlice({
@@ -74,6 +76,8 @@ export const homeSlice = createSlice({
 
             boardItem.workspaceId = recentBoard.workspaceId
 
+            if (isBlank(boardItem.id)) return
+
             // Convert Set to Array
             try {
                 const recentBoardArray = [...state.recentBoard]
@@ -111,6 +115,9 @@ export const homeSlice = createSlice({
         loadRecentBoard: (state) => {
             const recentBoardArray = JSON.parse(localStorage.getItem('recent-board')) || []
             state.recentBoard = [...recentBoardArray]
+        },
+        setPrefetchWorkspace: (state) => {
+            state.isPrefetchWorkspace = true
         }
     },
     extraReducers: (builder) => {
@@ -165,6 +172,7 @@ export const {
     addCreatedBoard,
     addRecentBoard,
     loadRecentBoard,
+    setPrefetchWorkspace,
 } = homeSlice.actions
 
 export default homeSlice.reducer

@@ -129,7 +129,7 @@ const SideBarExpandButton: React.FC<SideBarExpandButtonProps> = ({ workSpaceItem
                         <SideBarButton id={`${workSpaceItem.id}-boards-button`}
                             sx={collapseButtonSx} text={'Boards'} icon={<Box sx={iconSx}><TrelloIcon /></Box>} />
                     </Box >
-                    <Box>
+                    <Box onClick={() => navigate(`/w/${workSpaceItem.id}/dashboard`)}>
                         <SideBarButton id={`${workSpaceItem.id}-views-button`}
                             sx={collapseButtonSx} text={'Views'} icon={<GridViewOutlinedIcon sx={iconSx} />} />
                     </Box >

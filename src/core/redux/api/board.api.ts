@@ -5,7 +5,7 @@ import { apiSlice } from '~/core/redux/api/base.api'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Board } from '../../model/board.model'
 import { create } from 'lodash'
-import { BoardBgUpdateReq, BoardCreateReq, BoardInfoUpdateReq, BoardStarReq } from '~/core/services/board-services.model'
+import { BoardBgUpdateReq, BoardCreateReq, BoardInfoUpdateReq, BoardStarReq, DeleteColumReq, UpdateColumTitleReq } from '~/core/services/board-services.model'
 
 export type Channel = 'redux' | 'general'
 
@@ -83,6 +83,31 @@ export const boardApi = apiSlice.injectEndpoints({
                 method: 'POST',
                 body: data
             })
+        }),
+        deleteBoardCard: builder.mutation({
+            query: (cardId: string) => ({
+                url: `${API_URL}/delete-board-card`,
+                method: 'POST',
+                body: {
+                    cardId: cardId
+                }
+            })
+        }),
+        updateColumnTitle: builder.mutation({
+            query: (data: UpdateColumTitleReq) => ({
+                url: `${API_URL}/update-colum-title`,
+                method: 'POST',
+                body: data
+            })
+        }),
+        deleteBoardColumn: builder.mutation({
+            query: (id: string) => ({
+                url: `${API_URL}/delete-colum`,
+                method: 'POST',
+                body: {
+                    id: id
+                }
+            })
         })
     })
 })
@@ -100,4 +125,7 @@ export const {
     useUpdateBoardInfomationMutation,
     useUpdateBoardBackgroundMutation,
     useUpdateStarBoardMutation,
+    useDeleteBoardCardMutation,
+    useUpdateColumnTitleMutation,
+    useDeleteBoardColumnMutation,
 } = boardApi

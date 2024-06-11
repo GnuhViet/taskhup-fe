@@ -86,7 +86,7 @@ function BoardBarFC({ board }) {
                     boxShadow: 'inset 0 0 0 1000px rgba(0, 0, 0, 0.4)'
                 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Tooltip title={board?.description}>
+                        <Tooltip title={'Board infomation'}>
                             <Chip
                                 sx={MENU_STYLES}
                                 icon={<DashboardIcon />}

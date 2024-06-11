@@ -26,13 +26,17 @@ import { useConfirm } from 'material-ui-confirm'
 import React from 'react'
 import { Column } from '~/core/model/column.model'
 import { useStompClient } from 'react-stomp-hooks'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { BoardCardCreateReq } from '~/core/services/board-services.model'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
 import SingleLineTextBoxToolTip from '~/components/Common/SingleLineTextBoxToolTip'
-import { max } from 'lodash'
+import { max, set } from 'lodash'
+import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
+import EditTitleDialog from './EditTitleDialog'
+import { setDisableDrag } from '~/core/redux/slices/boardSlice'
+import DeleteColumDialog from './DeleteColumDialog'
 
 interface ColumnFCProps {
     column: Column
@@ -48,6 +52,20 @@ const ColumnFC: React.FC<ColumnFCProps> = ({ column, deleteColumnDetails }) => {
     const [anchorEl, setAnchorEl] = useState(null)
     const [openNewCardForm, setOpenNewCardForm] = useState(false)
     const [newCardTitle, setNewCardTitle] = useState('')
+
+    const [isOpenEditTitleDialog, setIsOpenEditTitleDialog] = useState(false)
+    const [isOpenDeleteColumnDialog, setIsOpenDeleteColumnDialog] = useState(false)
+
+    const dispatch = useDispatch()
+    const handleClickOpen = async () => {
+        setIsOpenEditTitleDialog(true)
+        await dispatch(setDisableDrag(true))
+    }
+
+    const handleClickOpenDelete = async () => {
+        setIsOpenDeleteColumnDialog(true)
+        await dispatch(setDisableDrag(true))
+    }
 
     // Xử lý xóa một ColumnFC và Cards bên trong nó
     const confirmDeleteColumn = useConfirm()
@@ -97,31 +115,6 @@ const ColumnFC: React.FC<ColumnFCProps> = ({ column, deleteColumnDetails }) => {
         // Đóng trạng thái thêm Card mới & Clear Input
         toggleOpenNewCardForm()
         setNewCardTitle('')
-    }
-
-    const handleDeleteColumn = () => {
-        confirmDeleteColumn({
-            title: 'Delete ColumnFC?',
-            description: 'This action will permanently delete your ColumnFC and its Cards! Are you sure?',
-            confirmationText: 'Confirm',
-            cancellationText: 'Cancel'
-            // buttonOrder: ['confirm', 'cancel']
-            // content: 'test content hehe',
-            // allowClose: false,
-            // dialogProps: { maxWidth: 'lg' },
-            // cancellationButtonProps: { color: 'primary' },
-            // confirmationButtonProps: { color: 'success', variant: 'outlined' },
-            // description: 'Phải nhập chữ trungquandev thì mới được Confirm =))',
-            // confirmationKeyword: 'trungquandev'
-        }).then(() => {
-            /**
-       * Gọi lên props function deleteColumnDetails nằm ở component cha cao nhất (boards/_id.jsx)
-       * Lưu ý: Về sau ở học phần MERN Stack Advance nâng cao học trực tiếp mình sẽ với mình thì chúng ta sẽ đưa dữ liệu Board ra ngoài Redux Global Store,
-       * và lúc này chúng ta có thể gọi luôn API ở đây là xong thay vì phải lần lượt gọi ngược lên những component cha phía bên trên. (Đối với component con nằm càng sâu thì càng khổ :D)
-       * - Với việc sử dụng Redux như vậy thì code sẽ Clean chuẩn chỉnh hơn rất nhiều.
-       */
-            deleteColumnDetails(column.id)
-        }).catch(() => { })
     }
 
     // Phải bọc div ở đây vì vấn đề chiều cao của column khi kéo thả sẽ có bug kiểu kiểu flickering (video 32)
@@ -205,21 +198,29 @@ const ColumnFC: React.FC<ColumnFCProps> = ({ column, deleteColumnDetails }) => {
                                 <ListItemIcon><AddCardIcon className="add-card-icon" fontSize="small" /></ListItemIcon>
                                 <ListItemText>Add new card</ListItemText>
                             </MenuItem>
-                            <MenuItem>
-                                <ListItemIcon><ContentCut fontSize="small" /></ListItemIcon>
-                                <ListItemText>Cut</ListItemText>
+                            <MenuItem
+                                onClick={() => {
+                                    handleClose()
+                                    handleClickOpen()
+                                }}
+                            >
+                                <ListItemIcon><BorderColorOutlinedIcon fontSize="small" /></ListItemIcon>
+                                <ListItemText>Edit title</ListItemText>
                             </MenuItem>
-                            <MenuItem>
+                            {/* <MenuItem>
                                 <ListItemIcon><ContentCopy fontSize="small" /></ListItemIcon>
                                 <ListItemText>Copy</ListItemText>
                             </MenuItem>
                             <MenuItem>
                                 <ListItemIcon><ContentPaste fontSize="small" /></ListItemIcon>
                                 <ListItemText>Paste</ListItemText>
-                            </MenuItem>
+                            </MenuItem> */}
                             <Divider />
                             <MenuItem
-                                onClick={handleDeleteColumn}
+                                onClick={() => {
+                                    handleClose()
+                                    handleClickOpenDelete()
+                                }}
                                 sx={{
                                     '&:hover': {
                                         color: 'warning.dark',
@@ -230,10 +231,10 @@ const ColumnFC: React.FC<ColumnFCProps> = ({ column, deleteColumnDetails }) => {
                                 <ListItemIcon><DeleteForeverIcon className="delete-forever-icon" fontSize="small" /></ListItemIcon>
                                 <ListItemText>Delete this column</ListItemText>
                             </MenuItem>
-                            <MenuItem>
+                            {/* <MenuItem>
                                 <ListItemIcon><Cloud fontSize="small" /></ListItemIcon>
                                 <ListItemText>Archive this column</ListItemText>
-                            </MenuItem>
+                            </MenuItem> */}
                         </Menu>
                     </Box>
                 </Box>
@@ -310,6 +311,19 @@ const ColumnFC: React.FC<ColumnFCProps> = ({ column, deleteColumnDetails }) => {
                         </Box>
                     }
                 </Box>
+
+                <EditTitleDialog
+                    open={isOpenEditTitleDialog}
+                    onClose={() => setIsOpenEditTitleDialog(false)}
+                    oldTitle={column.title}
+                    columnId={column.id}
+                />
+                <DeleteColumDialog
+                    id={`delete-column-dialog-${column.id}`}
+                    open={isOpenDeleteColumnDialog}
+                    onClose={() => setIsOpenDeleteColumnDialog(false)}
+                    columnId={column.id}
+                />
             </Box>
         </div>
     )

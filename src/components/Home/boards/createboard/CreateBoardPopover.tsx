@@ -21,6 +21,8 @@ import { useCreateBoardMutation } from '~/core/redux/api/board.api'
 import { addCreatedBoard } from '~/core/redux/slices/homeSlice'
 import { ApiResponse } from '~/core/services/api.model'
 import { toast } from 'react-toastify'
+import SingleLineTextBoxToolTip from '~/components/Common/SingleLineTextBoxToolTip'
+import { Tooltip } from '@mui/material'
 
 export interface CreateBoardPopoverProps {
     id: string
@@ -159,7 +161,7 @@ const CreateBoardPopover: React.FC<CreateBoardPopoverProps> = ({ id, workspaceId
         }
     })
 
-    const { register, handleSubmit, formState } = form
+    const { register, handleSubmit, formState, getValues } = form
     const { errors } = formState
 
     const [create, { isLoading }] = useCreateBoardMutation()
@@ -282,13 +284,23 @@ const CreateBoardPopover: React.FC<CreateBoardPopoverProps> = ({ id, workspaceId
                                                 transform: 'rotate(-180deg)'
                                             }
                                         },
-                                        zIndex: 9999 // Add this line
+                                        zIndex: 9999, // Add this line
+                                        maxWidth: '276px'
                                     }}
                                     defaultValue={workspaceId} // Add this line
                                     {...register('workspaceId', { required: 'Field is required' })}
                                 >
                                     {workspaces.map((item: WorkSpace) => (
-                                        <Option value={item.id} key={item.id}>{item.title}</Option>
+                                        <Option value={item.id} key={item.id}>
+                                            <SingleLineTextBoxToolTip
+                                                id={`create-board-workspace-select-${item.id}`}
+                                                text={item.title}
+                                                sx={{
+                                                    maxWidth: '250px'
+                                                }}
+                                            />
+                                            {/* {item.title} */}
+                                        </Option>
                                     ))}
                                 </Select>
                             </Box>

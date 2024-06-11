@@ -1,8 +1,8 @@
 import React from 'react'
 import { useLocation, Outlet, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { addRecentBoard } from './core/redux/slices/homeSlice'
-import { RecentBoardReq } from './core/services/board-services.model'
+import { addRecentBoard } from '../core/redux/slices/homeSlice'
+import { RecentBoardReq } from '../core/services/board-services.model'
 
 const RouterWrapper = () => {
     const location = useLocation()

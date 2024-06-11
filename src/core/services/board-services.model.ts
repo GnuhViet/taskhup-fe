@@ -128,3 +128,12 @@ export class RecentBoardReq {
     boardId: string
     workspaceId: string
 }
+
+export class UpdateColumTitleReq {
+    title: string
+    columnId: string
+}
+
+export class DeleteColumReq {
+    id: string
+}

@@ -16,7 +16,9 @@ import JoinInviteFC from './pages/Auth/JoinInviteFC'
 import ProfileFC from './pages/User/ProfileFC'
 import Box from '@mui/material/Box'
 import TinyMce from './components/Common/TinyMce'
-import RouterWrapper from './RouterWrapper'
+import RouterWrapper from './routerwrap/RouterWrapper'
+import HomeWrapper from './routerwrap/HomeWrapper'
+import DashboardFC from './pages/Dashboard/DashboardFC'
 
 const router = createBrowserRouter([
     {
@@ -31,18 +33,24 @@ const router = createBrowserRouter([
             {
                 element: <RequireAuth />,
                 children: [
-                    { path: '/home', element: <HomeFC /> },
-                    { path: '/invite/:id', element: <JoinInviteFC /> },
-                    { path: '/error', element: <ErrorPage /> },
-                    { path: '/profile', element: <ProfileFC /> },
                     {
-                        element: <RequireRole />,
-                        path: '/w/:workspaceId',
+                        element: <HomeWrapper />,
                         children: [
-                            { path: 'settings', element: <WorkspaceSettingFC /> },
-                            { path: 'member', element: <MemberFC /> },
-                            { path: 'b/:boardId', element: <BoardComponentWrap /> }
-                            // { path: '/boards', element: <BoardComponentWrap /> }
+                            { path: '/home', element: <HomeFC /> },
+                            { path: '/invite/:id', element: <JoinInviteFC /> },
+                            { path: '/error', element: <ErrorPage /> },
+                            { path: '/profile', element: <ProfileFC /> },
+                            {
+                                element: <RequireRole />,
+                                path: '/w/:workspaceId',
+                                children: [
+                                    { path: 'dashboard', element: <DashboardFC /> },
+                                    { path: 'settings', element: <WorkspaceSettingFC /> },
+                                    { path: 'member', element: <MemberFC /> },
+                                    { path: 'b/:boardId', element: <BoardComponentWrap /> }
+                                    // { path: '/boards', element: <BoardComponentWrap /> }
+                                ]
+                            }
                         ]
                     }
                 ]
@@ -60,9 +68,9 @@ const App: React.FC = () => {
             <RouterProvider router={router} />
 
             {/* PRE LOAD TINY MCE */}
-            <Box sx={{ display: 'none' }}>
+            {/* <Box sx={{ display: 'none' }}>
                 <TinyMce value={null} setValue={null} />
-            </Box>
+            </Box> */}
             {/* <RouterProvider router={router} /> */}
             {/* <Box sx={{ display: 'none' }}>
                 <BoardComponent />

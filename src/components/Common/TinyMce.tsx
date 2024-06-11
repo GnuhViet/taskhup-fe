@@ -33,7 +33,7 @@ const TinyMce: React.FC<TinyMceProps> = ({ value, setValue, disableAutoFocus, di
 
     return (
         <Editor
-            apiKey='dbg7svsu8ovrt7sgcc1su1vw1rdya8ygm0ll3im2av4185gi'
+            apiKey='qb1sn5smc05czikfntqzx93pg52hvp4j9fwoycii8gi6rtm3'
             init={
                 disableAutoFocus
                     ?

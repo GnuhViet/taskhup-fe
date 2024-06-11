@@ -118,7 +118,7 @@ const MemberFC = () => {
         <>
             <Box className="home-container" sx={{ overflow: 'hidden' }}>
                 <Box className="section-workspace-header" sx={{ overflow: 'hidden' }}>
-                    <Box className="section-header-content">
+                    <Box className="section-header-content" sx={{ minWidth: '1050px!important' }}>
                         <Box className="workspace-title">
                             <Box className="title-main">
                                 <SquareAvatar sx={avatarSx} src={workspaceInfo?.avatarUrl} alt={workspaceInfo.title.charAt(0)} />
@@ -187,63 +187,63 @@ const MemberFC = () => {
 
                         {(() => {
                             switch (selectedButtonId) {
-                            case 'workspace-member-button':
-                                return <>
-                                    <WorkSpaceMember />
-                                </>
-                            case 'workspace-guest-button':
-                                return <>
-                                    <Box>
-                                        <Box sx={{ ...borderBottom, pb: '14px' }}>
-                                            <Box sx={headingSx}>Guests (1)</Box>
-                                            <Box sx={textSx}>Guests are not included in your Premium account. Guests can only view and edit the boards to which they’ve been added.</Box>
-                                        </Box>
-                                        <Box sx={{ ...borderBottom, p: '24px 0 24px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <Box sx={{ maxWidth: '600px' }}>
-                                                <Box sx={headingSx}>Single-board guests (1)</Box>
-                                                <Box sx={textSx}>Single-board guests are members of only one Workspace board and free on your Premium plan.</Box>
-                                            </Box>
-                                            <Button sx={{ ...buttonSx, mr: 0 }} variant='contained' startIcon={<GroupAddOutlinedIcon />}>Invite with link</Button>
-                                        </Box>
-                                        <Box sx={{ ...borderBottom, p: '24px 0 12px 0' }}>
-                                            <TextField
-                                                placeholder='Filter by name...'
-                                                size='small'
-                                                sx={{ width: '450px' }}
-                                            />
-                                        </Box>
+                                case 'workspace-member-button':
+                                    return <>
+                                        <WorkSpaceMember />
+                                    </>
+                                case 'workspace-guest-button':
+                                    return <>
                                         <Box>
-                                            {new Array(4).fill(null).map((item, index) => (
-                                                <Box key={index} sx={{ ...borderBottom, p: '16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                        <CircleAvatar sx={{ minWidth: '42px', minHeight: '42px', fontSize: '16px', mr: '12px', background: '#5243AA' }} src={null} alt='V' />
-                                                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                                            <Box sx={{ fontSize: '16px', fontWeight: '800', color: '#172B4D' }}>Việt Hưng Nguyễn</Box>
-                                                            <Box sx={{ fontSize: '14px', fontWeight: '400', color: '#44546f', display: 'flex' }}>
-                                                                <Box>@vithngnguyn16</Box>
-                                                                <Box sx={{ fontSize: '20px', display: 'flex', alignItems: 'center', lineHeight: '14px' }}>
+                                            <Box sx={{ ...borderBottom, pb: '14px' }}>
+                                                <Box sx={headingSx}>Guests (1)</Box>
+                                                <Box sx={textSx}>Guests are not included in your Premium account. Guests can only view and edit the boards to which they’ve been added.</Box>
+                                            </Box>
+                                            <Box sx={{ ...borderBottom, p: '24px 0 24px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <Box sx={{ maxWidth: '600px' }}>
+                                                    <Box sx={headingSx}>Single-board guests (1)</Box>
+                                                    <Box sx={textSx}>Single-board guests are members of only one Workspace board and free on your Premium plan.</Box>
+                                                </Box>
+                                                <Button sx={{ ...buttonSx, mr: 0 }} variant='contained' startIcon={<GroupAddOutlinedIcon />}>Invite with link</Button>
+                                            </Box>
+                                            <Box sx={{ ...borderBottom, p: '24px 0 12px 0' }}>
+                                                <TextField
+                                                    placeholder='Filter by name...'
+                                                    size='small'
+                                                    sx={{ width: '450px' }}
+                                                />
+                                            </Box>
+                                            <Box>
+                                                {new Array(4).fill(null).map((item, index) => (
+                                                    <Box key={index} sx={{ ...borderBottom, p: '16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                            <CircleAvatar sx={{ minWidth: '42px', minHeight: '42px', fontSize: '16px', mr: '12px', background: '#5243AA' }} src={null} alt='V' />
+                                                            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                                                <Box sx={{ fontSize: '16px', fontWeight: '800', color: '#172B4D' }}>Việt Hưng Nguyễn</Box>
+                                                                <Box sx={{ fontSize: '14px', fontWeight: '400', color: '#44546f', display: 'flex' }}>
+                                                                    <Box>@vithngnguyn16</Box>
+                                                                    <Box sx={{ fontSize: '20px', display: 'flex', alignItems: 'center', lineHeight: '14px' }}>
                                                                         &nbsp;•&nbsp;
+                                                                    </Box>
+                                                                    <Box>Joined 1 month ago</Box>
                                                                 </Box>
-                                                                <Box>Joined 1 month ago</Box>
                                                             </Box>
                                                         </Box>
+                                                        <Box>
+                                                            <Button sx={{ ...buttonSx }} variant='contained'>View boards (3)</Button>
+                                                            <Button sx={{ ...buttonSx }} variant='contained' startIcon={<BadgeOutlinedIcon sx={{ mb: '4px' }} />}>Role</Button>
+                                                            <Button sx={{ ...buttonSx, mr: 0 }} variant='contained' startIcon={<CloseOutlinedIcon />}>Leave&nbsp;...</Button>
+                                                        </Box>
                                                     </Box>
-                                                    <Box>
-                                                        <Button sx={{ ...buttonSx }} variant='contained'>View boards (3)</Button>
-                                                        <Button sx={{ ...buttonSx }} variant='contained' startIcon={<BadgeOutlinedIcon sx={{ mb: '4px' }} />}>Role</Button>
-                                                        <Button sx={{ ...buttonSx, mr: 0 }} variant='contained' startIcon={<CloseOutlinedIcon />}>Leave&nbsp;...</Button>
-                                                    </Box>
-                                                </Box>
-                                            ))}
+                                                ))}
+                                            </Box>
                                         </Box>
-                                    </Box>
-                                </>
-                            case 'workspace-join-request-button':
-                                return <>
-                                    <JoinRequest />
-                                </>
-                            default:
-                                return null
+                                    </>
+                                case 'workspace-join-request-button':
+                                    return <>
+                                        <JoinRequest />
+                                    </>
+                                default:
+                                    return null
                             }
                         })()}
                     </Box>
