@@ -19,6 +19,7 @@ import TinyMce from './components/Common/TinyMce'
 import RouterWrapper from './routerwrap/RouterWrapper'
 import HomeWrapper from './routerwrap/HomeWrapper'
 import DashboardFC from './pages/Dashboard/DashboardFC'
+import BoardGridFC from './pages/BoardGrid/BoardGridFC'
 
 const router = createBrowserRouter([
     {
@@ -44,6 +45,7 @@ const router = createBrowserRouter([
                                 element: <RequireRole />,
                                 path: '/w/:workspaceId',
                                 children: [
+                                    { path: 'board-grid', element: <BoardGridFC /> },
                                     { path: 'dashboard', element: <DashboardFC /> },
                                     { path: 'settings', element: <WorkspaceSettingFC /> },
                                     { path: 'member', element: <MemberFC /> },

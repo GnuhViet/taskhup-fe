@@ -125,7 +125,7 @@ const SideBarExpandButton: React.FC<SideBarExpandButtonProps> = ({ workSpaceItem
             </ListItemButton>
             <Collapse in={open} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                    <Box >
+                    <Box onClick={() => navigate(`/w/${workSpaceItem.id}/board-grid`)}>
                         <SideBarButton id={`${workSpaceItem.id}-boards-button`}
                             sx={collapseButtonSx} text={'Boards'} icon={<Box sx={iconSx}><TrelloIcon /></Box>} />
                     </Box >

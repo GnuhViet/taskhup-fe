@@ -89,7 +89,7 @@ const WorkSpaceItem: React.FC<WorkSpaceItemProps> = ({ workspace }) => {
                     <TextBoxToolTip sx={titleSx} text={workspace?.title.toUpperCase()} id={workspace?.id} breakOnLine={1} />
                 </Box>
                 <Box sx={{ minWidth: '592px' }}>
-                    <Button sx={{ ...buttonSx }} variant='contained' startIcon={<TrelloIcon />}>Boards</Button>
+                    <Button sx={{ ...buttonSx }} variant='contained' startIcon={<TrelloIcon />} onClick={() => navigate(`/w/${workspace.id}/board-grid`)}>Boards</Button>
                     <Button sx={{ ...buttonSx }} variant='contained' startIcon={<GridViewOutlinedIcon />} onClick={() => navigate(`/w/${workspace.id}/dashboard`)}>Views</Button>
                     <Button sx={{ ...buttonSx }} variant='contained' startIcon={<PermIdentityOutlinedIcon />} onClick={() => navigate(`/w/${workspace.id}/member`)}>Members ({workspace.memberCount})</Button>
                     <Button sx={{ ...buttonSx }} variant='contained' startIcon={<SettingsOutlinedIcon />} onClick={() => navigate(`/w/${workspace.id}/settings`)}>Settings</Button>

@@ -49,6 +49,10 @@ export const homeSlice = createSlice({
         addCreatedWorkSpace: (state, action: PayloadAction<WorkSpace>) => {
             const workspace = { ...action.payload } as WorkSpace
             workspace.type = 'JOINED'
+            workspace.canCreateBoard = true
+            workspace.avatarUrl = null
+            workspace.memberCount = 1
+            workspace.boards = []
             state.workspace = [...state.workspace, workspace]
         },
         addCreatedBoard: (state, action: PayloadAction<BoardCreateResp>) => {
