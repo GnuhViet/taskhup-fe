@@ -10,6 +10,7 @@ import WorkSpaceItem from '~/components/Home/workspace/WorkSpaceItem'
 import { useGetUserWorkSpaceQuery } from '~/core/redux/api/workspace.api'
 import { WorkSpace } from '~/core/model/workspace.model'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 const iconSx = {
     fontSize: '16px'
@@ -27,6 +28,7 @@ const workspaceItemSx = {
 
 const HomeFC = () => {
     const workspace = useSelector((state: any) => state.homeReducer.workspace) as WorkSpace[]
+    // const navigate = useNavigate()
 
     const { error, isLoading } = useGetUserWorkSpaceQuery({})
     // const response = data as ApiResponse<GetWorkSpaceResp>
@@ -45,7 +47,7 @@ const HomeFC = () => {
                         <List className="top-button">
                             <SideBarButton id={'workspace-button'} text={'Word Spaces'} icon={<TrelloIcon style={iconSx} />} defaultSelected />
                             <SideBarButton id={'activity-button'} text={'My Activity'} icon={<InsightsOutlinedIcon sx={iconSx} />} />
-                            <SideBarButton id={'home-button'} text={'Home'} icon={<HomeOutlinedIcon sx={iconSx} />} />
+                            {/* <SideBarButton id={'home-button'} text={'Home'} icon={<HomeOutlinedIcon sx={iconSx} />} /> */}
                         </List>
                         <List className="work-spaces" sx={{ overflow: 'auto', maxHeight: 'calc(100vh - 200px)' }}>
                             <Box className="title">WordSpaces</Box>

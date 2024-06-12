@@ -287,7 +287,6 @@ const BoardInfoDialog: React.FC<DialogProps> = ({ open, handleClose }) => {
                                     </Box>
                                 </Box>
                             </Box>
-                            <BackgroundColorSection refetch={fetchBoardInfo} />
                         </Box>
                         <Box >
                             <Box sx={{ mb: '18px' }}>
@@ -341,6 +340,9 @@ const BoardInfoDialog: React.FC<DialogProps> = ({ open, handleClose }) => {
                                 </Box>
                             </Box>
                         </Box>
+                    </Box>
+                    <Box>
+                        <BackgroundColorSection refetch={fetchBoardInfo} />
                     </Box>
 
 

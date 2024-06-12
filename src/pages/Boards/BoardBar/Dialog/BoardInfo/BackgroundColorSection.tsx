@@ -52,7 +52,15 @@ const BackgroundColorSection: React.FC<BackgroundItemProps> = ({ refetch }) => {
         5: { color: 'linear-gradient(to bottom right, #FF3344, #FF99FF)' },
         6: { color: 'linear-gradient(to bottom right, #A1D1FF, #B3E0FF)' },
         7: { color: 'linear-gradient(to bottom right, #FFA1C1, #FFB3D4)' },
-        8: { color: 'linear-gradient(to bottom right, #D1A1FF, #E0B3FF)' }
+        8: { color: 'linear-gradient(to bottom right, #D1A1FF, #E0B3FF)' },
+        9: { color: 'linear-gradient(to bottom right, #FFA1A1, #FFB3B3)' },
+        10: { color: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)' },
+        11: { color: 'linear-gradient(to bottom right, #A1A1FF, #B3B3FF)' },
+        12: { color: 'linear-gradient(45deg, #9C27B0 30%, #E040FB 90%)' },
+        13: { color: 'linear-gradient(45deg, #FF3D00 30%, #FF9100 90%)' },
+        14: { color: 'linear-gradient(45deg, #4CAF50 30%, #8BC34A 90%)' },
+        15: { color: 'linear-gradient(to bottom right, #FFA1FF, #FFB3FF)' },
+        16: { color: 'linear-gradient(45deg, #607D8B 30%, #9E9E9E 90%)' }
     }
 
     const [selectedColor, setSelectedColor] = React.useState(null)
@@ -61,7 +69,7 @@ const BackgroundColorSection: React.FC<BackgroundItemProps> = ({ refetch }) => {
         return (
             <Box
                 sx={{
-                    width: '110px',
+                    width: '124px',
                     height: '62px',
                     background: color,
                     borderRadius: '8px',
@@ -109,7 +117,7 @@ const BackgroundColorSection: React.FC<BackgroundItemProps> = ({ refetch }) => {
             <Box
                 sx={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(4, 1fr)',
+                    gridTemplateColumns: 'repeat(8, 1fr)',
                     gap: '10px'
                 }}
             >

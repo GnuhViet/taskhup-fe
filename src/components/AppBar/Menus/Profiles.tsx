@@ -59,13 +59,17 @@ const Profiles: React.FC = () => {
                 }}
             >
                 <MenuItem onClick={() => navigate('/profile')}>
-                    <Avatar sx={{ width: 28, height: 28, mr: 2 }} /> Profile
+                    <Avatar
+                        sx={{ width: 28, height: 28, mr: 2 }}
+                        alt={userInfo?.fullName}
+                        src={userInfo?.avatar}
+                    /> Profile
                 </MenuItem>
-                <MenuItem>
+                {/* <MenuItem>
                     <Avatar sx={{ width: 28, height: 28, mr: 2 }} /> My account
-                </MenuItem>
+                </MenuItem> */}
                 <Divider />
-                <MenuItem>
+                {/* <MenuItem>
                     <ListItemIcon>
                         <PersonAdd fontSize="small" />
                     </ListItemIcon>
@@ -76,7 +80,7 @@ const Profiles: React.FC = () => {
                         <Settings fontSize="small" />
                     </ListItemIcon>
                     Settings
-                </MenuItem>
+                </MenuItem> */}
                 <MenuItem onClick={() => dispatch(logOut())}>
                     <ListItemIcon>
                         <Logout fontSize="small" />

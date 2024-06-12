@@ -71,10 +71,10 @@ const titleSx = {
 }
 
 const backGroundUrlList = {
-    img1: 'https://images.unsplash.com/photo-1713187340827-45c991f6eecd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MDY2fDB8MXxjb2xsZWN0aW9ufDF8MzE3MDk5fHx8fHwyfHwxNzEzNDAzMTk1fA&ixlib=rb-4.0.3&q=80&w=400&quot',
-    img2: 'https://images.unsplash.com/photo-1713196157990-ea5ddd26fed7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MDY2fDB8MXxjb2xsZWN0aW9ufDJ8MzE3MDk5fHx8fHwyfHwxNzEzNDAzMTk1fA&ixlib=rb-4.0.3&q=80&w=400&quot',
-    img3: 'https://images.unsplash.com/photo-1712312640787-a0b0cc94356e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MDY2fDB8MXxjb2xsZWN0aW9ufDN8MzE3MDk5fHx8fHwyfHwxNzEzNDAzMTk1fA&ixlib=rb-4.0.3&q=80&w=400&quot',
-    img4: 'https://images.unsplash.com/photo-1712839398257-8f7ee9127998?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MDY2fDB8MXxjb2xsZWN0aW9ufDR8MzE3MDk5fHx8fHwyfHwxNzEzNDAzMTk1fA&ixlib=rb-4.0.3&q=80&w=400&quot',
+    img1: '#1976d2',
+    img2: 'linear-gradient(to bottom right, #FF5733, #FFC300)',
+    img3: 'linear-gradient(to bottom right, #3385FF, #D433FF)',
+    img4: 'linear-gradient(to bottom right, #FF33A1, #FF3333)',
     color1: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
     color2: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
     color3: 'linear-gradient(45deg, #FF3D00 30%, #FF9100 90%)',
@@ -103,6 +103,11 @@ const CreateBoardPopover: React.FC<CreateBoardPopoverProps> = ({ id, workspaceId
         setBackgroundType(type)
     }
 
+    React.useEffect(() => {
+        setBackGroundData(backGroundUrlList.img1)
+        reset()
+    }, [open])
+
     const BackgourndUrlSelect: React.FC<BackgourndSelectProps> = ({ id, data, selectedId }) => {
         return (
             <Box
@@ -110,7 +115,7 @@ const CreateBoardPopover: React.FC<CreateBoardPopoverProps> = ({ id, workspaceId
                     width: '64px',
                     height: '40px',
                     borderRadius: '3px',
-                    backgroundImage: `url(${data})`,
+                    background: `${data}`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     display: 'flex',
@@ -156,12 +161,12 @@ const CreateBoardPopover: React.FC<CreateBoardPopoverProps> = ({ id, workspaceId
     const form = useForm<BoardCreateReq>({
         defaultValues: {
             title: '',
-            background: '',
+            background: backGroundUrlList.img1,
             workspaceId: workspaceId === undefined ? '' : workspaceId
         }
     })
 
-    const { register, handleSubmit, formState, getValues } = form
+    const { register, handleSubmit, formState, getValues, reset } = form
     const { errors } = formState
 
     const [create, { isLoading }] = useCreateBoardMutation()
@@ -169,6 +174,7 @@ const CreateBoardPopover: React.FC<CreateBoardPopoverProps> = ({ id, workspaceId
     const onSubmit: SubmitHandler<BoardCreateReq> = async (data) => {
         try {
             data.background = backGroundData
+            console.log(data)
 
             const resp = await create(data).unwrap() as ApiResponse<BoardCreateResp>
             dispatch(addCreatedBoard(resp.data))
@@ -232,7 +238,7 @@ const CreateBoardPopover: React.FC<CreateBoardPopoverProps> = ({ id, workspaceId
                             <Box sx={{
                                 width: '200px', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 borderRadius: '3px',
-                                backgroundImage: backgroundType === BackgroundType.URL ? `url(${backGroundData})` : backGroundData,
+                                background: backGroundData,
                                 backgroundSize: 'cover',
                                 backgroundPosition: 'center'
                             }}>
@@ -311,7 +317,7 @@ const CreateBoardPopover: React.FC<CreateBoardPopoverProps> = ({ id, workspaceId
                                 sx={{ height: '32px', m: '16px 0 8px 0' }}
                                 disabled={!formState.isValid}>Create</Button>
                             <Box sx={{ maxWidth: '276px', fontSize: '12px', mt: '8px' }}>
-                                By using images from Unsplash, you agree to their <a href="https://unsplash.com/license" target="_blank" rel="noreferrer">license</a> and <a href="https://unsplash.com/terms" target="_blank" rel="noreferrer">Terms of Service</a>
+                                You can update board data later on the board settings in board detail menu.
                             </Box>
                         </form>
                     </Box>

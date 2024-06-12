@@ -166,7 +166,7 @@ const MemberFC = () => {
                         <List className="top-button">
                             <Box className="title">Collaborators</Box>
                             <SideBarButton id={'workspace-member-button'} text={'Workspace members'} defaultSelected />
-                            <SideBarButton id={'workspace-guest-button'} text={'Guests'} />
+                            {/* <SideBarButton id={'workspace-guest-button'} text={'Guests'} /> */}
                         </List>
                         <List className="work-spaces" sx={{ overflow: 'auto', maxHeight: 'calc(100vh - 200px)' }}>
                             <SideBarButton id={'workspace-join-request-button'} text={'Join requests'} />

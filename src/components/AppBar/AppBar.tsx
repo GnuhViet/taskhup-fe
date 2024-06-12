@@ -168,7 +168,7 @@ const AppBar: React.FC = () => {
                         </Badge>
                     </Tooltip>
 
-                    <Tooltip title="Help">
+                    <Tooltip title="Click to dowload tutorial document" arrow>
                         <HelpOutlineIcon sx={{ cursor: 'pointer' }} />
                     </Tooltip>
 
