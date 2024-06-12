@@ -4,13 +4,13 @@ import ReactApexChart from 'react-apexcharts'
 import ApiLoadingOverlay from '~/components/Common/ApiLoadingOverlay'
 
 export interface Series {
-    name: string // column title
     data: SeriesData[]
 }
 
 export interface SeriesData {
     x: string // task title
     y: any[] // start and end date
+    // fillColor: string // board color
 }
 
 const options = {
@@ -51,57 +51,43 @@ const options = {
 }
 
 export interface TimelineCharstProps {
-    boardInfo: any
+    listBoardInfo: any
 }
 
-const buildTimeLineChartData = (boardInfo: any): Series[] => {
+const buildTimeLineChartData = (listBoardInfo: any): Series[] => {
     const series: Series[] = []
 
-    // sort columns by boardInfo.columnOrderIds (id,id,id)
-    const sortedColumns = [...boardInfo.columns].sort((a: any, b: any) => {
-        return boardInfo.columnOrderIds.indexOf(a.id) - boardInfo.columnOrderIds.indexOf(b.id)
-    })
+    // oder board by start date
+    // need to clone obj
+    const sortedBoard = [...listBoardInfo]
+        .sort((a: any, b: any) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
 
-    sortedColumns?.map((column: any) => {
-        const name = column.title
 
-        const seriesData: SeriesData[] = []
+    sortedBoard.forEach((board: any) => {
+        const data: SeriesData[] = []
 
-        // sort cards by column.cardOrderIds (id,id,id)
-        const sortedCards = [...column.cards].sort((a: any, b: any) => {
-            return column.cardOrderIds.indexOf(a.id) - column.cardOrderIds.indexOf(b.id)
+        if (!board.startDate || !board.endDate) return
+
+        data.push({
+            x: board.title,
+            y: [new Date(board.startDate).getTime(), new Date(board.endDate).getTime()]
+            // fillColor: board.color // give random hex color
         })
 
-        sortedCards?.map((card: any) => {
-            const members = card.members.map((member: any) => member.fullName).join(', ')
-
-            if (!card.fromDate || !card.deadlineDate) return
-
-            const data: SeriesData = {
-                x: `${card.title} by ${members}`,
-                y: [new Date(card.fromDate).getTime(), new Date(card.deadlineDate).getTime()]
-            }
-
-            seriesData.push(data)
+        series.push({
+            data: data
         })
-
-        const serie: Series = {
-            name: name,
-            data: seriesData
-        }
-
-        series.push(serie)
     })
 
     return series
 }
 
-const TaskTimelineChart: React.FC<TimelineCharstProps> = ({ boardInfo }) => {
+const WorkspaeTimelineChart: React.FC<TimelineCharstProps> = ({ listBoardInfo }) => {
     const [data, setData] = React.useState(null)
 
     const buildData = async () => {
 
-        const series = await buildTimeLineChartData(boardInfo)
+        const series = await buildTimeLineChartData(listBoardInfo)
 
         setData({
             series: series,
@@ -110,9 +96,9 @@ const TaskTimelineChart: React.FC<TimelineCharstProps> = ({ boardInfo }) => {
     }
 
     React.useEffect(() => {
-        if (!boardInfo) return
+        if (!listBoardInfo) return
         buildData()
-    }, [boardInfo])
+    }, [listBoardInfo])
 
     if (!data) {
         return (
@@ -125,4 +111,4 @@ const TaskTimelineChart: React.FC<TimelineCharstProps> = ({ boardInfo }) => {
     )
 }
 
-export default TaskTimelineChart
+export default WorkspaeTimelineChart

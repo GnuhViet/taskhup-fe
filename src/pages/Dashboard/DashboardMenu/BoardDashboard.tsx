@@ -1,10 +1,10 @@
 import React from 'react'
 import Box from '@mui/material/Box'
 import ApiLoadingOverlay from '~/components/Common/ApiLoadingOverlay'
-import TaskTimelineChart from '../Charts/TaskTimelineChart'
-import TaskWorkingStatusChart from '../Charts/TaskWorkingStatusChart'
-import MemberWorkingStatusChart from '../Charts/MemberWorkingStatusChart'
-import TaskCountChart from '../Charts/TaskCountChart'
+import TaskTimelineChart from '../Charts/Board/TaskTimelineChart'
+import TaskWorkingStatusChart from '../Charts/Board/TaskWorkingStatusChart'
+import MemberWorkingStatusChart from '../Charts/Board/MemberWorkingStatusChart'
+import TaskCountChart from '../Charts/Board/TaskCountChart'
 
 interface BoardDashboardProps {
     selectedBoard: any

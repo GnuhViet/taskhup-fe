@@ -70,10 +70,11 @@ const TaskWorkingStatusChart: React.FC<TimelineCharstProps> = ({ boardInfo }) =>
                             total: {
                                 show: true,
                                 label: 'Total',
-                                // formatter: function (w: any) {
-                                //     // By default this function returns the average of all series. The below is just an example to show the use of custom formatter function
-                                //     return 249
-                                // }
+                                formatter: function (w: any) {
+                                    const series = w?.config?.series
+                                    const avg = parseFloat((series.reduce((a: number, b: number) => a + b, 0) / series.length).toFixed(2));
+                                    return `${avg}%`
+                                }
                             }
                         }
                     }

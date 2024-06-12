@@ -13,13 +13,14 @@ import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { useLazyGetBoardByCodeQuery, useLazyGetBoardInfomationQuery } from '~/core/redux/api/board.api'
 import { Board } from '~/core/model/board.model'
-import TimelineCharst from './Charts/TaskTimelineChart'
+import TimelineCharst from './Charts/Board/TaskTimelineChart'
 import SideBarButton from '~/components/Home/sidebar/SideBarButton'
 import List from '@mui/material/List'
 import BoardDashboard from './DashboardMenu/BoardDashboard'
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
+import WorkspaceDashboard from './DashboardMenu/WorkspaceDashboard'
 
 const avatarSx = {
     minWidth: '60px',
@@ -69,7 +70,7 @@ const DashboardFC = () => {
         }
 
         setListBoardInfo(boardInfoList)
-        console.log(boardInfoList)
+        // console.log(boardInfoList)
     }
 
     React.useEffect(() => {
@@ -190,11 +191,14 @@ const DashboardFC = () => {
                         <SideBarButton id={`workspace-dashboard-item-${workspaceId}`} text={'Workspace dashboard'} defaultSelected />
                     </List>
                     <List className="work-spaces" sx={{ overflow: 'auto', maxHeight: 'calc(100vh - 200px)' }}>
-                        {listBoardInfo?.map((board: any, index: number) => (
-                            <Box key={index} onClick={() => setSelectedBoard(board)}>
-                                <SideBarButton id={`single-board-dashboard-${board.id}`} text={board.title} />
-                            </Box>
-                        ))}
+                        {listBoardInfo
+                            ?.filter((board: any) => board.startDate && board.endDate)
+                            .sort((a: any, b: any) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+                            .map((board: any, index: number) => (
+                                <Box key={index} onClick={() => setSelectedBoard(board)}>
+                                    <SideBarButton id={`single-board-dashboard-${board.id}`} text={board.title} />
+                                </Box>
+                            ))}
                     </List>
                 </Box>
 
@@ -206,12 +210,12 @@ const DashboardFC = () => {
                         maxWidth: '1200px !important'
                     }}>
                     {selectedButtonId === `workspace-dashboard-item-${workspaceId}`
-                        ? <></>
-                        : <Box>
-                            <BoardDashboard
-                                selectedBoard={selectedBoard}
-                            />
-                        </Box>
+                        ? <WorkspaceDashboard
+                            listBoardInfo={listBoardInfo}
+                        />
+                        : <BoardDashboard
+                            selectedBoard={selectedBoard}
+                        />
                     }
                 </Box>
             </Box>
